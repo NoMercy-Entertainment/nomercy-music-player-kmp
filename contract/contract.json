@@ -1,0 +1,2405 @@
+{
+  "version": "2.0.1",
+  "provenance": {
+    "version": "2.0.1",
+    "commit": "523bf4b",
+    "commitsAheadOfTag": 1,
+    "dirty": false
+  },
+  "events": [
+    {
+      "name": "activity",
+      "payload": "{ active: boolean }",
+      "map": "base"
+    },
+    {
+      "name": "audioTrack",
+      "payload": "{ id: number | null }",
+      "map": "base"
+    },
+    {
+      "name": "audioTrackPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "audioTrackState",
+      "payload": "{ state: 'default' | 'manual' }",
+      "map": "base"
+    },
+    {
+      "name": "auth:failed",
+      "payload": "{ error: PlayerErrorEvent['error'] }",
+      "map": "base"
+    },
+    {
+      "name": "auth:refreshed",
+      "payload": "{ tokenAcquiredAt: number }",
+      "map": "base"
+    },
+    {
+      "name": "authReady",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "authReadyError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "backend:changed",
+      "payload": "{ kind: string }",
+      "map": "base"
+    },
+    {
+      "name": "backend:error",
+      "payload": "{ error: PlayerErrorEvent['error']; kind: string }",
+      "map": "base"
+    },
+    {
+      "name": "backend:loaded",
+      "payload": "{ url: string; kind: string; duration: number }",
+      "map": "base"
+    },
+    {
+      "name": "backend:loading",
+      "payload": "{ url: string; kind: string }",
+      "map": "base"
+    },
+    {
+      "name": "backend:ratechange",
+      "payload": "{ rate: number }",
+      "map": "base"
+    },
+    {
+      "name": "backend:stalled",
+      "payload": "{ time: number }",
+      "map": "base"
+    },
+    {
+      "name": "backend:waiting",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "backlog",
+      "payload": "I[]",
+      "map": "base"
+    },
+    {
+      "name": "backlog:append",
+      "payload": "{ items: I[] }",
+      "map": "base"
+    },
+    {
+      "name": "backlog:clear",
+      "payload": "{ previousLength: number }",
+      "map": "base"
+    },
+    {
+      "name": "backlog:remove",
+      "payload": "{ id: string | number; index: number; item: I }",
+      "map": "base"
+    },
+    {
+      "name": "beforeAudioTrack",
+      "payload": "BeforeEvent<{ id: number }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeDispose",
+      "payload": "BeforeEvent<void>",
+      "map": "base"
+    },
+    {
+      "name": "beforeLanguage",
+      "payload": "BeforeEvent<{ lang: string }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeLoad",
+      "payload": "BeforeEvent<{ item: I; source?: ActionSource }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeMutation",
+      "payload": "BeforeEvent<{\n\t\tmethod: string;\n\t\targs: ReadonlyArray<unknown>;\n\t\tphase: PlayerPhase;\n\t\tdispatchStack: ReadonlyArray<string>;\n\t}>",
+      "map": "base"
+    },
+    {
+      "name": "beforeMute",
+      "payload": "BeforeEvent<{ muted: boolean }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeNext",
+      "payload": "BeforeEvent<ActionOptions>",
+      "map": "base"
+    },
+    {
+      "name": "beforePause",
+      "payload": "BeforeEvent<ActionOptions>",
+      "map": "base"
+    },
+    {
+      "name": "beforePlay",
+      "payload": "BeforeEvent<ActionOptions>",
+      "map": "base"
+    },
+    {
+      "name": "beforePlaybackRate",
+      "payload": "BeforeEvent<{ rate: number }>",
+      "map": "base"
+    },
+    {
+      "name": "beforePrevious",
+      "payload": "BeforeEvent<ActionOptions>",
+      "map": "base"
+    },
+    {
+      "name": "beforeRepeat",
+      "payload": "BeforeEvent<{ state: RepeatState }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeSeek",
+      "payload": "BeforeEvent<{ time: number; source?: ActionSource }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeSetup",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "beforeShuffle",
+      "payload": "BeforeEvent<{ state: ShuffleState }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeStop",
+      "payload": "BeforeEvent<ActionOptions>",
+      "map": "base"
+    },
+    {
+      "name": "beforeSubtitle",
+      "payload": "BeforeEvent<{ track: number | null }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeTransfer",
+      "payload": "BeforeEvent<{ target: CastTarget }>",
+      "map": "base"
+    },
+    {
+      "name": "beforeVolume",
+      "payload": "BeforeEvent<{ level: number }>",
+      "map": "base"
+    },
+    {
+      "name": "castState",
+      "payload": "{ state: CastState }",
+      "map": "base"
+    },
+    {
+      "name": "chapter",
+      "payload": "{ index: number; title: string }",
+      "map": "base"
+    },
+    {
+      "name": "chapters",
+      "payload": "{ chapters: ReadonlyArray<Chapter> }",
+      "map": "base"
+    },
+    {
+      "name": "configResolved",
+      "payload": "{ config: BasePlayerConfig }",
+      "map": "base"
+    },
+    {
+      "name": "configResolvedError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "cue:enter",
+      "payload": "CueEventPayload",
+      "map": "base"
+    },
+    {
+      "name": "cue:exit",
+      "payload": "CueEventPayload",
+      "map": "base"
+    },
+    {
+      "name": "dispose",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "disposePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "duration",
+      "payload": "{ duration: number }",
+      "map": "base"
+    },
+    {
+      "name": "ended",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "error",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "fatal",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "fetch:complete",
+      "payload": "{ url: string; ok: boolean; status?: number; durationMs: number; pluginId?: string }",
+      "map": "base"
+    },
+    {
+      "name": "fetch:retry",
+      "payload": "{ url: string; attempt: number; reason: 'unauthenticated' | 'http-5xx' | 'timeout' | 'network'; delayMs: number; pluginId?: string }",
+      "map": "base"
+    },
+    {
+      "name": "fetch:start",
+      "payload": "{ url: string; pluginId?: string }",
+      "map": "base"
+    },
+    {
+      "name": "firstFrame",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "info",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "item",
+      "payload": "{ item: I | undefined; index: number }",
+      "map": "base"
+    },
+    {
+      "name": "itemEndingSoon",
+      "payload": "{ remaining: number; item: I }",
+      "map": "base"
+    },
+    {
+      "name": "language",
+      "payload": "{ lang: string }",
+      "map": "base"
+    },
+    {
+      "name": "languagePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "level-switched",
+      "payload": "{ level: number }",
+      "map": "base"
+    },
+    {
+      "name": "listeners-changed",
+      "payload": "{ name: string; count: number }",
+      "map": "base"
+    },
+    {
+      "name": "loadPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "mediaReady",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "mediaReadyError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "mutationPrevented",
+      "payload": "{ method: string; reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "mute",
+      "payload": "{ muted: boolean }",
+      "map": "base"
+    },
+    {
+      "name": "mutePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "network:offline",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "network:online",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "network:slow",
+      "payload": "{ rttMs: number | undefined }",
+      "map": "base"
+    },
+    {
+      "name": "next",
+      "payload": "ActionOptions",
+      "map": "base"
+    },
+    {
+      "name": "nextPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "pause",
+      "payload": "ActionOptions",
+      "map": "base"
+    },
+    {
+      "name": "pausePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "phase",
+      "payload": "{ from: PlayerPhase; to: PlayerPhase }",
+      "map": "base"
+    },
+    {
+      "name": "play",
+      "payload": "ActionOptions",
+      "map": "base"
+    },
+    {
+      "name": "playPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "playback:metrics",
+      "payload": "PlaybackMetrics",
+      "map": "base"
+    },
+    {
+      "name": "playbackRate",
+      "payload": "{ rate: number }",
+      "map": "base"
+    },
+    {
+      "name": "playbackRatePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "playing",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "playlistError",
+      "payload": "{ url: string; error: Error; code: string }",
+      "map": "base"
+    },
+    {
+      "name": "playlistReady",
+      "payload": "{ length: number }",
+      "map": "base"
+    },
+    {
+      "name": "playlistResolveError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "playlistResolving",
+      "payload": "{ url: string }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:disabled",
+      "payload": "{ id: string; reason?: string }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:disposed",
+      "payload": "{ id: string }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:enabled",
+      "payload": "{ id: string }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:error",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "plugin:failed",
+      "payload": "{ id: string; error: PlayerErrorEvent['error'] }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:installed",
+      "payload": "{ id: string; version: string }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:opts:changed",
+      "payload": "{ id: string; opts: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "plugin:warning",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "pluginsRegistered",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "pluginsRegisteredError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "pluginsRegistering",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "pluginsRegisteringError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "preloadComplete",
+      "payload": "{ item: I }",
+      "map": "base"
+    },
+    {
+      "name": "preloadError",
+      "payload": "{ item: I; error: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "preloadProgress",
+      "payload": "{ item: I; loaded: number; total: number }",
+      "map": "base"
+    },
+    {
+      "name": "preloadStart",
+      "payload": "{ item: I; assets: ReadonlyArray<{ url: string; category: string }> }",
+      "map": "base"
+    },
+    {
+      "name": "previous",
+      "payload": "ActionOptions",
+      "map": "base"
+    },
+    {
+      "name": "previousPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "progress",
+      "payload": "{ time: number; duration: number; percentage: number }",
+      "map": "base"
+    },
+    {
+      "name": "qualityState",
+      "payload": "{ state: 'auto' | 'manual' }",
+      "map": "base"
+    },
+    {
+      "name": "queue",
+      "payload": "I[]",
+      "map": "base"
+    },
+    {
+      "name": "queue:append",
+      "payload": "{ items: I[]; from: number }",
+      "map": "base"
+    },
+    {
+      "name": "queue:clear",
+      "payload": "{ previousLength: number }",
+      "map": "base"
+    },
+    {
+      "name": "queue:exhausted",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "queue:insert",
+      "payload": "{ items: I[]; index: number }",
+      "map": "base"
+    },
+    {
+      "name": "queue:move",
+      "payload": "{ from: number; to: number }",
+      "map": "base"
+    },
+    {
+      "name": "queue:prepend",
+      "payload": "{ items: I[] }",
+      "map": "base"
+    },
+    {
+      "name": "queue:remove",
+      "payload": "{ id: string | number; index: number; item: I }",
+      "map": "base"
+    },
+    {
+      "name": "queue:shuffle",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "queue:sort",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "ready",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "repeat",
+      "payload": "{ state: RepeatState }",
+      "map": "base"
+    },
+    {
+      "name": "repeatPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "seek",
+      "payload": "{ time: number; source?: ActionSource }",
+      "map": "base"
+    },
+    {
+      "name": "seekPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "seeked",
+      "payload": "{ time: number }",
+      "map": "base"
+    },
+    {
+      "name": "setupStart",
+      "payload": "{ container: HTMLElement }",
+      "map": "base"
+    },
+    {
+      "name": "setupStartError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "shuffle",
+      "payload": "{ state: ShuffleState }",
+      "map": "base"
+    },
+    {
+      "name": "shufflePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "stop",
+      "payload": "ActionOptions",
+      "map": "base"
+    },
+    {
+      "name": "stopPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "stream:encrypted",
+      "payload": "{ initData: ArrayBuffer; initDataType: string }",
+      "map": "base"
+    },
+    {
+      "name": "stream:error",
+      "payload": "{ details: string; fatal: boolean }",
+      "map": "base"
+    },
+    {
+      "name": "stream:fragment-loaded",
+      "payload": "{ url: string; durationMs: number }",
+      "map": "base"
+    },
+    {
+      "name": "stream:level-considered",
+      "payload": "{ candidate: number; decided: number; reason: string }",
+      "map": "base"
+    },
+    {
+      "name": "stream:level-switched",
+      "payload": "{ level: number; label: string }",
+      "map": "base"
+    },
+    {
+      "name": "stream:manifest-loaded",
+      "payload": "{ url: string }",
+      "map": "base"
+    },
+    {
+      "name": "streamsReady",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "streamsReadyError",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "subtitle",
+      "payload": "{ track: number | null }",
+      "map": "base"
+    },
+    {
+      "name": "subtitleCue",
+      "payload": "SubtitleCueChange",
+      "map": "base"
+    },
+    {
+      "name": "subtitlePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "subtitleStyle",
+      "payload": "SubtitleStyle",
+      "map": "base"
+    },
+    {
+      "name": "subtitles",
+      "payload": "{ tracks: ReadonlyArray<SubtitleTrack> }",
+      "map": "base"
+    },
+    {
+      "name": "time",
+      "payload": "TimeState",
+      "map": "base"
+    },
+    {
+      "name": "transferPrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "transitionCancelled",
+      "payload": "{ reason: string }",
+      "map": "base"
+    },
+    {
+      "name": "transitionComplete",
+      "payload": "{ from: I; to: I }",
+      "map": "base"
+    },
+    {
+      "name": "transitionProgress",
+      "payload": "{ outgoing: I; incoming: I; fraction: number }",
+      "map": "base"
+    },
+    {
+      "name": "transitionStart",
+      "payload": "{ outgoing: I; incoming: I }",
+      "map": "base"
+    },
+    {
+      "name": "visibility:hidden",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "visibility:visible",
+      "payload": "void",
+      "map": "base"
+    },
+    {
+      "name": "volume",
+      "payload": "{ level: number }",
+      "map": "base"
+    },
+    {
+      "name": "volumePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "base"
+    },
+    {
+      "name": "warning",
+      "payload": "PlayerErrorEvent",
+      "map": "base"
+    },
+    {
+      "name": "backend:changed",
+      "payload": "{ kind: AudioBackendKind }",
+      "map": "music"
+    },
+    {
+      "name": "beforeCrossfade",
+      "payload": "BeforeEvent<{ from: T | null; to: T; duration: number }>",
+      "map": "music"
+    },
+    {
+      "name": "crossfadeComplete",
+      "payload": "{ item: T }",
+      "map": "music"
+    },
+    {
+      "name": "crossfadePrevented",
+      "payload": "{ reason: PreventedReason; cause?: unknown }",
+      "map": "music"
+    },
+    {
+      "name": "crossfadeStart",
+      "payload": "{ from: T | null; to: T; duration: number }",
+      "map": "music"
+    },
+    {
+      "name": "aspectRatio",
+      "payload": "{ value: Stretching }",
+      "map": "video"
+    },
+    {
+      "name": "audioTracks",
+      "payload": "{ tracks: AudioTrack[] }",
+      "map": "video"
+    },
+    {
+      "name": "back",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "canplay",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "cast",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "close",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "display-message",
+      "payload": "{ text: string; ms?: number }",
+      "map": "video"
+    },
+    {
+      "name": "fullscreen",
+      "payload": "{ active: boolean }",
+      "map": "video"
+    },
+    {
+      "name": "levels",
+      "payload": "{ levels: QualityLevel[] }",
+      "map": "video"
+    },
+    {
+      "name": "pip",
+      "payload": "{ active: boolean }",
+      "map": "video"
+    },
+    {
+      "name": "quality:requested",
+      "payload": "{ level: number | 'auto' }",
+      "map": "video"
+    },
+    {
+      "name": "remove-message",
+      "payload": "undefined",
+      "map": "video"
+    },
+    {
+      "name": "segmentBoundary",
+      "payload": "SegmentBoundaryPayload",
+      "map": "video"
+    },
+    {
+      "name": "stalled",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "subtitle-size-down",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "subtitle-size-up",
+      "payload": "void",
+      "map": "video"
+    },
+    {
+      "name": "theater",
+      "payload": "{ active: boolean }",
+      "map": "video"
+    },
+    {
+      "name": "videoRect",
+      "payload": "{ rect: VideoRect | null }",
+      "map": "video"
+    },
+    {
+      "name": "waiting",
+      "payload": "void",
+      "map": "video"
+    }
+  ],
+  "methods": [
+    {
+      "name": "activityTracking",
+      "signature": "{\n\t\t(): boolean;\n\t\t(enabled: boolean): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "addClasses",
+      "signature": "IPlayer<MusicEventMap>['addClasses']",
+      "player": "music"
+    },
+    {
+      "name": "addPlugin",
+      "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P), opts?: P['opts']) => this",
+      "player": "music"
+    },
+    {
+      "name": "addTranslations",
+      "signature": "(bundle: Translations) => void",
+      "player": "music"
+    },
+    {
+      "name": "announce",
+      "signature": "(text: string, level?: AriaLiveLevel) => void",
+      "player": "music"
+    },
+    {
+      "name": "audioContext",
+      "signature": "() => AudioContext | undefined",
+      "player": "music"
+    },
+    {
+      "name": "audioOutput",
+      "signature": "{\n\t\t(): Promise<string | null>;\n\t\t(deviceId: string): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "audioOutputs",
+      "signature": "() => Promise<MediaDeviceInfo[]>",
+      "player": "music"
+    },
+    {
+      "name": "audioTrack",
+      "signature": "{\n\t\t(): CurrentAudioTrackSelection | null;\n\t\t(idx: number): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "audioTrackMode",
+      "signature": "{\n\t\t(): AudioTrackState;\n\t\t(idx: number): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "audioTracks",
+      "signature": "() => AudioTrack[]",
+      "player": "music"
+    },
+    {
+      "name": "auth",
+      "signature": "{\n\t\t(): Readonly<AuthConfig> | undefined;\n\t\t(config: AuthConfig): void;\n\t\t(partial: Partial<AuthConfig>): void;\n\t\t(clear: null): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "backend",
+      "signature": "(kind?: AudioBackendKind) => IAudioBackend | Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "backlog",
+      "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[]): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "backlogAppend",
+      "signature": "(item: T | T[]) => void",
+      "player": "music"
+    },
+    {
+      "name": "backlogClear",
+      "signature": "() => void",
+      "player": "music"
+    },
+    {
+      "name": "backlogRemove",
+      "signature": "(id: string | number) => void",
+      "player": "music"
+    },
+    {
+      "name": "bandwidth",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "bandwidthEstimator",
+      "signature": "{\n\t\t(): (() => number) | undefined;\n\t\t(fn: () => number): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "baseUrl",
+      "signature": "{\n\t\t(): string | undefined;\n\t\t(url: string): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "bufferState",
+      "signature": "() => BufferState",
+      "player": "music"
+    },
+    {
+      "name": "buffered",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "bufferedRanges",
+      "signature": "() => TimeRanges",
+      "player": "music"
+    },
+    {
+      "name": "bumpActivity",
+      "signature": "() => void",
+      "player": "music"
+    },
+    {
+      "name": "canPlay",
+      "signature": "(profile: { contentType: string; width?: number; height?: number; bitrate?: number; framerate?: number }) => Promise<CanPlayResult>",
+      "player": "music"
+    },
+    {
+      "name": "castState",
+      "signature": "() => CastState",
+      "player": "music"
+    },
+    {
+      "name": "chapter",
+      "signature": "{\n\t\t(): Chapter | null;\n\t\t(idx: number): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "chapters",
+      "signature": "() => Chapter[]",
+      "player": "music"
+    },
+    {
+      "name": "container",
+      "signature": "HTMLElement",
+      "player": "music"
+    },
+    {
+      "name": "createButton",
+      "signature": "IPlayer<MusicEventMap>['createButton']",
+      "player": "music"
+    },
+    {
+      "name": "createElement",
+      "signature": "IPlayer<MusicEventMap>['createElement']",
+      "player": "music"
+    },
+    {
+      "name": "createSVG",
+      "signature": "IPlayer<MusicEventMap>['createSVG']",
+      "player": "music"
+    },
+    {
+      "name": "crossfadeTo",
+      "signature": "(item: T, opts?: CrossfadeOptions & ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "device",
+      "signature": "() => DeviceCapabilities",
+      "player": "music"
+    },
+    {
+      "name": "dispatching",
+      "signature": "() => ReadonlyArray<string>",
+      "player": "music"
+    },
+    {
+      "name": "dispose",
+      "signature": "() => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "duration",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "enabledPlugins",
+      "signature": "() => ReadonlyArray<Plugin>",
+      "player": "music"
+    },
+    {
+      "name": "experimental",
+      "signature": "PlayerExperimental",
+      "player": "music"
+    },
+    {
+      "name": "forward",
+      "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "getPlugin",
+      "signature": "<P extends object>(PluginClass: PluginCtorWithId & (new () => P)) => P | undefined",
+      "player": "music"
+    },
+    {
+      "name": "getPluginById",
+      "signature": "<P extends object = object>(id: string) => P | undefined",
+      "player": "music"
+    },
+    {
+      "name": "getStreamFactory",
+      "signature": "(id: string) => IStreamFactory | undefined",
+      "player": "music"
+    },
+    {
+      "name": "index",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "isDesktop",
+      "signature": "() => boolean",
+      "player": "music"
+    },
+    {
+      "name": "isMobile",
+      "signature": "() => boolean",
+      "player": "music"
+    },
+    {
+      "name": "isTransitioning",
+      "signature": "() => boolean",
+      "player": "music"
+    },
+    {
+      "name": "isTv",
+      "signature": "() => boolean",
+      "player": "music"
+    },
+    {
+      "name": "item",
+      "signature": "{\n\t\t(): T | undefined;\n\t\t(target: T | string | number, opts?: LoadOptions): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "language",
+      "signature": "{\n\t\t(): string;\n\t\t(lang: string): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "load",
+      "signature": "(item: T, opts?: LoadOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "loadQueue",
+      "signature": "(url: string, parser?: (raw: string) => T[]) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "metrics",
+      "signature": "() => PlaybackMetrics",
+      "player": "music"
+    },
+    {
+      "name": "mute",
+      "signature": "() => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "networkState",
+      "signature": "() => NetworkState",
+      "player": "music"
+    },
+    {
+      "name": "next",
+      "signature": "(opts?: LoadOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "nextChapter",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "now",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "options",
+      "signature": "MusicPlayerConfig<T>",
+      "player": "music"
+    },
+    {
+      "name": "pause",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "peekNext",
+      "signature": "() => T | undefined",
+      "player": "music"
+    },
+    {
+      "name": "peekPrevious",
+      "signature": "() => T | undefined",
+      "player": "music"
+    },
+    {
+      "name": "phase",
+      "signature": "() => PlayerPhase",
+      "player": "music"
+    },
+    {
+      "name": "platform",
+      "signature": "() => IPlatform",
+      "player": "music"
+    },
+    {
+      "name": "play",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "playItem",
+      "signature": "(\n\t\ttarget: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
+      "player": "music"
+    },
+    {
+      "name": "playNow",
+      "signature": "(\n\t\titems: BasePlaylistItem[],\n\t\tstart?: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
+      "player": "music"
+    },
+    {
+      "name": "playState",
+      "signature": "() => PlayState",
+      "player": "music"
+    },
+    {
+      "name": "playbackRate",
+      "signature": "{\n\t\t(): number;\n\t\t(rate: number): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "playbackRates",
+      "signature": "() => number[]",
+      "player": "music"
+    },
+    {
+      "name": "playerId",
+      "signature": "string",
+      "player": "music"
+    },
+    {
+      "name": "plugins",
+      "signature": "() => ReadonlyArray<Plugin>",
+      "player": "music"
+    },
+    {
+      "name": "preloadStrategy",
+      "signature": "() => IPreloadStrategy",
+      "player": "music"
+    },
+    {
+      "name": "previous",
+      "signature": "(opts?: LoadOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "previousChapter",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "quality",
+      "signature": "{\n\t\t(): CurrentQualitySelection | 'auto';\n\t\t(idx: number | 'auto'): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "qualityLevels",
+      "signature": "{\n\t\t(): QualityLevel[];\n\t\t(opts: { includeUnsupported: true }): QualityLevel[];\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "qualityMode",
+      "signature": "{\n\t\t(): QualityState;\n\t\t(target: number | 'auto'): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "queue",
+      "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[], opts?: ActionOptions): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "queueAppend",
+      "signature": "(item: T | T[], opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueClear",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueIndexOf",
+      "signature": "(id: string | number) => number",
+      "player": "music"
+    },
+    {
+      "name": "queueInsert",
+      "signature": "(item: T | T[], index: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueLength",
+      "signature": "() => number",
+      "player": "music"
+    },
+    {
+      "name": "queueMove",
+      "signature": "(from: number, to: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queuePrepend",
+      "signature": "(item: T | T[], opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueRemove",
+      "signature": "(id: string | number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueRemoveAt",
+      "signature": "(index: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueShuffle",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "queueSort",
+      "signature": "(compare: (itemA: T, itemB: T) => number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "ready",
+      "signature": "() => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "recordMetric",
+      "signature": "(name: string, value: number) => void",
+      "player": "music"
+    },
+    {
+      "name": "refreshAuth",
+      "signature": "() => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "registerCueParser",
+      "signature": "(parser: ICueParser, prepend?: boolean) => void",
+      "player": "music"
+    },
+    {
+      "name": "registerStream",
+      "signature": "(factory: IStreamFactory, prepend?: boolean) => this",
+      "player": "music"
+    },
+    {
+      "name": "registerTitleTokens",
+      "signature": "(tokens: Record<string, string>) => void",
+      "player": "music"
+    },
+    {
+      "name": "removeClasses",
+      "signature": "IPlayer<MusicEventMap>['removeClasses']",
+      "player": "music"
+    },
+    {
+      "name": "removePlugin",
+      "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P)) => void",
+      "player": "music"
+    },
+    {
+      "name": "removePluginById",
+      "signature": "(id: string) => void",
+      "player": "music"
+    },
+    {
+      "name": "removeTranslations",
+      "signature": "(prefix: string, lang?: string) => void",
+      "player": "music"
+    },
+    {
+      "name": "repeatState",
+      "signature": "{\n\t\t(): RepeatState;\n\t\t(state: RepeatState): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "resolveCueParser",
+      "signature": "(url: string) => ICueParser | undefined",
+      "player": "music"
+    },
+    {
+      "name": "resolveUrl",
+      "signature": "(url: string, category?: UrlCategory) => Promise<ResolvedUrl>",
+      "player": "music"
+    },
+    {
+      "name": "restart",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "rewind",
+      "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "seekByPercentage",
+      "signature": "(pct: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "seekToChapter",
+      "signature": "(idx: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "seekToIndex",
+      "signature": "(position: number, opts?: ActionOptions) => void",
+      "player": "music"
+    },
+    {
+      "name": "seekable",
+      "signature": "() => TimeRanges",
+      "player": "music"
+    },
+    {
+      "name": "selectAudioOutput",
+      "signature": "() => Promise<MediaDeviceInfo | null>",
+      "player": "music"
+    },
+    {
+      "name": "setPreloadStrategy",
+      "signature": "(strategy: IPreloadStrategy) => void",
+      "player": "music"
+    },
+    {
+      "name": "setTransitionStrategy",
+      "signature": "(strategy: ITransitionStrategy) => void",
+      "player": "music"
+    },
+    {
+      "name": "setup",
+      "signature": "(config: MusicPlayerConfig<T>) => this",
+      "player": "music"
+    },
+    {
+      "name": "setupState",
+      "signature": "() => SetupState",
+      "player": "music"
+    },
+    {
+      "name": "shuffleState",
+      "signature": "{\n\t\t(): ShuffleState;\n\t\t(state: ShuffleState | boolean): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "stop",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "streamState",
+      "signature": "() => string",
+      "player": "music"
+    },
+    {
+      "name": "streams",
+      "signature": "() => ReadonlyArray<string>",
+      "player": "music"
+    },
+    {
+      "name": "t",
+      "signature": "{\n\t\t(key: string, vars?: Record<string, string>): string;\n\t\t(PluginClass: PluginCtorWithId, key: string, vars?: Record<string, string>): string;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "time",
+      "signature": "{\n\t\t(): number;\n\t\t(seconds: number, opts?: ActionOptions): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "timeData",
+      "signature": "() => KitTimeState",
+      "player": "music"
+    },
+    {
+      "name": "toggleMute",
+      "signature": "() => void",
+      "player": "music"
+    },
+    {
+      "name": "togglePlayback",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "transferTo",
+      "signature": "(target: CastTarget) => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "transitionStrategy",
+      "signature": "() => ITransitionStrategy",
+      "player": "music"
+    },
+    {
+      "name": "translation",
+      "signature": "{\n\t\t(lang: string, key: string): string | undefined;\n\t\t(lang: string, key: string, value: string): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "unmute",
+      "signature": "() => Promise<void>",
+      "player": "music"
+    },
+    {
+      "name": "unregisterCueParser",
+      "signature": "(id: string) => void",
+      "player": "music"
+    },
+    {
+      "name": "unregisterStream",
+      "signature": "(id: string) => this",
+      "player": "music"
+    },
+    {
+      "name": "urlResolver",
+      "signature": "{\n\t\t(): IUrlResolver | undefined;\n\t\t(resolver: IUrlResolver | undefined): void;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "visibilityState",
+      "signature": "() => VisibilityState",
+      "player": "music"
+    },
+    {
+      "name": "volume",
+      "signature": "{\n\t\t(): number;\n\t\t(level: number): Promise<void>;\n\t}",
+      "player": "music"
+    },
+    {
+      "name": "volumeDown",
+      "signature": "(step?: number) => void",
+      "player": "music"
+    },
+    {
+      "name": "volumeState",
+      "signature": "() => VolumeState",
+      "player": "music"
+    },
+    {
+      "name": "volumeUp",
+      "signature": "(step?: number) => void",
+      "player": "music"
+    },
+    {
+      "name": "activityTracking",
+      "signature": "{\n\t\t(): boolean;\n\t\t(enabled: boolean): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "addClasses",
+      "signature": "IPlayer<VideoEventMap>['addClasses']",
+      "player": "video"
+    },
+    {
+      "name": "addPlugin",
+      "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P), opts?: P['opts']) => this",
+      "player": "video"
+    },
+    {
+      "name": "addSubtitleTrack",
+      "signature": "(track: SidecarSubtitleInput, opts?: ActionOptions) => SubtitleTrack",
+      "player": "video"
+    },
+    {
+      "name": "addTranslations",
+      "signature": "(bundle: Translations) => void",
+      "player": "video"
+    },
+    {
+      "name": "announce",
+      "signature": "(text: string, level?: AriaLiveLevel) => void",
+      "player": "video"
+    },
+    {
+      "name": "aspectRatio",
+      "signature": "(value?: Stretching) => Stretching | void",
+      "player": "video"
+    },
+    {
+      "name": "audioContext",
+      "signature": "() => AudioContext | undefined",
+      "player": "video"
+    },
+    {
+      "name": "audioOutput",
+      "signature": "{\n\t\t(): Promise<string | null>;\n\t\t(deviceId: string): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "audioOutputs",
+      "signature": "() => Promise<MediaDeviceInfo[]>",
+      "player": "video"
+    },
+    {
+      "name": "audioTrack",
+      "signature": "{\n\t\t(): CurrentAudioTrackSelection | null;\n\t\t(idx: number): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "audioTrackMode",
+      "signature": "{\n\t\t(): AudioTrackState;\n\t\t(idx: number): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "audioTracks",
+      "signature": "() => AudioTrack[]",
+      "player": "video"
+    },
+    {
+      "name": "auth",
+      "signature": "{\n\t\t(): Readonly<AuthConfig> | undefined;\n\t\t(config: AuthConfig): void;\n\t\t(partial: Partial<AuthConfig>): void;\n\t\t(clear: null): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "backend",
+      "signature": "(kind?: VideoBackendKind) => IVideoBackend | Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "backlog",
+      "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[]): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "backlogAppend",
+      "signature": "(item: T | T[]) => void",
+      "player": "video"
+    },
+    {
+      "name": "backlogClear",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "backlogRemove",
+      "signature": "(id: string | number) => void",
+      "player": "video"
+    },
+    {
+      "name": "bandwidth",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "bandwidthEstimator",
+      "signature": "{\n\t\t(): (() => number) | undefined;\n\t\t(fn: () => number): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "baseUrl",
+      "signature": "{\n\t\t(): string | undefined;\n\t\t(url: string): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "bufferState",
+      "signature": "() => BufferState",
+      "player": "video"
+    },
+    {
+      "name": "buffered",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "bufferedRanges",
+      "signature": "() => TimeRanges",
+      "player": "video"
+    },
+    {
+      "name": "bumpActivity",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "canPlay",
+      "signature": "(profile: { contentType: string; width?: number; height?: number; bitrate?: number; framerate?: number }) => Promise<CanPlayResult>",
+      "player": "video"
+    },
+    {
+      "name": "castState",
+      "signature": "() => CastState",
+      "player": "video"
+    },
+    {
+      "name": "chapter",
+      "signature": "{\n\t\t(): Chapter | null;\n\t\t(idx: number): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "chapters",
+      "signature": "() => Chapter[]",
+      "player": "video"
+    },
+    {
+      "name": "clearSegment",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "container",
+      "signature": "HTMLElement",
+      "player": "video"
+    },
+    {
+      "name": "createButton",
+      "signature": "IPlayer<VideoEventMap>['createButton']",
+      "player": "video"
+    },
+    {
+      "name": "createElement",
+      "signature": "IPlayer<VideoEventMap>['createElement']",
+      "player": "video"
+    },
+    {
+      "name": "createSVG",
+      "signature": "IPlayer<VideoEventMap>['createSVG']",
+      "player": "video"
+    },
+    {
+      "name": "cycleAspectRatio",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "cycleAudioTracks",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "cycleSubtitles",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "device",
+      "signature": "() => DeviceCapabilities",
+      "player": "video"
+    },
+    {
+      "name": "dispatching",
+      "signature": "() => ReadonlyArray<string>",
+      "player": "video"
+    },
+    {
+      "name": "dispose",
+      "signature": "() => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "duration",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "enabledPlugins",
+      "signature": "() => ReadonlyArray<Plugin>",
+      "player": "video"
+    },
+    {
+      "name": "experimental",
+      "signature": "PlayerExperimental",
+      "player": "video"
+    },
+    {
+      "name": "forward",
+      "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "fullscreen",
+      "signature": "(state?: FullscreenState | boolean) => FullscreenState | void",
+      "player": "video"
+    },
+    {
+      "name": "getPlugin",
+      "signature": "<P extends object>(PluginClass: PluginCtorWithId & (new () => P)) => P | undefined",
+      "player": "video"
+    },
+    {
+      "name": "getPluginById",
+      "signature": "<P extends object = object>(id: string) => P | undefined",
+      "player": "video"
+    },
+    {
+      "name": "getStreamFactory",
+      "signature": "(id: string) => IStreamFactory | undefined",
+      "player": "video"
+    },
+    {
+      "name": "index",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "isDesktop",
+      "signature": "() => boolean",
+      "player": "video"
+    },
+    {
+      "name": "isMobile",
+      "signature": "() => boolean",
+      "player": "video"
+    },
+    {
+      "name": "isTv",
+      "signature": "() => boolean",
+      "player": "video"
+    },
+    {
+      "name": "item",
+      "signature": "{\n\t\t(): T | undefined;\n\t\t(target: T | string | number, opts?: LoadOptions): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "language",
+      "signature": "{\n\t\t(): string;\n\t\t(lang: string): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "load",
+      "signature": "(item: T, opts?: LoadOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "loadQueue",
+      "signature": "(url: string, parser?: (raw: string) => T[]) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "metrics",
+      "signature": "() => PlaybackMetrics",
+      "player": "video"
+    },
+    {
+      "name": "mute",
+      "signature": "() => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "networkState",
+      "signature": "() => NetworkState",
+      "player": "video"
+    },
+    {
+      "name": "next",
+      "signature": "(opts?: LoadOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "nextChapter",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "normalizePlaylistItem",
+      "signature": "(item: BasePlaylistItem) => BasePlaylistItem",
+      "player": "video"
+    },
+    {
+      "name": "now",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "options",
+      "signature": "VideoPlayerConfig<T>",
+      "player": "video"
+    },
+    {
+      "name": "pause",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "peekNext",
+      "signature": "() => T | undefined",
+      "player": "video"
+    },
+    {
+      "name": "peekPrevious",
+      "signature": "() => T | undefined",
+      "player": "video"
+    },
+    {
+      "name": "phase",
+      "signature": "() => PlayerPhase",
+      "player": "video"
+    },
+    {
+      "name": "pip",
+      "signature": "(state?: PipState | boolean) => PipState | void",
+      "player": "video"
+    },
+    {
+      "name": "platform",
+      "signature": "() => IPlatform",
+      "player": "video"
+    },
+    {
+      "name": "play",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "playItem",
+      "signature": "(\n\t\ttarget: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
+      "player": "video"
+    },
+    {
+      "name": "playNow",
+      "signature": "(\n\t\titems: BasePlaylistItem[],\n\t\tstart?: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
+      "player": "video"
+    },
+    {
+      "name": "playSegment",
+      "signature": "(opts: SegmentOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "playState",
+      "signature": "() => PlayState",
+      "player": "video"
+    },
+    {
+      "name": "playbackRate",
+      "signature": "{\n\t\t(): number;\n\t\t(rate: number): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "playbackRates",
+      "signature": "() => number[]",
+      "player": "video"
+    },
+    {
+      "name": "playerId",
+      "signature": "string",
+      "player": "video"
+    },
+    {
+      "name": "plugins",
+      "signature": "() => ReadonlyArray<Plugin>",
+      "player": "video"
+    },
+    {
+      "name": "preloadStrategy",
+      "signature": "() => IPreloadStrategy",
+      "player": "video"
+    },
+    {
+      "name": "previous",
+      "signature": "(opts?: LoadOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "previousChapter",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "quality",
+      "signature": "{\n\t\t(): CurrentQualitySelection | 'auto';\n\t\t(idx: number | 'auto'): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "qualityLevels",
+      "signature": "{\n\t\t(): QualityLevel[];\n\t\t(opts: { includeUnsupported: true }): QualityLevel[];\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "qualityMode",
+      "signature": "{\n\t\t(): QualityState;\n\t\t(target: number | 'auto'): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "queue",
+      "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[], opts?: ActionOptions): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "queueAppend",
+      "signature": "(item: T | T[], opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueClear",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueIndexOf",
+      "signature": "(id: string | number) => number",
+      "player": "video"
+    },
+    {
+      "name": "queueInsert",
+      "signature": "(item: T | T[], index: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueLength",
+      "signature": "() => number",
+      "player": "video"
+    },
+    {
+      "name": "queueMove",
+      "signature": "(from: number, to: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queuePrepend",
+      "signature": "(item: T | T[], opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueRemove",
+      "signature": "(id: string | number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueRemoveAt",
+      "signature": "(index: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueShuffle",
+      "signature": "(opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "queueSort",
+      "signature": "(compare: (itemA: T, itemB: T) => number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "ready",
+      "signature": "() => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "recordMetric",
+      "signature": "(name: string, value: number) => void",
+      "player": "video"
+    },
+    {
+      "name": "refreshAuth",
+      "signature": "() => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "registerCueParser",
+      "signature": "(parser: ICueParser, prepend?: boolean) => void",
+      "player": "video"
+    },
+    {
+      "name": "registerStream",
+      "signature": "(factory: IStreamFactory, prepend?: boolean) => this",
+      "player": "video"
+    },
+    {
+      "name": "registerTitleTokens",
+      "signature": "(tokens: Record<string, string>) => void",
+      "player": "video"
+    },
+    {
+      "name": "removeClasses",
+      "signature": "IPlayer<VideoEventMap>['removeClasses']",
+      "player": "video"
+    },
+    {
+      "name": "removePlugin",
+      "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P)) => void",
+      "player": "video"
+    },
+    {
+      "name": "removePluginById",
+      "signature": "(id: string) => void",
+      "player": "video"
+    },
+    {
+      "name": "removeSubtitleTrack",
+      "signature": "(id: string, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "removeTranslations",
+      "signature": "(prefix: string, lang?: string) => void",
+      "player": "video"
+    },
+    {
+      "name": "repeatState",
+      "signature": "{\n\t\t(): RepeatState;\n\t\t(state: RepeatState): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "resolveCueParser",
+      "signature": "(url: string) => ICueParser | undefined",
+      "player": "video"
+    },
+    {
+      "name": "resolveUrl",
+      "signature": "(url: string, category?: UrlCategory) => Promise<ResolvedUrl>",
+      "player": "video"
+    },
+    {
+      "name": "restart",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "rewind",
+      "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "seekByPercentage",
+      "signature": "(pct: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "seekToChapter",
+      "signature": "(idx: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "seekToIndex",
+      "signature": "(position: number, opts?: ActionOptions) => void",
+      "player": "video"
+    },
+    {
+      "name": "seekable",
+      "signature": "() => TimeRanges",
+      "player": "video"
+    },
+    {
+      "name": "selectAudioOutput",
+      "signature": "() => Promise<MediaDeviceInfo | null>",
+      "player": "video"
+    },
+    {
+      "name": "setPreloadStrategy",
+      "signature": "(strategy: IPreloadStrategy) => void",
+      "player": "video"
+    },
+    {
+      "name": "setTransitionStrategy",
+      "signature": "(strategy: ITransitionStrategy) => void",
+      "player": "video"
+    },
+    {
+      "name": "setup",
+      "signature": "(config: VideoPlayerConfig<T>) => this",
+      "player": "video"
+    },
+    {
+      "name": "setupState",
+      "signature": "() => SetupState",
+      "player": "video"
+    },
+    {
+      "name": "shuffleState",
+      "signature": "{\n\t\t(): ShuffleState;\n\t\t(state: ShuffleState | boolean): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "stop",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "streamState",
+      "signature": "() => string",
+      "player": "video"
+    },
+    {
+      "name": "streams",
+      "signature": "() => ReadonlyArray<string>",
+      "player": "video"
+    },
+    {
+      "name": "subtitle",
+      "signature": "{\n\t\t(): CurrentSubtitleSelection | null;\n\t\t(idx: number | null): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "subtitleState",
+      "signature": "() => SubtitleState",
+      "player": "video"
+    },
+    {
+      "name": "subtitleStyle",
+      "signature": "{\n\t\t(): SubtitleStyle;\n\t\t(patch: Partial<SubtitleStyle>): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "subtitles",
+      "signature": "() => SubtitleTrack[]",
+      "player": "video"
+    },
+    {
+      "name": "t",
+      "signature": "{\n\t\t(key: string, vars?: Record<string, string>): string;\n\t\t(PluginClass: PluginCtorWithId, key: string, vars?: Record<string, string>): string;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "theater",
+      "signature": "(state?: TheaterState | boolean) => TheaterState | void",
+      "player": "video"
+    },
+    {
+      "name": "time",
+      "signature": "{\n\t\t(): number;\n\t\t(seconds: number, opts?: ActionOptions): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "timeData",
+      "signature": "() => KitTimeState",
+      "player": "video"
+    },
+    {
+      "name": "toggleFullscreen",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "toggleMute",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "togglePip",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "togglePlayback",
+      "signature": "(opts?: ActionOptions) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "toggleTheater",
+      "signature": "() => void",
+      "player": "video"
+    },
+    {
+      "name": "transferTo",
+      "signature": "(target: CastTarget) => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "transitionStrategy",
+      "signature": "() => ITransitionStrategy",
+      "player": "video"
+    },
+    {
+      "name": "translation",
+      "signature": "{\n\t\t(lang: string, key: string): string | undefined;\n\t\t(lang: string, key: string, value: string): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "unmute",
+      "signature": "() => Promise<void>",
+      "player": "video"
+    },
+    {
+      "name": "unregisterCueParser",
+      "signature": "(id: string) => void",
+      "player": "video"
+    },
+    {
+      "name": "unregisterStream",
+      "signature": "(id: string) => this",
+      "player": "video"
+    },
+    {
+      "name": "urlResolver",
+      "signature": "{\n\t\t(): IUrlResolver | undefined;\n\t\t(resolver: IUrlResolver | undefined): void;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "videoElement",
+      "signature": "HTMLVideoElement | undefined",
+      "player": "video"
+    },
+    {
+      "name": "videoRect",
+      "signature": "() => VideoRect | null",
+      "player": "video"
+    },
+    {
+      "name": "visibilityState",
+      "signature": "() => VisibilityState",
+      "player": "video"
+    },
+    {
+      "name": "volume",
+      "signature": "{\n\t\t(): number;\n\t\t(level: number): Promise<void>;\n\t}",
+      "player": "video"
+    },
+    {
+      "name": "volumeDown",
+      "signature": "(step?: number) => void",
+      "player": "video"
+    },
+    {
+      "name": "volumeState",
+      "signature": "() => VolumeState",
+      "player": "video"
+    },
+    {
+      "name": "volumeUp",
+      "signature": "(step?: number) => void",
+      "player": "video"
+    }
+  ],
+  "errors": [
+    "canvas:render/renderer-failed",
+    "core:auth/forbidden",
+    "core:auth/refresh-failed",
+    "core:auth/unauthenticated",
+    "core:drm/license-url-missing",
+    "core:lifecycle/already-setup",
+    "core:lifecycle/cleanup-failed",
+    "core:lifecycle/use-plugin-after-dispose",
+    "core:media-tracks/no-active-item",
+    "core:media/codec-unsupported",
+    "core:media/hls-unsupported",
+    "core:media/load-failed",
+    "core:media/missing-url",
+    "core:network/aborted",
+    "core:network/bad-gateway",
+    "core:network/client-error",
+    "core:network/gateway-timeout",
+    "core:network/gone",
+    "core:network/not-found",
+    "core:network/offline",
+    "core:network/parse-failed",
+    "core:network/rate-limited",
+    "core:network/request-timeout",
+    "core:network/server-error",
+    "core:network/server-error-other",
+    "core:network/service-unavailable",
+    "core:network/timeout",
+    "core:player/backend-missing",
+    "core:player/crossfade-unsupported",
+    "core:player/disposed",
+    "core:player/element-missing",
+    "core:player/element-not-div",
+    "core:player/invalid-id-type",
+    "core:player/no-element",
+    "core:player/not-found",
+    "core:player/not-ready",
+    "core:playlist/fetch-error",
+    "core:playlist/parse-error",
+    "core:plugin/dispose-failed",
+    "core:plugin/duplicate-id",
+    "core:plugin/has-dependents",
+    "core:plugin/incompatible-core-version",
+    "core:plugin/init-timeout",
+    "core:plugin/missing-dep",
+    "core:plugin/state-uninitialized",
+    "core:plugin/version-mismatch",
+    "core:resource/playlist-fetch-failed",
+    "core:state/queue-empty",
+    "core:state/vite-plugin-not-configured",
+    "core:stream/fragment-failed",
+    "core:stream/hls-attach-failed",
+    "core:stream/no-factory-match",
+    "core:test/getplugin-returned-undefined",
+    "core:test/listener-leak",
+    "core:test/player-missing-addplugin",
+    "core:test/vitest-globals-missing",
+    "plugin:canvas/not-mounted",
+    "plugin:lyrics/fetch-failed",
+    "plugin:lyrics/no-parser",
+    "plugin:octopus/fonts-manifest-failed",
+    "plugin:octopus/load-failed",
+    "plugin:octopus/render-error",
+    "plugin:scrobble/now-playing-failed",
+    "plugin:scrobble/scrobble-failed",
+    "visualization:render/failed"
+  ]
+}

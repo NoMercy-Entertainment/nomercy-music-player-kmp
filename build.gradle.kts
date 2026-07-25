@@ -61,6 +61,7 @@ kotlin {
             // line works against a published core and against a local edit.
             api(libs.nomercy.player.core)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -79,6 +80,7 @@ detekt {
     source.setFrom(
         "src/commonMain/kotlin",
         "src/commonTest/kotlin",
+        "src/jvmTest/kotlin",
         "src/androidMain/kotlin",
         "src/appleMain/kotlin",
         "src/jvmMain/kotlin",
