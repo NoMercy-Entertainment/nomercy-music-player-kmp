@@ -59,3 +59,19 @@ public final class tv/nomercy/player/music/MusicEvents {
 	public final fun getCrossfadeStart ()Ltv/nomercy/player/core/events/EventKey;
 }
 
+public class tv/nomercy/player/music/NMMusicPlayer : tv/nomercy/player/core/controllers/ComposedPlayer {
+	public static final field Companion Ltv/nomercy/player/music/NMMusicPlayer$Companion;
+	public fun <init> ()V
+	public fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun announceBackend (Ljava/lang/String;)V
+	public fun crossfadeDuration ()D
+	public fun crossfadeDuration (D)V
+	public fun crossfadeEnabled ()Z
+	public fun crossfadeTo (Ltv/nomercy/player/core/media/PlaylistItem;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/NMMusicPlayer$Companion {
+	public final fun instances ()Ljava/util/List;
+}
+

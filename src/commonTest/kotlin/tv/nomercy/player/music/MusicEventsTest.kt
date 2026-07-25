@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-private data class Track(
+internal data class Track(
     override val id: String,
     override val url: String = "https://example.test/$id",
     override val title: String? = null,
