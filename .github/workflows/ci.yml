@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: packages-native/nomercy-music-player-kmp
+
+      # Core is not on Maven Central yet, so the composite build is the only way
+      # to resolve it. The relative path mirrors the monorepo, which is what
+      # settings.gradle.kts looks for.
+      - uses: actions/checkout@v4
+        with:
+          repository: NoMercy-Entertainment/nomercy-player-core-kmp
+          path: packages-native/nomercy-player-core-kmp
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build
+        working-directory: packages-native/nomercy-music-player-kmp
+        run: ./gradlew build --stacktrace

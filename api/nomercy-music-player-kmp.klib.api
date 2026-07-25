@@ -1,0 +1,83 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, tvosArm64, tvosSimulatorArm64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <nomercy-music-player-kmp>
+final class tv.nomercy.player.music/AudioBackendChange { // tv.nomercy.player.music/AudioBackendChange|null[0]
+    constructor <init>(kotlin/String) // tv.nomercy.player.music/AudioBackendChange.<init>|<init>(kotlin.String){}[0]
+
+    final val kind // tv.nomercy.player.music/AudioBackendChange.kind|{}kind[0]
+        final fun <get-kind>(): kotlin/String // tv.nomercy.player.music/AudioBackendChange.kind.<get-kind>|<get-kind>(){}[0]
+
+    final fun component1(): kotlin/String // tv.nomercy.player.music/AudioBackendChange.component1|component1(){}[0]
+    final fun copy(kotlin/String = ...): tv.nomercy.player.music/AudioBackendChange // tv.nomercy.player.music/AudioBackendChange.copy|copy(kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music/AudioBackendChange.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music/AudioBackendChange.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music/AudioBackendChange.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music/Crossfade { // tv.nomercy.player.music/Crossfade|null[0]
+    constructor <init>(tv.nomercy.player.core.media/PlaylistItem?, tv.nomercy.player.core.media/PlaylistItem, kotlin/Double) // tv.nomercy.player.music/Crossfade.<init>|<init>(tv.nomercy.player.core.media.PlaylistItem?;tv.nomercy.player.core.media.PlaylistItem;kotlin.Double){}[0]
+
+    final val duration // tv.nomercy.player.music/Crossfade.duration|{}duration[0]
+        final fun <get-duration>(): kotlin/Double // tv.nomercy.player.music/Crossfade.duration.<get-duration>|<get-duration>(){}[0]
+    final val from // tv.nomercy.player.music/Crossfade.from|{}from[0]
+        final fun <get-from>(): tv.nomercy.player.core.media/PlaylistItem? // tv.nomercy.player.music/Crossfade.from.<get-from>|<get-from>(){}[0]
+    final val to // tv.nomercy.player.music/Crossfade.to|{}to[0]
+        final fun <get-to>(): tv.nomercy.player.core.media/PlaylistItem // tv.nomercy.player.music/Crossfade.to.<get-to>|<get-to>(){}[0]
+
+    final fun component1(): tv.nomercy.player.core.media/PlaylistItem? // tv.nomercy.player.music/Crossfade.component1|component1(){}[0]
+    final fun component2(): tv.nomercy.player.core.media/PlaylistItem // tv.nomercy.player.music/Crossfade.component2|component2(){}[0]
+    final fun component3(): kotlin/Double // tv.nomercy.player.music/Crossfade.component3|component3(){}[0]
+    final fun copy(tv.nomercy.player.core.media/PlaylistItem? = ..., tv.nomercy.player.core.media/PlaylistItem = ..., kotlin/Double = ...): tv.nomercy.player.music/Crossfade // tv.nomercy.player.music/Crossfade.copy|copy(tv.nomercy.player.core.media.PlaylistItem?;tv.nomercy.player.core.media.PlaylistItem;kotlin.Double){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music/Crossfade.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music/Crossfade.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music/Crossfade.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music/CrossfadeComplete { // tv.nomercy.player.music/CrossfadeComplete|null[0]
+    constructor <init>(tv.nomercy.player.core.media/PlaylistItem) // tv.nomercy.player.music/CrossfadeComplete.<init>|<init>(tv.nomercy.player.core.media.PlaylistItem){}[0]
+
+    final val item // tv.nomercy.player.music/CrossfadeComplete.item|{}item[0]
+        final fun <get-item>(): tv.nomercy.player.core.media/PlaylistItem // tv.nomercy.player.music/CrossfadeComplete.item.<get-item>|<get-item>(){}[0]
+
+    final fun component1(): tv.nomercy.player.core.media/PlaylistItem // tv.nomercy.player.music/CrossfadeComplete.component1|component1(){}[0]
+    final fun copy(tv.nomercy.player.core.media/PlaylistItem = ...): tv.nomercy.player.music/CrossfadeComplete // tv.nomercy.player.music/CrossfadeComplete.copy|copy(tv.nomercy.player.core.media.PlaylistItem){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music/CrossfadeComplete.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music/CrossfadeComplete.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music/CrossfadeComplete.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music/CrossfadePrevented { // tv.nomercy.player.music/CrossfadePrevented|null[0]
+    constructor <init>(kotlin/String?, kotlin/Any? = ...) // tv.nomercy.player.music/CrossfadePrevented.<init>|<init>(kotlin.String?;kotlin.Any?){}[0]
+
+    final val cause // tv.nomercy.player.music/CrossfadePrevented.cause|{}cause[0]
+        final fun <get-cause>(): kotlin/Any? // tv.nomercy.player.music/CrossfadePrevented.cause.<get-cause>|<get-cause>(){}[0]
+    final val reason // tv.nomercy.player.music/CrossfadePrevented.reason|{}reason[0]
+        final fun <get-reason>(): kotlin/String? // tv.nomercy.player.music/CrossfadePrevented.reason.<get-reason>|<get-reason>(){}[0]
+
+    final fun component1(): kotlin/String? // tv.nomercy.player.music/CrossfadePrevented.component1|component1(){}[0]
+    final fun component2(): kotlin/Any? // tv.nomercy.player.music/CrossfadePrevented.component2|component2(){}[0]
+    final fun copy(kotlin/String? = ..., kotlin/Any? = ...): tv.nomercy.player.music/CrossfadePrevented // tv.nomercy.player.music/CrossfadePrevented.copy|copy(kotlin.String?;kotlin.Any?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music/CrossfadePrevented.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music/CrossfadePrevented.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music/CrossfadePrevented.toString|toString(){}[0]
+}
+
+final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/MusicEvents|null[0]
+    final val BackendChanged // tv.nomercy.player.music/MusicEvents.BackendChanged|{}BackendChanged[0]
+        final fun <get-BackendChanged>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music/AudioBackendChange> // tv.nomercy.player.music/MusicEvents.BackendChanged.<get-BackendChanged>|<get-BackendChanged>(){}[0]
+    final val BeforeCrossfade // tv.nomercy.player.music/MusicEvents.BeforeCrossfade|{}BeforeCrossfade[0]
+        final fun <get-BeforeCrossfade>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.core.events/BeforeEvent<tv.nomercy.player.music/Crossfade>> // tv.nomercy.player.music/MusicEvents.BeforeCrossfade.<get-BeforeCrossfade>|<get-BeforeCrossfade>(){}[0]
+    final val CrossfadeComplete // tv.nomercy.player.music/MusicEvents.CrossfadeComplete|{}CrossfadeComplete[0]
+        final fun <get-CrossfadeComplete>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music/CrossfadeComplete> // tv.nomercy.player.music/MusicEvents.CrossfadeComplete.<get-CrossfadeComplete>|<get-CrossfadeComplete>(){}[0]
+    final val CrossfadePrevented // tv.nomercy.player.music/MusicEvents.CrossfadePrevented|{}CrossfadePrevented[0]
+        final fun <get-CrossfadePrevented>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music/CrossfadePrevented> // tv.nomercy.player.music/MusicEvents.CrossfadePrevented.<get-CrossfadePrevented>|<get-CrossfadePrevented>(){}[0]
+    final val CrossfadeStart // tv.nomercy.player.music/MusicEvents.CrossfadeStart|{}CrossfadeStart[0]
+        final fun <get-CrossfadeStart>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music/Crossfade> // tv.nomercy.player.music/MusicEvents.CrossfadeStart.<get-CrossfadeStart>|<get-CrossfadeStart>(){}[0]
+    final val all // tv.nomercy.player.music/MusicEvents.all|{}all[0]
+        final fun <get-all>(): kotlin.collections/List<tv.nomercy.player.core.events/EventKey<*>> // tv.nomercy.player.music/MusicEvents.all.<get-all>|<get-all>(){}[0]
+}

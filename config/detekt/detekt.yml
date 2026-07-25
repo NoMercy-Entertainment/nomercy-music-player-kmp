@@ -1,0 +1,178 @@
+# detekt — complexity and quality gates for the native player trio.
+#
+# Numbers here are HARD. The baseline is frozen at zero and adding to it is
+# forbidden: a baseline that grows is a ratchet pointing the wrong way.
+#
+# Chosen tighter than detekt's defaults because this is a published library —
+# a consumer reads this code to learn the plugin API, and every function they
+# read is documentation whether we meant it to be or not.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: true
+
+comments:
+  active: true
+  # Machine-enforced so nobody has to remember it. Template lives beside this
+  # file; detekt reports the first line that stops matching.
+  AbsentOrWrongFileLicense:
+    active: true
+    licenseTemplateFile: 'license.template'
+    licenseTemplateIsRegex: false
+
+complexity:
+  active: true
+
+  # Sonar S3776's threshold. The one metric that tracks "can a human hold this
+  # in their head" rather than merely counting branches.
+  CognitiveComplexMethod:
+    active: true
+    threshold: 15
+
+  # detekt defaults to 15. Tighter, because a 15-branch method in a library
+  # someone is reading to learn the API is a wall.
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 10
+    ignoreSingleWhenExpression: true      # an exhaustive `when` over a sealed type is a table, not complexity
+    ignoreSimpleWhenEntries: true
+
+  LongMethod:
+    active: true
+    threshold: 40                          # detekt default 60
+
+  LongParameterList:
+    active: true
+    functionThreshold: 5
+    constructorThreshold: 7                # controllers take their collaborators; DI is not a smell
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+
+  NestedBlockDepth:
+    active: true
+    threshold: 3                           # detekt default 4
+
+  ComplexCondition:
+    active: true
+    threshold: 3                           # detekt default 4 — name the predicate instead
+
+  LargeClass:
+    active: true
+    threshold: 400                         # detekt default 600
+
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 15
+    thresholdInClasses: 15
+    thresholdInInterfaces: 15
+    thresholdInObjects: 15
+    thresholdInEnums: 5
+    ignoreDeprecated: false
+    ignorePrivate: false
+    ignoreOverridden: true
+
+  ComplexInterface:
+    active: true
+    threshold: 10
+    includeStaticDeclarations: false
+
+  # OFF, deliberately. The web contract mandates bare-noun overloads —
+  # time()/time(s), subtitles()/subtitle(idx), quality()/quality(level).
+  # This rule would fight the contract, and the contract wins.
+  MethodOverloading:
+    active: false
+
+  LabeledExpression:
+    active: true
+
+  StringLiteralDuplication:
+    active: true
+    threshold: 3
+    ignoreAnnotation: true
+    excludes: ['**/test/**', '**/commonTest/**', '**/androidTest/**']
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: true
+  SwallowedException:
+    active: true                           # a caught error that vanishes is a bug with no symptom
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: true
+  ReturnFromFinally:
+    active: true
+  PrintStackTrace:
+    active: true
+
+potential-bugs:
+  active: true
+  UnsafeCallOnNullableType:
+    active: true                           # `!!` is banned — narrow it or handle it
+  UnsafeCast:
+    active: true
+  CastToNullableType:
+    active: true
+  IgnoredReturnValue:
+    active: true
+  ExplicitGarbageCollectionCall:
+    active: true
+  LateinitUsage:
+    active: true                           # hidden construction order; inject it
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: true                           # unscoped work outlives its owner and leaks
+  SuspendFunWithFlowReturnType:
+    active: true
+  RedundantSuspendModifier:
+    active: true
+  SleepInsteadOfDelay:
+    active: true
+
+naming:
+  active: true
+  VariableNaming:
+    active: true
+  FunctionNaming:
+    active: true
+  ClassNaming:
+    active: true
+  ForbiddenClassName:
+    active: true
+    forbiddenName: ['Manager', 'Helper', 'Util', 'Utils', 'Data', 'Info']  # names that describe nothing
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    ignoreNumbers: ['-1', '0', '1', '2']
+    ignoreHashCodeFunction: true
+    ignorePropertyDeclaration: true
+    ignoreEnums: true
+  ReturnCount:
+    active: true
+    max: 3
+  ThrowsCount:
+    active: true
+    max: 2
+  UnusedPrivateClass:
+    active: true
+  UnusedPrivateMember:
+    active: true
+  UnusedPrivateProperty:
+    active: true
+  UnusedParameter:
+    active: true
+  ForbiddenComment:
+    active: true
+    comments: ['TODO:', 'FIXME:', 'STOPSHIP:']   # unfinished work does not ship in a library
+
+# The player-specific pack lives in the core repo and is not published yet, so
+# it cannot be applied here. When it is, add the same `player:` section the core
+# repo carries — the advice is about writing plugins, and plugins are written
+# against this library too.
