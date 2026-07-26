@@ -17,6 +17,7 @@ import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.ports.BackendState
 import tv.nomercy.player.core.ports.CrossfadeCurve
 import tv.nomercy.player.core.ports.TransitionBackend
+import tv.nomercy.player.core.ports.CanonicalBackendEvent
 import tv.nomercy.player.core.ports.LoadOptions
 import tv.nomercy.player.core.ports.MediaBackend
 import kotlin.test.Test
@@ -26,6 +27,13 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+// A backend that answers on its own event stream, the way a real one does.
+//
+// It was silent before, and that silence meant every test in this repo drove
+// the player without the bridge ever hearing back. The whole difference between
+// play and playing lives in that return path — a chrome bound to playing shows
+// a spinner forever while audio comes out of the speakers — so a fake that never
+// confirmed anything was leaving the most important seam untested.
 internal open class SilentBackend : MediaBackend {
     var playCount: Int = 0
 
@@ -33,9 +41,30 @@ internal open class SilentBackend : MediaBackend {
     // refused one from an accepted one, which is the whole question a
     // before-hook test asks.
     val seekedTo: MutableList<Double> = mutableListOf()
-    override suspend fun load(url: String, opts: LoadOptions) = Unit
-    override suspend fun play() { playCount += 1 }
-    override fun pause() = Unit
+
+    private val listeners: MutableMap<String, MutableList<(Any?) -> Unit>> = mutableMapOf()
+
+    fun fire(event: String, data: Any? = null) {
+        listeners[event]?.toList()?.forEach { it(data) }
+    }
+
+    override suspend fun load(url: String, opts: LoadOptions) {
+        // What a real engine reports once it has read the container.
+        fire(CanonicalBackendEvent.LOAD_START)
+        fire(CanonicalBackendEvent.LOADED_METADATA)
+        fire(CanonicalBackendEvent.CAN_PLAY)
+    }
+
+    override suspend fun play() {
+        playCount += 1
+        fire(CanonicalBackendEvent.PLAY)
+        fire(CanonicalBackendEvent.PLAYING)
+    }
+
+    override fun pause() {
+        fire(CanonicalBackendEvent.PAUSE)
+    }
+
     override fun stop() = Unit
     override fun currentTime(): Double = 0.0
     override fun currentTime(seconds: Double) {
@@ -50,8 +79,13 @@ internal open class SilentBackend : MediaBackend {
     override fun playbackRate(): Double = 1.0
     override fun playbackRate(rate: Double) = Unit
     override fun state(): BackendState = BackendState.IDLE
-    override fun on(event: String, fn: (Any?) -> Unit) = Unit
-    override fun off(event: String, fn: (Any?) -> Unit) = Unit
+    override fun on(event: String, fn: (Any?) -> Unit) {
+        listeners.getOrPut(event) { mutableListOf() }.add(fn)
+    }
+
+    override fun off(event: String, fn: (Any?) -> Unit) {
+        listeners[event]?.remove(fn)
+    }
 }
 
 // An engine that can hold two tracks, recording what the fade asked it to do.

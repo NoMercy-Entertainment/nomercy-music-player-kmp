@@ -1,0 +1,596 @@
+{
+  "contractVersion": "2.0.1",
+  "scenarios": [
+    {
+      "id": "transport/play",
+      "name": "play announces itself before it happens, then reports that it did",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        }
+      ],
+      "expect": [
+        "beforePlay",
+        "play",
+        "playing"
+      ]
+    },
+    {
+      "id": "transport/play-prevented",
+      "name": "a listener refusing beforePlay stops playback and says so",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "preventVia": "beforePlay"
+        },
+        {
+          "method": "play"
+        }
+      ],
+      "expect": [
+        "beforePlay",
+        "playPrevented"
+      ]
+    },
+    {
+      "id": "transport/pause",
+      "name": "pause after play",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "method": "pause"
+        }
+      ],
+      "expect": [
+        "beforePlay",
+        "play",
+        "beforePause",
+        "pause"
+      ]
+    },
+    {
+      "id": "transport/pause-prevented",
+      "name": "a refused pause leaves playback running",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "preventVia": "beforePause"
+        },
+        {
+          "method": "pause"
+        }
+      ],
+      "expect": [
+        "play",
+        "beforePause",
+        "pausePrevented"
+      ]
+    },
+    {
+      "id": "transport/stop",
+      "name": "stop after play",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "method": "stop"
+        }
+      ],
+      "expect": [
+        "beforePlay",
+        "play",
+        "beforeStop",
+        "stop"
+      ]
+    },
+    {
+      "id": "transport/seek",
+      "name": "seeking announces before, then seek, then seeked",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "method": "time",
+          "args": [
+            30
+          ]
+        }
+      ],
+      "expect": [
+        "beforeSeek",
+        "seek"
+      ]
+    },
+    {
+      "id": "transport/seek-prevented",
+      "name": "a refused seek does not move the playhead",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "preventVia": "beforeSeek"
+        },
+        {
+          "method": "time",
+          "args": [
+            30
+          ]
+        }
+      ],
+      "expect": [
+        "beforeSeek",
+        "seekPrevented"
+      ]
+    },
+    {
+      "id": "queue/next",
+      "name": "next advances the cursor and announces the new item",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        },
+        {
+          "id": "b",
+          "title": "B",
+          "url": "https://example.test/b"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "method": "next"
+        }
+      ],
+      "expect": [
+        "beforeNext",
+        "next",
+        "item"
+      ]
+    },
+    {
+      "id": "queue/next-prevented",
+      "name": "a refused next leaves the cursor where it was",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        },
+        {
+          "id": "b",
+          "title": "B",
+          "url": "https://example.test/b"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "preventVia": "beforeNext"
+        },
+        {
+          "method": "next"
+        }
+      ],
+      "expect": [
+        "beforeNext",
+        "nextPrevented"
+      ]
+    },
+    {
+      "id": "queue/previous",
+      "name": "previous walks back through the queue",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        },
+        {
+          "id": "b",
+          "title": "B",
+          "url": "https://example.test/b"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "method": "next"
+        },
+        {
+          "method": "previous"
+        }
+      ],
+      "expect": [
+        "next",
+        "beforePrevious",
+        "previous"
+      ]
+    },
+    {
+      "id": "mode/volume",
+      "name": "a volume change is announced",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "volume",
+          "args": [
+            40
+          ]
+        }
+      ],
+      "expect": [
+        "beforeVolume",
+        "volume"
+      ]
+    },
+    {
+      "id": "mode/volume-prevented",
+      "name": "a refused volume change does not move the level",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "preventVia": "beforeVolume"
+        },
+        {
+          "method": "volume",
+          "args": [
+            40
+          ]
+        }
+      ],
+      "expect": [
+        "beforeVolume",
+        "volumePrevented"
+      ]
+    },
+    {
+      "id": "mode/mute",
+      "name": "muting is announced separately from the volume level",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "mute",
+          "args": [
+            true
+          ]
+        }
+      ],
+      "expect": [
+        "beforeMute",
+        "mute"
+      ]
+    },
+    {
+      "id": "mode/playback-rate",
+      "name": "a playback-rate change is announced",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "playbackRate",
+          "args": [
+            1.5
+          ]
+        }
+      ],
+      "expect": [
+        "beforePlaybackRate",
+        "playbackRate"
+      ]
+    },
+    {
+      "id": "backend/ended",
+      "name": "the backend reaching the end surfaces as ended",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "backend": "ended"
+        }
+      ],
+      "expect": [
+        "play",
+        "ended"
+      ]
+    },
+    {
+      "id": "backend/time",
+      "name": "a backend time update surfaces as progress then time",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "backend": "timeupdate",
+          "args": [
+            {
+              "currentTime": 12,
+              "duration": 100
+            }
+          ]
+        }
+      ],
+      "expect": [
+        "play",
+        "progress",
+        "time"
+      ]
+    },
+    {
+      "id": "backend/stalled",
+      "name": "the backend stalling is reported rather than swallowed",
+      "medium": "video",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "backend": "stalled"
+        }
+      ],
+      "expect": [
+        "play",
+        "stalled"
+      ]
+    },
+    {
+      "id": "backend/waiting",
+      "name": "the backend waiting for data is reported",
+      "medium": "video",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "backend": "waiting"
+        }
+      ],
+      "expect": [
+        "play",
+        "waiting"
+      ]
+    },
+    {
+      "id": "backend/level-switched",
+      "name": "an ABR level switch reaches the consumer",
+      "medium": "video",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        },
+        {
+          "backend": "level-switched",
+          "args": [
+            {
+              "level": 2
+            }
+          ]
+        }
+      ],
+      "expect": [
+        "play",
+        "level-switched"
+      ]
+    },
+    {
+      "id": "lifecycle/play-reaches-media-ready",
+      "name": "playing walks the phase machine through to a ready media pipeline",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        }
+      ],
+      "expect": [
+        "beforePlay",
+        "phase",
+        "play",
+        "playing",
+        "firstFrame",
+        "mediaReady"
+      ]
+    },
+    {
+      "id": "lifecycle/video-reports-duration-and-canplay",
+      "name": "the video pipeline reports duration and canplay before it is ready",
+      "medium": "video",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "play"
+        }
+      ],
+      "expect": [
+        "play",
+        "duration",
+        "canplay",
+        "mediaReady"
+      ]
+    },
+    {
+      "id": "queue/replace",
+      "name": "replacing the queue announces it",
+      "medium": "both",
+      "playlist": [
+        {
+          "id": "a",
+          "title": "A",
+          "url": "https://example.test/a"
+        }
+      ],
+      "actions": [
+        {
+          "method": "queue",
+          "args": [
+            [
+              {
+                "id": "x",
+                "title": "X",
+                "url": "https://example.test/x"
+              },
+              {
+                "id": "y",
+                "title": "Y",
+                "url": "https://example.test/y"
+              }
+            ]
+          ]
+        }
+      ],
+      "expect": [
+        "queue"
+      ]
+    }
+  ]
+}
