@@ -101,4 +101,5 @@ final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/Mu
         final fun <get-all>(): kotlin.collections/List<tv.nomercy.player.core.events/EventKey<*>> // tv.nomercy.player.music/MusicEvents.all.<get-all>|<get-all>(){}[0]
 }
 
+final fun tv.nomercy.player.music/defaultAudioBackend(): tv.nomercy.player.core.ports/AudioBackend // tv.nomercy.player.music/defaultAudioBackend|defaultAudioBackend(){}[0]
 final fun tv.nomercy.player.music/nmMusicPlayer(kotlin/String = ..., tv.nomercy.player.core.ports/AudioBackend? = ...): tv.nomercy.player.music/NMMusicPlayer // tv.nomercy.player.music/nmMusicPlayer|nmMusicPlayer(kotlin.String;tv.nomercy.player.core.ports.AudioBackend?){}[0]

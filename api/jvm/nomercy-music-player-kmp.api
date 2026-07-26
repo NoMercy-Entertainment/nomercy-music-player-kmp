@@ -49,6 +49,10 @@ public final class tv/nomercy/player/music/CrossfadePrevented {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class tv/nomercy/player/music/DefaultAudioBackend_jvmKt {
+	public static final fun defaultAudioBackend ()Ltv/nomercy/player/core/ports/AudioBackend;
+}
+
 public final class tv/nomercy/player/music/FactoryKt {
 	public static final fun nmMusicPlayer (Ljava/lang/String;Ltv/nomercy/player/core/ports/AudioBackend;)Ltv/nomercy/player/music/NMMusicPlayer;
 	public static synthetic fun nmMusicPlayer$default (Ljava/lang/String;Ltv/nomercy/player/core/ports/AudioBackend;ILjava/lang/Object;)Ltv/nomercy/player/music/NMMusicPlayer;
