@@ -62,8 +62,9 @@ public final class tv/nomercy/player/music/MusicEvents {
 public class tv/nomercy/player/music/NMMusicPlayer : tv/nomercy/player/core/controllers/ComposedPlayer {
 	public static final field Companion Ltv/nomercy/player/music/NMMusicPlayer$Companion;
 	public fun <init> ()V
-	public fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;)V
-	public synthetic fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ltv/nomercy/player/core/ports/AudioBackend;)V
+	public fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun announceBackend (Ljava/lang/String;)V
 	public fun crossfadeDuration ()D
 	public fun crossfadeDuration (D)V

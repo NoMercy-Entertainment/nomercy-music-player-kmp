@@ -10,7 +10,10 @@ package tv.nomercy.player.music
 
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.media.PlaylistItem
+import tv.nomercy.player.core.ports.AudioBackend
+import tv.nomercy.player.core.ports.CrossfadeCurve
 import tv.nomercy.player.core.ports.MediaBackend
+import tv.nomercy.player.core.ports.TransitionBackend
 
 // A music player.
 //
@@ -24,7 +27,17 @@ import tv.nomercy.player.core.ports.MediaBackend
 // crossfaded, and the plugin that knows that is the one holding the tags.
 public open class NMMusicPlayer(
     backend: MediaBackend? = null,
+    // The same backend again when it can hold two tracks at once.
+    //
+    // Passed rather than tested for, because asking a MediaBackend whether it is
+    // really a TransitionBackend is a cast, and the one rule this library does
+    // not bend is that a caller says what it has instead of the library
+    // guessing. The convenience constructor below covers the ordinary case.
+    private val transitions: TransitionBackend? = null,
 ) : ComposedPlayer(backend) {
+
+    // An audio backend is both, so a caller with one says so once.
+    public constructor(audio: AudioBackend) : this(audio, audio)
 
     private var crossfadeSeconds: Double = 0.0
 
@@ -48,28 +61,41 @@ public open class NMMusicPlayer(
     // something knew better — so the caller gets false and plays the next track
     // the ordinary way.
     public open suspend fun crossfadeTo(next: PlaylistItem): Boolean {
-        val from: PlaylistItem? = item()
         val outcome = dispatchBefore(
             MusicEvents.BeforeCrossfade,
-            Crossfade(from = from, to = next, duration = crossfadeSeconds),
+            Crossfade(from = item(), to = next, duration = crossfadeSeconds),
         )
-
-        if (outcome.prevented) {
-            emit(MusicEvents.CrossfadePrevented, CrossfadePrevented(outcome.reason))
-            return false
-        }
-
-        // The listener may have shortened it to nothing, which is a refusal
-        // spelled differently and deserves the same answer.
         val resolved: Crossfade = outcome.data
-        if (resolved.duration <= 0.0) {
-            emit(MusicEvents.CrossfadePrevented, CrossfadePrevented("zero-duration"))
-            return false
+        val engine: TransitionBackend? = transitions
+
+        // Every way this can decline, decided in one place. A listener refusing,
+        // a listener shortening it to nothing, and an engine that cannot hold two
+        // tracks at once are all the same answer to the caller: false, with a
+        // reason. Emitting a start and a completion with nothing between them is
+        // what this did before the transition seam existed, and it looked exactly
+        // like a working crossfade.
+        val refusal: String? = when {
+            outcome.prevented -> outcome.reason
+            resolved.duration <= 0.0 -> "zero-duration"
+            engine == null -> "no-transition-backend"
+            !engine.supportsCrossfade() -> "backend-cannot-crossfade"
+            else -> null
         }
+        if (engine == null || refusal != null) return refuse(refusal)
 
         emit(MusicEvents.CrossfadeStart, resolved)
+
+        engine.loadSecondary(resolved.to.url)
+        engine.primeSecondary()
+        engine.crossfade((resolved.duration * MILLIS_PER_SECOND).toLong(), CrossfadeCurve.EQUAL_POWER)
+
         emit(MusicEvents.CrossfadeComplete, CrossfadeComplete(resolved.to))
         return true
+    }
+
+    private fun refuse(reason: String?): Boolean {
+        emit(MusicEvents.CrossfadePrevented, CrossfadePrevented(reason))
+        return false
     }
 
     public open fun announceBackend(kind: String) {
@@ -77,6 +103,8 @@ public open class NMMusicPlayer(
     }
 
     public companion object {
+        private const val MILLIS_PER_SECOND = 1000.0
+
         private val live: MutableList<NMMusicPlayer> = mutableListOf()
 
         public fun instances(): List<NMMusicPlayer> = live.toList()
