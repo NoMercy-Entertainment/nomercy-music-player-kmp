@@ -67,6 +67,14 @@ kotlin {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
         }
+        jvmTest.dependencies {
+            // The surface gate asks the class what it exposes, which is the only
+            // way to notice a method renamed, never written, or invented here.
+            // jvmTest-only: a reflection library in the shipped artifact would be
+            // a megabyte every consumer carries so a test could ask a question at
+            // build time.
+            implementation(kotlin("reflect"))
+        }
     }
 }
 

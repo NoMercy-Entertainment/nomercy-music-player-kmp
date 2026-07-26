@@ -8,6 +8,9 @@
 
 package tv.nomercy.player.music
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.ports.BackendState
@@ -17,6 +20,7 @@ import tv.nomercy.player.core.ports.LoadOptions
 import tv.nomercy.player.core.ports.MediaBackend
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -78,7 +82,86 @@ private class TwoTrackBackend : SilentBackend(), TransitionBackend {
     override fun secondaryGain(value: Float) = Unit
 }
 
+// A backend that stays inside its crossfade until released, so a second call
+// arrives while the first is still running — which is the only way to test the
+// re-entrancy guard.
+// An engine that fails partway through, which real ones do: a device
+// disappearing mid-fade takes the secondary buffer with it.
+private class ThrowingFadeBackend : SilentBackend(), TransitionBackend {
+    override fun supportsCrossfade(): Boolean = true
+    override suspend fun loadSecondary(url: String) = Unit
+    override suspend fun primeSecondary(seekMs: Long) = Unit
+    override suspend fun crossfade(durationMs: Long, curve: CrossfadeCurve): Unit =
+        error("the output device went away")
+    override fun disposeSecondary() = Unit
+    override fun secondaryGain(): Float = 0f
+    override fun secondaryGain(value: Float) = Unit
+}
+
+private class SlowFadeBackend : SilentBackend(), TransitionBackend {
+    val gate: CompletableDeferred<Unit> = CompletableDeferred()
+    var fades: Int = 0
+        private set
+
+    override fun supportsCrossfade(): Boolean = true
+    override suspend fun loadSecondary(url: String) = Unit
+    override suspend fun primeSecondary(seekMs: Long) = Unit
+
+    override suspend fun crossfade(durationMs: Long, curve: CrossfadeCurve) {
+        fades += 1
+        gate.await()
+    }
+
+    override fun disposeSecondary() = Unit
+    override fun secondaryGain(): Float = 0f
+    override fun secondaryGain(value: Float) = Unit
+}
+
 class NMMusicPlayerTest {
+
+    @Test
+    fun aSecondCrossfadeWhileOneIsRunningIsRefused() = runTest {
+        // Two overlapping crossfades drive the same gain and the loser wins: one
+        // ends by setting the outgoing track to silence while the other is still
+        // fading it up, so a track vanishes mid-song.
+        val backend = SlowFadeBackend()
+        val subject = NMMusicPlayer(backend, backend)
+        subject.setup()
+        subject.ready().await()
+        subject.configureCrossfade(3.0)
+        subject.queue(listOf(Track("a"), Track("b"), Track("c")))
+        subject.play()
+
+        val first = async { subject.crossfadeTo(Track("b")) }
+        runCurrent()
+
+        assertTrue(subject.isTransitioning(), "the player did not report the crossfade it was running")
+        assertFalse(subject.crossfadeTo(Track("c")), "a stacked crossfade was accepted")
+
+        backend.gate.complete(Unit)
+        assertTrue(first.await())
+        assertEquals(1, backend.fades, "the refused crossfade reached the engine anyway")
+        assertFalse(subject.isTransitioning())
+    }
+
+    @Test
+    fun anEngineThatThrowsMidFadeDoesNotStrandThePlayer() = runTest {
+        // Left set, every crossfade for the rest of the session is refused —
+        // and nothing says why, because the refusal looks exactly like a
+        // listener declining one.
+        val backend = ThrowingFadeBackend()
+        val subject = NMMusicPlayer(backend, backend)
+        subject.setup()
+        subject.ready().await()
+        subject.configureCrossfade(3.0)
+        subject.queue(listOf(Track("a"), Track("b")))
+        subject.play()
+
+        assertFails { subject.crossfadeTo(Track("b")) }
+
+        assertFalse(subject.isTransitioning(), "a failed crossfade left the player transitioning forever")
+    }
+
 
     private suspend fun player(): Pair<NMMusicPlayer, TwoTrackBackend> {
         val backend = TwoTrackBackend()
@@ -106,23 +189,26 @@ class NMMusicPlayerTest {
         val (subject, _) = player()
 
         // Crossfading by surprise is worse than not crossfading.
-        assertEquals(0.0, subject.crossfadeDuration())
         assertFalse(subject.crossfadeEnabled())
     }
 
     @Test
     fun aNegativeDurationIsClampedRatherThanTrusted() = runTest {
+        // Read through the behaviour rather than a getter: a negative duration
+        // reaching the engine is the failure, and a clamped one refuses the
+        // crossfade for the same reason zero does.
         val (subject, _) = player()
 
-        subject.crossfadeDuration(-4.0)
+        subject.configureCrossfade(-4.0)
 
-        assertEquals(0.0, subject.crossfadeDuration())
+        assertFalse(subject.crossfadeEnabled())
+        assertFalse(subject.crossfadeTo(Track("b")))
     }
 
     @Test
     fun crossfadingAnnouncesTheStartAndThenTheCompletion() = runTest {
         val (subject, _) = player()
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         subject.queue(listOf(Track("a"), Track("b")))
         subject.play()
         val seen = mutableListOf<String>()
@@ -138,7 +224,7 @@ class NMMusicPlayerTest {
     @Test
     fun aRefusedCrossfadeIsNotAFailureAndSaysWhy() = runTest {
         val (subject, _) = player()
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         subject.queue(listOf(Track("a")))
         subject.play()
         subject.on(MusicEvents.BeforeCrossfade) { it.preventDefault() }
@@ -159,7 +245,7 @@ class NMMusicPlayerTest {
     @Test
     fun aListenerCanShortenACrossfadeRatherThanOnlyRefusingIt() = runTest {
         val (subject, _) = player()
-        subject.crossfadeDuration(8.0)
+        subject.configureCrossfade(8.0)
         subject.queue(listOf(Track("a")))
         subject.play()
         subject.on(MusicEvents.BeforeCrossfade) { it.data = it.data.copy(duration = 1.5) }
@@ -174,7 +260,7 @@ class NMMusicPlayerTest {
     @Test
     fun shorteningACrossfadeToNothingIsARefusalSpelledDifferently() = runTest {
         val (subject, _) = player()
-        subject.crossfadeDuration(4.0)
+        subject.configureCrossfade(4.0)
         subject.queue(listOf(Track("a")))
         subject.play()
         subject.on(MusicEvents.BeforeCrossfade) { it.data = it.data.copy(duration = 0.0) }
@@ -190,7 +276,7 @@ class NMMusicPlayerTest {
     @Test
     fun theFirstTrackOfASessionCrossfadesFromNothing() = runTest {
         val (subject, _) = player()
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         var from: Any? = "unset"
         subject.on(MusicEvents.CrossfadeStart) { from = it.from }
 
@@ -226,7 +312,7 @@ class NMMusicPlayerTest {
         // transition that starts with silence, and nothing reports it — the
         // events fire in the right order either way.
         val (subject, backend) = player()
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         subject.queue(listOf(Track("a")))
         subject.item("a")
 
@@ -244,7 +330,7 @@ class NMMusicPlayerTest {
         // A listener may shorten it. The engine has to be told the resolved
         // duration, not the configured one, or the hook is decorative.
         val (subject, backend) = player()
-        subject.crossfadeDuration(4.0)
+        subject.configureCrossfade(4.0)
         subject.queue(listOf(Track("a")))
         subject.item("a")
         subject.on(MusicEvents.BeforeCrossfade) { it.data = it.data.copy(duration = 1.5) }
@@ -261,7 +347,7 @@ class NMMusicPlayerTest {
         // like a working crossfade.
         val (subject, backend) = player()
         backend.canCrossfade = false
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         subject.queue(listOf(Track("a")))
         subject.item("a")
         var refusal: String? = null
@@ -281,7 +367,7 @@ class NMMusicPlayerTest {
         val subject = NMMusicPlayer(SilentBackend())
         subject.setup()
         subject.ready().await()
-        subject.crossfadeDuration(3.0)
+        subject.configureCrossfade(3.0)
         var refusal: String? = null
         subject.on(MusicEvents.CrossfadePrevented) { refusal = it.reason }
 

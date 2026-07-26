@@ -45,25 +45,42 @@ public open class NMMusicPlayer(
         register(this)
     }
 
-    // Zero means off, which is the default and the right one: crossfading by
-    // surprise is worse than not crossfading.
-    public open fun crossfadeDuration(): Double = crossfadeSeconds
+    // Whether a crossfade is running right now.
+    //
+    // The guard that makes crossfadeTo idempotent. Two overlapping crossfades
+    // both drive the same gain, and the loser wins: one ends by setting the
+    // outgoing track to silence while the other is still fading it up, so a
+    // track disappears mid-song. A second call while one is running is answered
+    // rather than queued, because by the time the first ends the second is
+    // about a track that is no longer next.
+    public open fun isTransitioning(): Boolean = transitioning
 
-    public open fun crossfadeDuration(seconds: Double) {
+    public open fun crossfadeEnabled(): Boolean = crossfadeSeconds > 0.0
+
+    // How long a crossfade takes when the caller does not say.
+    //
+    // Configured rather than exposed as a getter and setter, matching the web,
+    // where it lives in crossfadeDefaults. Zero means off, which is the default
+    // and the right one: crossfading by surprise is worse than not crossfading.
+    public open fun configureCrossfade(seconds: Double) {
         crossfadeSeconds = seconds.coerceAtLeast(0.0)
     }
 
-    public open fun crossfadeEnabled(): Boolean = crossfadeSeconds > 0.0
+    private var transitioning: Boolean = false
 
     // Fades from what is playing into [next] and reports what happened.
     //
     // Returns true when the crossfade ran. A refusal is not a failure — it means
     // something knew better — so the caller gets false and plays the next track
     // the ordinary way.
-    public open suspend fun crossfadeTo(next: PlaylistItem): Boolean {
+    public open suspend fun crossfadeTo(next: PlaylistItem, seconds: Double? = null): Boolean {
+        // Refused rather than queued. By the time a running crossfade finishes,
+        // a second request is about a track that is no longer the one coming up.
+        if (transitioning) return refuse(ALREADY_TRANSITIONING)
+
         val outcome = dispatchBefore(
             MusicEvents.BeforeCrossfade,
-            Crossfade(from = item(), to = next, duration = crossfadeSeconds),
+            Crossfade(from = item(), to = next, duration = seconds ?: crossfadeSeconds),
         )
         val resolved: Crossfade = outcome.data
         val engine: TransitionBackend? = transitions
@@ -84,10 +101,18 @@ public open class NMMusicPlayer(
         if (engine == null || refusal != null) return refuse(refusal)
 
         emit(MusicEvents.CrossfadeStart, resolved)
-
-        engine.loadSecondary(resolved.to.url)
-        engine.primeSecondary()
-        engine.crossfade((resolved.duration * MILLIS_PER_SECOND).toLong(), CrossfadeCurve.EQUAL_POWER)
+        transitioning = true
+        try {
+            engine.loadSecondary(resolved.to.url)
+            engine.primeSecondary()
+            engine.crossfade((resolved.duration * MILLIS_PER_SECOND).toLong(), CrossfadeCurve.EQUAL_POWER)
+        } finally {
+            // In a finally because an engine that throws mid-fade would
+            // otherwise leave this player believing it is still transitioning,
+            // and every crossfade after it would be refused for the rest of the
+            // session.
+            transitioning = false
+        }
 
         emit(MusicEvents.CrossfadeComplete, CrossfadeComplete(resolved.to))
         return true
@@ -104,6 +129,8 @@ public open class NMMusicPlayer(
 
     public companion object {
         private const val MILLIS_PER_SECOND = 1000.0
+
+        private const val ALREADY_TRANSITIONING = "already-transitioning"
 
         private val live: MutableList<NMMusicPlayer> = mutableListOf()
 

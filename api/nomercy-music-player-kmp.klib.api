@@ -72,10 +72,10 @@ open class tv.nomercy.player.music/NMMusicPlayer : tv.nomercy.player.core.contro
     constructor <init>(tv.nomercy.player.core.ports/MediaBackend? = ..., tv.nomercy.player.core.ports/TransitionBackend? = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.MediaBackend?;tv.nomercy.player.core.ports.TransitionBackend?){}[0]
 
     open fun announceBackend(kotlin/String) // tv.nomercy.player.music/NMMusicPlayer.announceBackend|announceBackend(kotlin.String){}[0]
-    open fun crossfadeDuration(): kotlin/Double // tv.nomercy.player.music/NMMusicPlayer.crossfadeDuration|crossfadeDuration(){}[0]
-    open fun crossfadeDuration(kotlin/Double) // tv.nomercy.player.music/NMMusicPlayer.crossfadeDuration|crossfadeDuration(kotlin.Double){}[0]
+    open fun configureCrossfade(kotlin/Double) // tv.nomercy.player.music/NMMusicPlayer.configureCrossfade|configureCrossfade(kotlin.Double){}[0]
     open fun crossfadeEnabled(): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.crossfadeEnabled|crossfadeEnabled(){}[0]
-    open suspend fun crossfadeTo(tv.nomercy.player.core.media/PlaylistItem): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.crossfadeTo|crossfadeTo(tv.nomercy.player.core.media.PlaylistItem){}[0]
+    open fun isTransitioning(): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.isTransitioning|isTransitioning(){}[0]
+    open suspend fun crossfadeTo(tv.nomercy.player.core.media/PlaylistItem, kotlin/Double? = ...): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.crossfadeTo|crossfadeTo(tv.nomercy.player.core.media.PlaylistItem;kotlin.Double?){}[0]
 
     final object Companion { // tv.nomercy.player.music/NMMusicPlayer.Companion|null[0]
         final fun instances(): kotlin.collections/List<tv.nomercy.player.music/NMMusicPlayer> // tv.nomercy.player.music/NMMusicPlayer.Companion.instances|instances(){}[0]
