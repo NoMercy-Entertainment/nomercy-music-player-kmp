@@ -28,12 +28,19 @@ import kotlin.test.assertTrue
 
 internal open class SilentBackend : MediaBackend {
     var playCount: Int = 0
+
+    // Recorded rather than discarded. A fake that drops seeks cannot tell a
+    // refused one from an accepted one, which is the whole question a
+    // before-hook test asks.
+    val seekedTo: MutableList<Double> = mutableListOf()
     override suspend fun load(url: String, opts: LoadOptions) = Unit
     override suspend fun play() { playCount += 1 }
     override fun pause() = Unit
     override fun stop() = Unit
     override fun currentTime(): Double = 0.0
-    override fun currentTime(seconds: Double) = Unit
+    override fun currentTime(seconds: Double) {
+        seekedTo += seconds
+    }
     override fun duration(): Double = 0.0
     override fun volume(): Float = 1.0f
     override fun volume(value: Float) = Unit
