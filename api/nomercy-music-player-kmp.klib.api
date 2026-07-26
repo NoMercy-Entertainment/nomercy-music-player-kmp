@@ -68,16 +68,20 @@ final class tv.nomercy.player.music/CrossfadePrevented { // tv.nomercy.player.mu
 }
 
 open class tv.nomercy.player.music/NMMusicPlayer : tv.nomercy.player.core.controllers/ComposedPlayer { // tv.nomercy.player.music/NMMusicPlayer|null[0]
-    constructor <init>(tv.nomercy.player.core.ports/AudioBackend) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.AudioBackend){}[0]
-    constructor <init>(tv.nomercy.player.core.ports/MediaBackend? = ..., tv.nomercy.player.core.ports/TransitionBackend? = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.MediaBackend?;tv.nomercy.player.core.ports.TransitionBackend?){}[0]
+    constructor <init>(tv.nomercy.player.core.ports/AudioBackend, kotlin/String = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.AudioBackend;kotlin.String){}[0]
+    constructor <init>(tv.nomercy.player.core.ports/MediaBackend? = ..., tv.nomercy.player.core.ports/TransitionBackend? = ..., kotlin/String = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.MediaBackend?;tv.nomercy.player.core.ports.TransitionBackend?;kotlin.String){}[0]
 
     open fun announceBackend(kotlin/String) // tv.nomercy.player.music/NMMusicPlayer.announceBackend|announceBackend(kotlin.String){}[0]
     open fun configureCrossfade(kotlin/Double) // tv.nomercy.player.music/NMMusicPlayer.configureCrossfade|configureCrossfade(kotlin.Double){}[0]
     open fun crossfadeEnabled(): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.crossfadeEnabled|crossfadeEnabled(){}[0]
     open fun isTransitioning(): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.isTransitioning|isTransitioning(){}[0]
+    open fun setTransitionStrategy(tv.nomercy.player.core.ports/TransitionStrategy) // tv.nomercy.player.music/NMMusicPlayer.setTransitionStrategy|setTransitionStrategy(tv.nomercy.player.core.ports.TransitionStrategy){}[0]
     open suspend fun crossfadeTo(tv.nomercy.player.core.media/PlaylistItem, kotlin/Double? = ...): kotlin/Boolean // tv.nomercy.player.music/NMMusicPlayer.crossfadeTo|crossfadeTo(tv.nomercy.player.core.media.PlaylistItem;kotlin.Double?){}[0]
+    open suspend fun setup(tv.nomercy.player.core.player/PlayerConfig) // tv.nomercy.player.music/NMMusicPlayer.setup|setup(tv.nomercy.player.core.player.PlayerConfig){}[0]
 
     final object Companion { // tv.nomercy.player.music/NMMusicPlayer.Companion|null[0]
+        final fun byId(kotlin/String): tv.nomercy.player.music/NMMusicPlayer? // tv.nomercy.player.music/NMMusicPlayer.Companion.byId|byId(kotlin.String){}[0]
+        final fun forget(kotlin/String) // tv.nomercy.player.music/NMMusicPlayer.Companion.forget|forget(kotlin.String){}[0]
         final fun instances(): kotlin.collections/List<tv.nomercy.player.music/NMMusicPlayer> // tv.nomercy.player.music/NMMusicPlayer.Companion.instances|instances(){}[0]
     }
 }
@@ -96,3 +100,5 @@ final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/Mu
     final val all // tv.nomercy.player.music/MusicEvents.all|{}all[0]
         final fun <get-all>(): kotlin.collections/List<tv.nomercy.player.core.events/EventKey<*>> // tv.nomercy.player.music/MusicEvents.all.<get-all>|<get-all>(){}[0]
 }
+
+final fun tv.nomercy.player.music/nmMusicPlayer(kotlin/String = ..., tv.nomercy.player.core.ports/AudioBackend? = ...): tv.nomercy.player.music/NMMusicPlayer // tv.nomercy.player.music/nmMusicPlayer|nmMusicPlayer(kotlin.String;tv.nomercy.player.core.ports.AudioBackend?){}[0]

@@ -11,7 +11,10 @@ package tv.nomercy.player.music
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.ports.AudioBackend
+import tv.nomercy.player.core.player.PlayerConfig
 import tv.nomercy.player.core.ports.CrossfadeCurve
+import tv.nomercy.player.core.ports.CrossfadeTransitionStrategy
+import tv.nomercy.player.core.ports.TransitionStrategy
 import tv.nomercy.player.core.ports.MediaBackend
 import tv.nomercy.player.core.ports.TransitionBackend
 
@@ -34,16 +37,21 @@ public open class NMMusicPlayer(
     // not bend is that a caller says what it has instead of the library
     // guessing. The convenience constructor below covers the ordinary case.
     private val transitions: TransitionBackend? = null,
-) : ComposedPlayer(backend) {
+    // Names this player, and is what the factory looks it up by.
+    id: String = "nmmusic",
+) : ComposedPlayer(backend, playerId = id) {
 
     // An audio backend is both, so a caller with one says so once.
-    public constructor(audio: AudioBackend) : this(audio, audio)
+    public constructor(audio: AudioBackend, id: String = "nmmusic") : this(audio, audio, id)
 
     private var crossfadeSeconds: Double = 0.0
 
-    init {
-        register(this)
-    }
+    // Whether a consumer picked the transition themselves.
+    //
+    // Needed because "core's default" and "a consumer who deliberately chose
+    // gapless" are the same object otherwise, and setup filling in a crossfade
+    // over the second is exactly the overwrite this is meant to avoid.
+    private var transitionChosen: Boolean = false
 
     // Whether a crossfade is running right now.
     //
@@ -127,17 +135,59 @@ public open class NMMusicPlayer(
         emit(MusicEvents.BackendChanged, AudioBackendChange(kind))
     }
 
+    // Music defaults, applied where the caller left a gap.
+    //
+    // A music player that crossfades out of the box is what everyone expects,
+    // and a video player that did would be wrong — which is exactly why the
+    // default lives here rather than in core.
+    //
+    // Only where absent. A consumer who configured three seconds asked for three
+    // seconds, and a library that overwrote it at setup would be answering a
+    // question nobody asked.
+    override suspend fun setup(config: PlayerConfig) {
+        super.setup(config)
+        if (crossfadeSeconds <= 0.0) crossfadeSeconds = config.crossfadeTailSeconds
+        if (!transitionChosen) {
+            val filled = CrossfadeTransitionStrategy(
+                leadSeconds = config.crossfadeLeadSeconds,
+                tailSeconds = config.crossfadeTailSeconds,
+            )
+            super.setTransitionStrategy(filled)
+        }
+    }
+
+    // Overridden only to remember that the choice was made. A consumer who picks
+    // gapless has picked something, and setup must not read that as a gap.
+    override fun setTransitionStrategy(strategy: TransitionStrategy) {
+        transitionChosen = true
+        super.setTransitionStrategy(strategy)
+    }
+
     public companion object {
         private const val MILLIS_PER_SECOND = 1000.0
 
         private const val ALREADY_TRANSITIONING = "already-transitioning"
 
-        private val live: MutableList<NMMusicPlayer> = mutableListOf()
+        // The players the factory built, by id.
+        //
+        // Only the factory's. A consumer who constructs one directly is doing
+        // something deliberate — a preview scrubber, a second engine under test
+        // — and a library that silently added it to a shared registry would hand
+        // it to the next caller asking for a player by that name.
+        private val live: MutableMap<String, NMMusicPlayer> = mutableMapOf()
 
-        public fun instances(): List<NMMusicPlayer> = live.toList()
+        public fun instances(): List<NMMusicPlayer> = live.values.toList()
 
-        private fun register(player: NMMusicPlayer) {
-            live.add(player)
+        public fun byId(id: String): NMMusicPlayer? = live[id]
+
+        internal fun register(player: NMMusicPlayer) {
+            live[player.playerId] = player
+        }
+
+        // For a host tearing a player down, and for tests, which would otherwise
+        // leak an instance into every later one through a process-wide map.
+        public fun forget(id: String) {
+            live.remove(id)
         }
     }
 }

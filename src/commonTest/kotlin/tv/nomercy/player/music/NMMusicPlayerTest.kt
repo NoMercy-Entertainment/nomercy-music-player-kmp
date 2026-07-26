@@ -25,98 +25,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-private open class SilentBackend : MediaBackend {
-    var playCount: Int = 0
-    override suspend fun load(url: String, opts: LoadOptions) = Unit
-    override suspend fun play() { playCount += 1 }
-    override fun pause() = Unit
-    override fun stop() = Unit
-    override fun currentTime(): Double = 0.0
-    override fun currentTime(seconds: Double) = Unit
-    override fun duration(): Double = 0.0
-    override fun volume(): Float = 1.0f
-    override fun volume(value: Float) = Unit
-    override fun mute() = Unit
-    override fun unmute() = Unit
-    override fun buffered(): Double = 0.0
-    override fun playbackRate(): Double = 1.0
-    override fun playbackRate(rate: Double) = Unit
-    override fun state(): BackendState = BackendState.IDLE
-    override fun on(event: String, fn: (Any?) -> Unit) = Unit
-    override fun off(event: String, fn: (Any?) -> Unit) = Unit
-}
-
-// An engine that can hold two tracks, recording what the fade asked it to do.
-//
-// The library's own crossfade is proven in core against the real curve; what
-// this checks is the sequence the music player drives — load the next track,
-// prime it, then fade — because loading after the fade starts is a transition
-// that begins with silence and nothing reports it.
-private class TwoTrackBackend : SilentBackend(), TransitionBackend {
-    val calls: MutableList<String> = mutableListOf()
-    var fadedForMs: Long = 0
-        private set
-    var canCrossfade: Boolean = true
-
-    override fun supportsCrossfade(): Boolean = canCrossfade
-
-    override suspend fun loadSecondary(url: String) {
-        calls += "loadSecondary:$url"
-    }
-
-    override suspend fun primeSecondary(seekMs: Long) {
-        calls += "primeSecondary"
-    }
-
-    override suspend fun crossfade(durationMs: Long, curve: CrossfadeCurve) {
-        calls += "crossfade:$curve"
-        fadedForMs = durationMs
-    }
-
-    override fun disposeSecondary() {
-        calls += "disposeSecondary"
-    }
-
-    override fun secondaryGain(): Float = 0f
-
-    override fun secondaryGain(value: Float) = Unit
-}
-
-// A backend that stays inside its crossfade until released, so a second call
-// arrives while the first is still running — which is the only way to test the
-// re-entrancy guard.
-// An engine that fails partway through, which real ones do: a device
-// disappearing mid-fade takes the secondary buffer with it.
-private class ThrowingFadeBackend : SilentBackend(), TransitionBackend {
-    override fun supportsCrossfade(): Boolean = true
-    override suspend fun loadSecondary(url: String) = Unit
-    override suspend fun primeSecondary(seekMs: Long) = Unit
-    override suspend fun crossfade(durationMs: Long, curve: CrossfadeCurve): Unit =
-        error("the output device went away")
-    override fun disposeSecondary() = Unit
-    override fun secondaryGain(): Float = 0f
-    override fun secondaryGain(value: Float) = Unit
-}
-
-private class SlowFadeBackend : SilentBackend(), TransitionBackend {
-    val gate: CompletableDeferred<Unit> = CompletableDeferred()
-    var fades: Int = 0
-        private set
-
-    override fun supportsCrossfade(): Boolean = true
-    override suspend fun loadSecondary(url: String) = Unit
-    override suspend fun primeSecondary(seekMs: Long) = Unit
-
-    override suspend fun crossfade(durationMs: Long, curve: CrossfadeCurve) {
-        fades += 1
-        gate.await()
-    }
-
-    override fun disposeSecondary() = Unit
-    override fun secondaryGain(): Float = 0f
-    override fun secondaryGain(value: Float) = Unit
-}
-
 class NMMusicPlayerTest {
 
     @Test
@@ -185,11 +93,17 @@ class NMMusicPlayerTest {
     }
 
     @Test
-    fun crossfadeIsOffUntilSomebodyAsksForIt() = runTest {
+    fun crossfadeArrivesWithSetupAndNotBeforeIt() = runTest {
+        // A music player that crossfades is what everyone expects, and the
+        // library fills that in at setup. What must not happen is it appearing
+        // on a player nobody has set up — a consumer inspecting one before
+        // configuring it should see what it actually has, not what it is going
+        // to get.
+        assertFalse(NMMusicPlayer(SilentBackend()).crossfadeEnabled())
+
         val (subject, _) = player()
 
-        // Crossfading by surprise is worse than not crossfading.
-        assertFalse(subject.crossfadeEnabled())
+        assertTrue(subject.crossfadeEnabled())
     }
 
     @Test
@@ -297,13 +211,16 @@ class NMMusicPlayerTest {
     }
 
     @Test
-    fun everyPlayerBuiltIsFindableWithoutThreadingAReference() = runTest {
+    fun aDirectlyBuiltPlayerIsNotAddedToTheSharedRegistry() = runTest {
+        // Constructing one directly is deliberate — a preview scrubber, a second
+        // engine under test — and a library that added it to a shared registry
+        // would hand it to the next caller asking for a player by that name.
         val before = NMMusicPlayer.instances().size
 
         val (subject, _) = player()
 
-        assertEquals(before + 1, NMMusicPlayer.instances().size)
-        assertTrue(NMMusicPlayer.instances().contains(subject))
+        assertEquals(before, NMMusicPlayer.instances().size)
+        assertTrue(!NMMusicPlayer.instances().contains(subject))
     }
 
     @Test

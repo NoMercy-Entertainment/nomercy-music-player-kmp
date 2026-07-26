@@ -49,6 +49,11 @@ public final class tv/nomercy/player/music/CrossfadePrevented {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class tv/nomercy/player/music/FactoryKt {
+	public static final fun nmMusicPlayer (Ljava/lang/String;Ltv/nomercy/player/core/ports/AudioBackend;)Ltv/nomercy/player/music/NMMusicPlayer;
+	public static synthetic fun nmMusicPlayer$default (Ljava/lang/String;Ltv/nomercy/player/core/ports/AudioBackend;ILjava/lang/Object;)Ltv/nomercy/player/music/NMMusicPlayer;
+}
+
 public final class tv/nomercy/player/music/MusicEvents {
 	public static final field INSTANCE Ltv/nomercy/player/music/MusicEvents;
 	public final fun getAll ()Ljava/util/List;
@@ -62,18 +67,23 @@ public final class tv/nomercy/player/music/MusicEvents {
 public class tv/nomercy/player/music/NMMusicPlayer : tv/nomercy/player/core/controllers/ComposedPlayer {
 	public static final field Companion Ltv/nomercy/player/music/NMMusicPlayer$Companion;
 	public fun <init> ()V
-	public fun <init> (Ltv/nomercy/player/core/ports/AudioBackend;)V
-	public fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;)V
-	public synthetic fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ltv/nomercy/player/core/ports/AudioBackend;Ljava/lang/String;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/ports/AudioBackend;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;Ljava/lang/String;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/ports/MediaBackend;Ltv/nomercy/player/core/ports/TransitionBackend;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun announceBackend (Ljava/lang/String;)V
 	public fun configureCrossfade (D)V
 	public fun crossfadeEnabled ()Z
 	public fun crossfadeTo (Ltv/nomercy/player/core/media/PlaylistItem;Ljava/lang/Double;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun crossfadeTo$default (Ltv/nomercy/player/music/NMMusicPlayer;Ltv/nomercy/player/core/media/PlaylistItem;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public fun isTransitioning ()Z
+	public fun setTransitionStrategy (Ltv/nomercy/player/core/ports/TransitionStrategy;)V
+	public fun setup (Ltv/nomercy/player/core/player/PlayerConfig;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tv/nomercy/player/music/NMMusicPlayer$Companion {
+	public final fun byId (Ljava/lang/String;)Ltv/nomercy/player/music/NMMusicPlayer;
+	public final fun forget (Ljava/lang/String;)V
 	public final fun instances ()Ljava/util/List;
 }
 
