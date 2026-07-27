@@ -114,5 +114,16 @@ apiValidation {
 
 mavenPublishing {
     publishToMavenCentral()
-    signAllPublications()
+
+    // Signed where there is a key, which is CI and nowhere else.
+    //
+    // Unconditional signAllPublications() takes publishToMavenLocal down with
+    // it — "no configured signatory" — and that is the one command that proves
+    // the module metadata carries every target before anything reaches Central.
+    // The signature is still mandatory where it matters: the workflow sets
+    // signingInMemoryKey from the repository secret, so a release without one
+    // is a release that never ran through CI.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
 }

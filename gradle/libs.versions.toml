@@ -1,5 +1,5 @@
 [versions]
-nomercyPlayerCore = "0.0.1-rc.1"
+nomercyPlayerCore = "2.0.0-rc.1"
 # Pinned to nomercy-app-kmp's catalog. The app consumes this library, and a
 # Kotlin/AGP split between the two produces metadata the app cannot read.
 # Changing either of these two lines requires changing the app in the same pass.
