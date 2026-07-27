@@ -145,8 +145,13 @@ class MusicConnectPassiveTest {
     fun theBarStopsAtTheEndOfTheTrack() = runTest {
         // Otherwise a mirror left running past the end shows a position longer
         // than the song, which a bar draws as overflowing its own track.
+        //
+        // The start is deliberately not a whole number of ticks from the end. At
+        // 199_000 the last tick lands exactly on the duration and the clamp is
+        // never asked to do anything — the test passed with it removed, which is
+        // how this was found. Real durations are not multiples of 250ms.
         val rig: Rig = rig()
-        send(rig, playingElsewhere(progressMs = 199_000))
+        send(rig, playingElsewhere(progressMs = 199_100))
 
         testScheduler.advanceTimeBy(10_000)
         testScheduler.runCurrent()
