@@ -91,3 +91,69 @@ public final class tv/nomercy/player/music/NMMusicPlayer$Companion {
 	public final fun instances ()Ljava/util/List;
 }
 
+public final class tv/nomercy/player/music/connect/ConnectCommand {
+	public static final field INSTANCE Ltv/nomercy/player/music/connect/ConnectCommand;
+	public static final field NEXT Ljava/lang/String;
+	public static final field PAUSE Ljava/lang/String;
+	public static final field PLAY Ljava/lang/String;
+	public static final field PREVIOUS Ljava/lang/String;
+	public static final field SEEK Ljava/lang/String;
+	public static final field STOP Ljava/lang/String;
+}
+
+public abstract interface class tv/nomercy/player/music/connect/MusicConnectChannel {
+	public abstract fun changeDevice (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getDeviceId ()Ljava/lang/String;
+	public abstract fun getFrames ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun playbackCommand (Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun reportPosition (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun serverTimeMs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/connect/MusicConnectChannel$DefaultImpls {
+	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/connect/MusicPlayerState {
+	public fun <init> (Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/Long;
+	public final fun component11 ()Z
+	public final fun component12 ()I
+	public final fun component13 ()Ltv/nomercy/player/core/player/RepeatState;
+	public final fun component14 ()Z
+	public final fun component15 ()Ljava/lang/String;
+	public final fun component16 ()Ljava/util/Map;
+	public final fun component2 ()J
+	public final fun component3 ()Ltv/nomercy/player/core/media/PlaylistItem;
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Z
+	public final fun component6 ()J
+	public final fun component7 ()J
+	public final fun component8 ()J
+	public final fun component9 ()Ljava/lang/Long;
+	public final fun copy (Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;)Ltv/nomercy/player/music/connect/MusicPlayerState;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/connect/MusicPlayerState;Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Ltv/nomercy/player/music/connect/MusicPlayerState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCurrentList ()Ljava/lang/String;
+	public final fun getDeviceId ()Ljava/lang/String;
+	public final fun getDeviceVolumes ()Ljava/util/Map;
+	public final fun getDurationMs ()J
+	public final fun getItem ()Ltv/nomercy/player/core/media/PlaylistItem;
+	public final fun getMutedState ()Z
+	public final fun getPlaylist ()Ljava/util/List;
+	public final fun getPositionCapturedAtMs ()Ljava/lang/Long;
+	public final fun getProgressMs ()J
+	public final fun getRepeatState ()Ltv/nomercy/player/core/player/RepeatState;
+	public final fun getSeq ()J
+	public final fun getServerTimeMs ()Ljava/lang/Long;
+	public final fun getShuffleState ()Z
+	public final fun getTimestamp ()J
+	public final fun getVolumePercentage ()I
+	public fun hashCode ()I
+	public final fun isPlaying ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
