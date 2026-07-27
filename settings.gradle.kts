@@ -43,3 +43,8 @@ if (coreCheckout.resolve("settings.gradle.kts").exists()) {
         }
     }
 }
+
+// The Compose chrome. Its own module so a consumer that draws its own controls
+// — or one on Apple, where the chrome is SwiftUI — takes the engine without
+// pulling a UI toolkit into the build.
+include(":ui-compose")

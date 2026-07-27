@@ -92,6 +92,13 @@ detekt {
         "src/androidMain/kotlin",
         "src/appleMain/kotlin",
         "src/jvmMain/kotlin",
+        // The Compose module is a separate Gradle project but the same codebase,
+        // and a rule that only applies to part of a repo is a rule people learn
+        // to route around.
+        "ui-compose/src/commonMain/kotlin",
+        "ui-compose/src/commonTest/kotlin",
+        "ui-compose/src/androidHostTest/kotlin",
+        "ui-compose/src/jvmTest/kotlin",
     )
     config.setFrom("config/detekt/detekt.yml")
     buildUponDefaultConfig = true
