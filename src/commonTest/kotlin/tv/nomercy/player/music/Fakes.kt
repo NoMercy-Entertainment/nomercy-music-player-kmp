@@ -37,6 +37,12 @@ import kotlin.test.assertTrue
 internal open class SilentBackend : MediaBackend {
     var playCount: Int = 0
 
+    // Counted for the same reason plays are: "did this device stay silent" is
+    // the question Connect asks of a passive device, and only a count answers
+    // it. A command reaching the hub proves the device spoke, not that it also
+    // kept quiet.
+    var pauseCount: Int = 0
+
     // Recorded rather than discarded. A fake that drops seeks cannot tell a
     // refused one from an accepted one, which is the whole question a
     // before-hook test asks.
@@ -62,6 +68,7 @@ internal open class SilentBackend : MediaBackend {
     }
 
     override fun pause() {
+        pauseCount += 1
         fire(CanonicalBackendEvent.PAUSE)
     }
 

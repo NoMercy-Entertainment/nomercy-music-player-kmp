@@ -124,6 +124,30 @@ public final class tv/nomercy/player/music/connect/MusicConnectChannel$DefaultIm
 	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public class tv/nomercy/player/music/connect/MusicConnectPlugin : tv/nomercy/player/core/plugin/Plugin {
+	public static final field Manifest Ltv/nomercy/player/music/connect/MusicConnectPlugin$Manifest;
+	public fun <init> (Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;)V
+	protected fun applyServerFrame (Ltv/nomercy/player/music/connect/MusicPlayerState;)V
+	public fun dispose ()V
+	protected final fun getActiveDeviceId ()Ljava/lang/String;
+	protected final fun getLastAppliedSeq ()J
+	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
+	public fun getRole ()Ltv/nomercy/player/music/connect/DeviceRole;
+	public fun isActiveDevice ()Z
+	public fun use ()V
+}
+
+public final class tv/nomercy/player/music/connect/MusicConnectPlugin$Manifest : tv/nomercy/player/core/plugin/PluginManifest {
+	public fun getContributions ()Ljava/util/List;
+	public fun getId ()Ljava/lang/String;
+	public fun getMinCoreVersion ()Ljava/lang/String;
+	public fun getPriority ()I
+	public fun getReplaces ()Ljava/util/List;
+	public fun getRequires ()Ljava/util/List;
+	public fun getTranslations ()Ljava/util/Map;
+	public fun getVersion ()Ljava/lang/String;
+}
+
 public final class tv/nomercy/player/music/connect/MusicPlayerState {
 	public fun <init> (Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;)V
 	public synthetic fun <init> (Ljava/lang/String;JLtv/nomercy/player/core/media/PlaylistItem;Ljava/util/List;ZJJJLjava/lang/Long;Ljava/lang/Long;ZILtv/nomercy/player/core/player/RepeatState;ZLjava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
