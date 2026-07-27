@@ -79,7 +79,14 @@ internal open class SilentBackend : MediaBackend {
         fire(CanonicalBackendEvent.PAUSE)
     }
 
-    override fun stop() = Unit
+    // Counted because "paused, not stopped" is a real distinction on a handoff:
+    // a stop tears the bar down, and a viewer watching the room they just handed
+    // playback to wants to keep seeing where it has got to.
+    var stopCount: Int = 0
+
+    override fun stop() {
+        stopCount += 1
+    }
     override fun currentTime(): Double = 0.0
     override fun currentTime(seconds: Double) {
         seekedTo += seconds
