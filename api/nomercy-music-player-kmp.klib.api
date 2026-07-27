@@ -6,6 +6,18 @@
 // - Show declarations: true
 
 // Library unique name: <nomercy-music-player-kmp>
+final enum class tv.nomercy.player.music.connect/DeviceRole : kotlin/Enum<tv.nomercy.player.music.connect/DeviceRole> { // tv.nomercy.player.music.connect/DeviceRole|null[0]
+    enum entry ACTIVE // tv.nomercy.player.music.connect/DeviceRole.ACTIVE|null[0]
+    enum entry NONE // tv.nomercy.player.music.connect/DeviceRole.NONE|null[0]
+    enum entry PASSIVE // tv.nomercy.player.music.connect/DeviceRole.PASSIVE|null[0]
+
+    final val entries // tv.nomercy.player.music.connect/DeviceRole.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<tv.nomercy.player.music.connect/DeviceRole> // tv.nomercy.player.music.connect/DeviceRole.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): tv.nomercy.player.music.connect/DeviceRole // tv.nomercy.player.music.connect/DeviceRole.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<tv.nomercy.player.music.connect/DeviceRole> // tv.nomercy.player.music.connect/DeviceRole.values|values#static(){}[0]
+}
+
 abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.nomercy.player.music.connect/MusicConnectChannel|null[0]
     abstract val deviceId // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId|{}deviceId[0]
         abstract fun <get-deviceId>(): kotlin/String // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId.<get-deviceId>|<get-deviceId>(){}[0]

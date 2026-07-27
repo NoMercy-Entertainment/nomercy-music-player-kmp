@@ -101,6 +101,15 @@ public final class tv/nomercy/player/music/connect/ConnectCommand {
 	public static final field STOP Ljava/lang/String;
 }
 
+public final class tv/nomercy/player/music/connect/DeviceRole : java/lang/Enum {
+	public static final field ACTIVE Ltv/nomercy/player/music/connect/DeviceRole;
+	public static final field NONE Ltv/nomercy/player/music/connect/DeviceRole;
+	public static final field PASSIVE Ltv/nomercy/player/music/connect/DeviceRole;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ltv/nomercy/player/music/connect/DeviceRole;
+	public static fun values ()[Ltv/nomercy/player/music/connect/DeviceRole;
+}
+
 public abstract interface class tv/nomercy/player/music/connect/MusicConnectChannel {
 	public abstract fun changeDevice (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun getDeviceId ()Ljava/lang/String;
