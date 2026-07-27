@@ -1,0 +1,58 @@
+name: publish
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  # macOS only, and not by preference. A multiplatform publication has to carry
+  # every declared target, and the Apple frameworks can only be linked here.
+  # Publishing from Linux would silently ship an artifact with no Apple variants.
+  publish:
+    runs-on: [self-hosted, macOS, ARM64, xcode]
+    env:
+      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # The tag is the source of truth for what gets published. A tag that does
+      # not match VERSION_NAME would publish a version nobody asked for, under a
+      # name nobody can find.
+      - name: Tag must match VERSION_NAME
+        run: |
+          tagged="${GITHUB_REF_NAME#v}"
+          declared=$(grep '^VERSION_NAME=' gradle.properties | cut -d= -f2)
+          if [ "$tagged" != "$declared" ]; then
+            echo "tag v$tagged does not match VERSION_NAME=$declared" >&2
+            exit 1
+          fi
+
+      # Gates first. A release that skips them is a release nothing checked.
+      - run: ./gradlew build
+
+      - name: Publish to Maven Central
+        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+# The Apple half of this release is deliberately absent. The music library has no
+# SwiftUI package yet, so there is no manifest to stamp a checksum into and no
+# framework a consumer could resolve — a job that packaged one anyway would
+# attach an asset nothing points at. It arrives with the package.
