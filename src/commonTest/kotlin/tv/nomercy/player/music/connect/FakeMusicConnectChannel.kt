@@ -18,8 +18,22 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 // to remove actually happens. A fake per device could never show it.
 class FakeMusicConnectChannel(
     override val deviceId: String = "device-a",
-    private val serverTime: Long? = 1_000_000,
+    var serverTime: Long? = 1_000_000,
 ) : MusicConnectChannel {
+
+    // What each answer costs on the way there and back, in the units the test's
+    // own clock counts in. A list rather than a number because the offset is a
+    // best-of-N: one uncontended trip among several slow ones is the sample the
+    // measurement is supposed to keep, and a fake with a single latency cannot
+    // tell keeping the best from keeping the last.
+    var roundTripCosts: List<Long> = emptyList()
+
+    // Advanced by each answer's cost, so a test's clock can be this device's.
+    var elapsedMs: Long = 0
+        private set
+
+    var answered: Int = 0
+        private set
 
     val sent: MutableList<String> = mutableListOf()
 
@@ -43,7 +57,14 @@ class FakeMusicConnectChannel(
         reported += positionMs
     }
 
-    override suspend fun serverTimeMs(): Long? = serverTime
+    override suspend fun serverTimeMs(): Long? {
+        // Cycled, so a round of measurements costs the same whichever round it
+        // is. A plugin measures once on its own the moment it starts, and a list
+        // read straight through would leave every later round free.
+        elapsedMs += if (roundTripCosts.isEmpty()) 0 else roundTripCosts[answered % roundTripCosts.size]
+        answered += 1
+        return serverTime
+    }
 
     // The server telling everyone what is true now.
     suspend fun broadcast(state: MusicPlayerState) {

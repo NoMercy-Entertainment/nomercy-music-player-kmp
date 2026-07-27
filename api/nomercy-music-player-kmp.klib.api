@@ -188,6 +188,7 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
     final var lastAppliedSeq // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq|{}lastAppliedSeq[0]
         final fun <get-lastAppliedSeq>(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq.<get-lastAppliedSeq>|<get-lastAppliedSeq>(){}[0]
 
+    final suspend fun syncClock() // tv.nomercy.player.music.connect/MusicConnectPlugin.syncClock|syncClock(){}[0]
     open fun applyServerFrame(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyServerFrame|applyServerFrame(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
     open fun dispose() // tv.nomercy.player.music.connect/MusicConnectPlugin.dispose|dispose(){}[0]
     open fun nowMs(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.nowMs|nowMs(){}[0]

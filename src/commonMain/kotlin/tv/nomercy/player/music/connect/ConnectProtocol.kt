@@ -51,7 +51,7 @@ internal fun resolveRole(frameDeviceId: String?, myDeviceId: String): DeviceRole
 // anchor there is and half of the round trip is the usual guess at one-way
 // latency. An unstamped frame is not corrected at all, because a made-up
 // correction is worse than a known-stale number.
-internal fun adjustedSeekSeconds(frame: MusicPlayerState, serverNowMs: Long): Double {
+internal fun adjustedPositionMs(frame: MusicPlayerState, serverNowMs: Long): Long {
     val capturedAtMs: Long? = frame.positionCapturedAtMs
     val elapsedMs: Long = when {
         capturedAtMs != null -> (serverNowMs - capturedAtMs).coerceAtLeast(0)
@@ -59,8 +59,13 @@ internal fun adjustedSeekSeconds(frame: MusicPlayerState, serverNowMs: Long): Do
         else -> 0
     }
 
-    return (frame.progressMs + elapsedMs) / MILLIS_PER_SECOND
+    val moved: Long = frame.progressMs + elapsedMs
+    return if (frame.durationMs > 0) moved.coerceAtMost(frame.durationMs) else moved
 }
+
+// The same number in the unit a seek is asked for.
+internal fun adjustedSeekSeconds(frame: MusicPlayerState, serverNowMs: Long): Double =
+    adjustedPositionMs(frame, serverNowMs) / MILLIS_PER_SECOND
 
 // An action the server itself caused. Sending it back would be this device
 // asking the server to do what the server just told it had happened, which on a
@@ -106,3 +111,21 @@ internal const val DRIFT_TOLERANCE_SECONDS = 5.0
 private const val MILLIS_PER_SECOND = 1000.0
 
 private const val UNSEQUENCED = 0L
+
+// How far the server's clock is from this device's, from one round trip.
+//
+// The reference instant is the midpoint of the exchange, not either end: the
+// server's answer describes a moment somewhere between the request leaving and
+// the reply arriving, and the midpoint is the only point equally wrong in both
+// directions. Anchoring on the send or the receive instead builds the whole
+// round trip into the offset, which on a slow connection is a bar seconds out.
+internal fun clockOffsetMs(serverMs: Long, sentAtMs: Long, receivedAtMs: Long): Long =
+    serverMs - (sentAtMs + receivedAtMs) / 2
+
+// Enough rounds to have a good chance of one uncontended trip, few enough that a
+// device does not spend its first second on the network asking what time it is.
+internal const val CLOCK_SAMPLES = 5
+
+// Half a minute. Clocks drift slowly, and a device that has been asleep gets a
+// fresh answer from the reconnect rather than from this.
+internal const val CLOCK_SYNC_PERIOD_MS = 30_000L

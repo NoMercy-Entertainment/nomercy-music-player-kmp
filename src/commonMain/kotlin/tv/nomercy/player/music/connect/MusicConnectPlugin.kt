@@ -62,6 +62,8 @@ public open class MusicConnectPlugin(
 
     private var subscription: Job? = null
 
+    private var clockSync: Job? = null
+
     private val ticker = ConnectMirrorTicker(scope)
 
     private var loadContinuation: List<Subscription> = emptyList()
@@ -91,9 +93,52 @@ public open class MusicConnectPlugin(
 
     public open val isActiveDevice: Boolean get() = role == DeviceRole.ACTIVE
 
-    // The server's clock. Identical to this device's until the offset has been
-    // measured, which is the honest starting point rather than a guess.
-    protected open fun serverNowMs(): Long = player.now()
+    // How far the server's clock is from this one. Zero until measured, which
+    // makes an unmeasured device fall back to local time rather than refuse to
+    // mirror — a transport that cannot answer is a reason to be approximate, not
+    // a reason to stop.
+    internal var serverClockOffsetMs: Long = 0
+        private set
+
+    // The server's clock as this device best understands it. Everything that
+    // compares a frame against "now" goes through here: the shield deciding
+    // whether a frame predates a press, and the interpolation deciding how far
+    // the bar has moved since the position was taken. Both are wrong by the
+    // whole skew if it reads the local clock instead, and on a phone whose time
+    // is a few seconds out that is a bar in the wrong place all session.
+    protected open fun serverNowMs(): Long = nowMs() + serverClockOffsetMs
+
+    // One measurement round, kept public so a host can re-measure after a
+    // reconnect — the offset it took before the network changed is the one thing
+    // that will not have survived it.
+    //
+    // Best of several rather than an average. A sample that went out and came
+    // back quickly was queued behind less, so its guess at one-way latency is
+    // closer to true; averaging it with a slow one moves the answer toward the
+    // worse sample rather than the better.
+    public suspend fun syncClock() {
+        var bestRtt: Long = Long.MAX_VALUE
+
+        // Starts from the offset already held, which is what makes a round where
+        // nothing answered leave it alone. A measurement that failed is not a
+        // measurement of zero, and treating it as one swings every judgement by
+        // the whole skew until the next success.
+        var bestOffset: Long = serverClockOffsetMs
+
+        repeat(CLOCK_SAMPLES) {
+            val sentAtMs: Long = nowMs()
+            val serverMs: Long? = channel.serverTimeMs()
+            val receivedAtMs: Long = nowMs()
+
+            val rtt: Long = receivedAtMs - sentAtMs
+            if (serverMs != null && rtt < bestRtt) {
+                bestRtt = rtt
+                bestOffset = clockOffsetMs(serverMs, sentAtMs, receivedAtMs)
+            }
+        }
+
+        serverClockOffsetMs = bestOffset
+    }
 
     // This device's own clock, which is what bounds the shield. Separate from
     // the server's on purpose: a shield measured on a clock the server controls
@@ -127,11 +172,19 @@ public open class MusicConnectPlugin(
         subscription = scope.launch {
             channel.frames.collect { frame -> applyServerFrame(frame) }
         }
+
+        // Measured once now and again on a cadence, because a clock that agreed
+        // at connect time drifts, and a device suspended in a pocket comes back
+        // with a different answer than it went in with.
+        scope.launch { syncClock() }
+        clockSync = interval(CLOCK_SYNC_PERIOD_MS) { scope.launch { syncClock() } }
     }
 
     override fun dispose() {
         subscription?.cancel()
         subscription = null
+        clockSync?.cancel()
+        clockSync = null
         cancelLoadContinuation()
         ticker.dispose()
     }
@@ -201,7 +254,12 @@ public open class MusicConnectPlugin(
             ConnectMirror(
                 item = item,
                 isPlaying = if (held) mirror.value.isPlaying else frame.isPlaying,
-                positionMs = frame.progressMs,
+                // Corrected the same way the active device's seek is, and for
+                // the same reason: the frame describes a moment that has already
+                // passed. A bar drawn at the raw number is always behind by
+                // however long the frame took to arrive, which on a device with
+                // a skewed clock is behind by the whole skew as well.
+                positionMs = adjustedPositionMs(frame, serverNowMs()),
                 durationMs = frame.durationMs,
             ),
         )
@@ -235,7 +293,12 @@ public open class MusicConnectPlugin(
         // the viewer is a few seconds into — the cursor moves and nothing else.
         if (isTrackChange && item.id == crossfadeTargetId) {
             crossfadeTargetId = null
-            advanceCursorTo(item)
+
+            // The cursor moves and the engine is asked for nothing, which is the
+            // whole point: the audio is already there.
+            val index: Int = player.queue().indexOfFirst { it.id == item.id }
+            if (index >= 0) player.seekToIndex(index + 1)
+
             matchPlaybackTo(frame)
             return
         }
@@ -276,13 +339,6 @@ public open class MusicConnectPlugin(
         val failed: Subscription = on(CoreEvents.Error) { cancelLoadContinuation() }
 
         loadContinuation = listOf(ready, streamFailed, failed)
-    }
-
-    // Moves the queue cursor without asking the engine for anything, which is
-    // the whole point: the audio is already there.
-    private fun advanceCursorTo(item: PlaylistItem) {
-        val index: Int = player.queue().indexOfFirst { it.id == item.id }
-        if (index >= 0) player.seekToIndex(index + 1)
     }
 
     private fun cancelLoadContinuation() {

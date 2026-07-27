@@ -159,6 +159,7 @@ public class tv/nomercy/player/music/connect/MusicConnectPlugin : tv/nomercy/pla
 	public fun isActiveDevice ()Z
 	protected fun nowMs ()J
 	protected fun serverNowMs ()J
+	public final fun syncClock (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun use ()V
 }
 
