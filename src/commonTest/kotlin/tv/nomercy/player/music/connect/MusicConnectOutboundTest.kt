@@ -42,8 +42,8 @@ class MusicConnectOutboundTest {
     private suspend fun TestScope.rig(activeDeviceId: String?): Rig {
         val backend = TwoTrackBackend()
         val channel = FakeMusicConnectChannel(deviceId = "dev-a")
-        val plugin = MusicConnectPlugin(channel, eager())
         val player = NMMusicPlayer(backend, backend)
+        val plugin = MusicConnectPlugin(player, channel, eager())
 
         player.setup()
         player.queue(listOf(Track("a"), Track("b")))
@@ -54,7 +54,7 @@ class MusicConnectOutboundTest {
         // starts is dropped — a shared flow with no replay behaves like a real
         // hub, which does not resend what happened before you connected.
         testScheduler.advanceUntilIdle()
-        channel.broadcast(MusicPlayerState(deviceId = activeDeviceId, seq = 1, item = null))
+        channel.broadcast(MusicPlayerState(deviceId = activeDeviceId, seq = 1, item = Track("a")))
         testScheduler.advanceUntilIdle()
 
         channel.sent.clear()
@@ -149,7 +149,7 @@ class MusicConnectOutboundTest {
         val rig: Rig = rig(activeDeviceId = "dev-b")
         assertEquals(DeviceRole.PASSIVE, rig.plugin.role)
 
-        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 2, item = null))
+        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 2, item = Track("a")))
         testScheduler.advanceUntilIdle()
 
         assertEquals(DeviceRole.ACTIVE, rig.plugin.role)
@@ -163,7 +163,7 @@ class MusicConnectOutboundTest {
         val rig: Rig = rig(activeDeviceId = "dev-b")
 
         rig.plugin.dispose()
-        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 5, item = null))
+        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 5, item = Track("a")))
         testScheduler.advanceUntilIdle()
 
         assertEquals(DeviceRole.PASSIVE, rig.plugin.role, "a disposed plugin was still listening")
@@ -176,7 +176,7 @@ class MusicConnectOutboundTest {
         // already given it up.
         val rig: Rig = rig(activeDeviceId = "dev-a")
 
-        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-b", seq = 1, item = null))
+        rig.channel.broadcast(MusicPlayerState(deviceId = "dev-b", seq = 1, item = Track("a")))
         testScheduler.advanceUntilIdle()
 
         assertEquals(DeviceRole.ACTIVE, rig.plugin.role, "a stale frame moved playback")

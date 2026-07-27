@@ -150,7 +150,7 @@ final class tv.nomercy.player.music/CrossfadePrevented { // tv.nomercy.player.mu
 }
 
 open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.player.core.plugin/Plugin<kotlin/Unit> { // tv.nomercy.player.music.connect/MusicConnectPlugin|null[0]
-    constructor <init>(tv.nomercy.player.music.connect/MusicConnectChannel, kotlinx.coroutines/CoroutineScope) // tv.nomercy.player.music.connect/MusicConnectPlugin.<init>|<init>(tv.nomercy.player.music.connect.MusicConnectChannel;kotlinx.coroutines.CoroutineScope){}[0]
+    constructor <init>(tv.nomercy.player.core.controllers/ComposedPlayer, tv.nomercy.player.music.connect/MusicConnectChannel, kotlinx.coroutines/CoroutineScope) // tv.nomercy.player.music.connect/MusicConnectPlugin.<init>|<init>(tv.nomercy.player.core.controllers.ComposedPlayer;tv.nomercy.player.music.connect.MusicConnectChannel;kotlinx.coroutines.CoroutineScope){}[0]
 
     open val isActiveDevice // tv.nomercy.player.music.connect/MusicConnectPlugin.isActiveDevice|{}isActiveDevice[0]
         open fun <get-isActiveDevice>(): kotlin/Boolean // tv.nomercy.player.music.connect/MusicConnectPlugin.isActiveDevice.<get-isActiveDevice>|<get-isActiveDevice>(){}[0]
@@ -165,6 +165,7 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
         final fun <get-lastAppliedSeq>(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq.<get-lastAppliedSeq>|<get-lastAppliedSeq>(){}[0]
 
     open fun applyServerFrame(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyServerFrame|applyServerFrame(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
+    open fun applyUniversalSettings(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyUniversalSettings|applyUniversalSettings(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
     open fun dispose() // tv.nomercy.player.music.connect/MusicConnectPlugin.dispose|dispose(){}[0]
     open fun use() // tv.nomercy.player.music.connect/MusicConnectPlugin.use|use(){}[0]
 

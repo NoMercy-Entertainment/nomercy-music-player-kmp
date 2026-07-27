@@ -14,10 +14,14 @@ import kotlinx.coroutines.launch
 import tv.nomercy.player.core.events.BeforeEvent
 import tv.nomercy.player.core.events.CoreEvents
 import tv.nomercy.player.core.events.SeekPosition
+import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.player.ActionOptions
 import tv.nomercy.player.core.player.ActionSource
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
+import tv.nomercy.player.core.player.RepeatState
+import tv.nomercy.player.core.player.ShuffleState
+import tv.nomercy.player.core.controllers.ComposedPlayer
 
 // Music across several devices, with one of them making sound.
 //
@@ -32,6 +36,7 @@ import tv.nomercy.player.core.plugin.PluginManifest
 // person holding it. A passive device tells the server and stops: it is not the
 // one playing, and letting it start would be the second stream.
 public open class MusicConnectPlugin(
+    private val player: ComposedPlayer,
     private val channel: MusicConnectChannel,
     private val scope: CoroutineScope,
 ) : Plugin<Unit>() {
@@ -87,10 +92,46 @@ public open class MusicConnectPlugin(
     // extend it rather than replacing this dispatch.
     protected open fun applyServerFrame(frame: MusicPlayerState) {
         val nextSeq: Long = nextAppliedSeqOrNull(frame.seq, lastAppliedSeq) ?: return
-
         lastAppliedSeq = nextSeq
+
+        // No item is the session ending, and it ends everywhere at once. The
+        // device that was playing stops and every other one stops mirroring,
+        // which is why this happens before the role is reconciled — after it,
+        // the device that just stopped being active would take the passive
+        // branch and start following a session that no longer exists.
+        if (frame.item == null) {
+            activeDeviceId = null
+            scope.launch { player.stop(remote) }
+            return
+        }
+
         activeDeviceId = frame.deviceId
+        applyUniversalSettings(frame)
     }
+
+    // What every device follows, whichever role it is in.
+    //
+    // Repeat, shuffle and the queue are the session rather than the playback: a
+    // passive device showing a different queue from the one playing is a viewer
+    // looking at the wrong list, and it becomes the wrong list to play from the
+    // moment they take over.
+    protected open fun applyUniversalSettings(frame: MusicPlayerState) {
+        val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
+
+        scope.launch {
+            player.queue(upcoming)
+            player.repeatState(frame.repeatState, remote)
+            player.shuffleState(
+                if (frame.shuffleState) ShuffleState.ON else ShuffleState.OFF,
+                remote,
+            )
+        }
+    }
+
+    // Marked as the server's doing, which is what stops every one of these
+    // becoming an outbound command. The guards read the source and the applier
+    // is the only thing that sets it.
+    private val remote = ActionOptions(source = ActionSource.REMOTE)
 
     // Its own function rather than a labelled return inside the subscription,
     // which reads as a jump out of a lambda and is one more thing to hold while

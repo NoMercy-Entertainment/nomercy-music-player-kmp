@@ -126,8 +126,9 @@ public final class tv/nomercy/player/music/connect/MusicConnectChannel$DefaultIm
 
 public class tv/nomercy/player/music/connect/MusicConnectPlugin : tv/nomercy/player/core/plugin/Plugin {
 	public static final field Manifest Ltv/nomercy/player/music/connect/MusicConnectPlugin$Manifest;
-	public fun <init> (Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;)V
+	public fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;)V
 	protected fun applyServerFrame (Ltv/nomercy/player/music/connect/MusicPlayerState;)V
+	protected fun applyUniversalSettings (Ltv/nomercy/player/music/connect/MusicPlayerState;)V
 	public fun dispose ()V
 	protected final fun getActiveDeviceId ()Ljava/lang/String;
 	protected final fun getLastAppliedSeq ()J
