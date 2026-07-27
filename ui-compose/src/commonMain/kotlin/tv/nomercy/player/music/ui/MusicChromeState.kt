@@ -42,6 +42,10 @@ public data class MusicChromeState(
 
     val queueSize: Int = 0,
     val queueIndex: Int = 0,
+    // What is coming, in order, so the list and the row are drawn from one
+    // value. Read separately by the list, it would be a queue that changes
+    // underneath the row somebody is tapping.
+    val queue: List<MusicTrack> = emptyList(),
 ) {
 
     // Drawn by the thin line under the row, so it is computed once here. Zero
@@ -74,11 +78,15 @@ public fun rememberMusicChromeState(
 ): MusicChromeState {
     val snapshot: PlayerState by player.stateFlow.collectAsState()
 
-    return musicChromeStateOf(snapshot, trackOf(snapshot.item))
+    return musicChromeStateOf(snapshot, trackOf(snapshot.item), player.queue().mapNotNull(trackOf))
 }
 
 // Split from the composable so it can be driven from a fixture.
-public fun musicChromeStateOf(snapshot: PlayerState, track: MusicTrack?): MusicChromeState = MusicChromeState(
+public fun musicChromeStateOf(
+    snapshot: PlayerState,
+    track: MusicTrack?,
+    queue: List<MusicTrack> = emptyList(),
+): MusicChromeState = MusicChromeState(
     playing = snapshot.playState == PlayState.PLAYING,
     buffering = snapshot.bufferState != BufferState.IDLE,
     track = track,
@@ -90,6 +98,7 @@ public fun musicChromeStateOf(snapshot: PlayerState, track: MusicTrack?): MusicC
     shuffled = snapshot.shuffleState == ShuffleState.ON,
     queueSize = snapshot.queueLength,
     queueIndex = snapshot.index,
+    queue = queue,
 )
 
 // The title, which is all a playlist item has. An artist and artwork are the

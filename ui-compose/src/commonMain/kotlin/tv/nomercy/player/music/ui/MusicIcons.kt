@@ -75,6 +75,73 @@ public object MusicIcons {
         }
     }
 
+    // The way back to the row. A chevron pointing down, because that is the
+    // direction the full player goes when it closes.
+    public val Collapse: ImageVector by lazy {
+        glyph("Collapse") {
+            moveTo(6f, 9f)
+            lineTo(12f, 15f)
+            lineTo(18f, 9f)
+            lineTo(16.6f, 7.6f)
+            lineTo(12f, 12.2f)
+            lineTo(7.4f, 7.6f)
+            close()
+        }
+    }
+
+    // Two crossing arrows, which is the shape every client uses and therefore
+    // the one a listener recognises without reading a label.
+    public val Shuffle: ImageVector by lazy {
+        glyph("Shuffle") {
+            moveTo(4f, 7f)
+            horizontalLineTo(8f)
+            lineTo(18f, 17f)
+            horizontalLineTo(21f)
+            verticalLineTo(19f)
+            horizontalLineTo(17f)
+            lineTo(7f, 9f)
+            horizontalLineTo(4f)
+            close()
+            moveTo(17f, 5f)
+            horizontalLineTo(21f)
+            verticalLineTo(7f)
+            horizontalLineTo(18f)
+            lineTo(15f, 10f)
+            lineTo(13.6f, 8.6f)
+            close()
+            moveTo(4f, 17f)
+            horizontalLineTo(7f)
+            lineTo(10f, 14f)
+            lineTo(11.4f, 15.4f)
+            lineTo(8f, 19f)
+            horizontalLineTo(4f)
+            close()
+        }
+    }
+
+    // A loop. The one-track variant carries a mark inside it rather than being a
+    // different shape, because they are the same idea at two scopes.
+    public val Repeat: ImageVector by lazy {
+        glyph("Repeat") {
+            moveTo(7f, 6f)
+            horizontalLineTo(17f)
+            verticalLineTo(3f)
+            lineTo(22f, 7.5f)
+            lineTo(17f, 12f)
+            verticalLineTo(9f)
+            horizontalLineTo(7f)
+            close()
+            moveTo(17f, 18f)
+            horizontalLineTo(7f)
+            verticalLineTo(21f)
+            lineTo(2f, 16.5f)
+            lineTo(7f, 12f)
+            verticalLineTo(15f)
+            horizontalLineTo(17f)
+            close()
+        }
+    }
+
     public val Previous: ImageVector by lazy {
         glyph("Previous") {
             moveTo(18f, 5f)

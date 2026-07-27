@@ -9,6 +9,7 @@
 package tv.nomercy.player.music.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,6 +47,7 @@ public fun MiniPlayer(
     commands: MusicCommands,
     modifier: Modifier = Modifier,
     strings: MusicStrings = MusicStrings(),
+    onExpand: () -> Unit = {},
     artwork: @Composable (MusicChromeState) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxWidth().background(Color.Black).testTag(MINI_PLAYER_TAG)) {
@@ -52,13 +56,29 @@ public fun MiniPlayer(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(GAP),
         ) {
-            // A slot rather than an image loader. The library has none and
-            // should not: artwork is a URL an application already knows how to
-            // fetch, and shipping a fetcher would be shipping a second one
-            // beside the one it has.
-            Box(modifier = Modifier.size(ARTWORK_SIZE).testTag(ARTWORK_TAG)) { artwork(state) }
+            // The artwork and the two lines open the full player; the buttons
+            // beside them do not. Making the whole row one tap target was the
+            // first attempt and it announced the entire row as a single control
+            // called "Open player" — the pause button inside it stopped being
+            // something a screen reader could reach at all. The test that found
+            // it was looking for the progress line, which had vanished into the
+            // same merge.
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onExpand)
+                    .semantics { contentDescription = strings.expand },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(GAP),
+            ) {
+                // A slot rather than an image loader. The library has none and
+                // should not: artwork is a URL an application already knows how
+                // to fetch, and shipping a fetcher would be shipping a second
+                // one beside the one it has.
+                Box(modifier = Modifier.size(ARTWORK_SIZE).testTag(ARTWORK_TAG)) { artwork(state) }
 
-            TrackLines(state, strings, Modifier.weight(1f))
+                TrackLines(state, strings, Modifier.weight(1f))
+            }
 
             Transport(state, commands, strings)
         }
@@ -156,6 +176,16 @@ public data class MusicStrings(
     val next: String = "Next",
     val previous: String = "Previous",
     val nothingPlaying: String = "Nothing playing",
+    val collapse: String = "Close player",
+    val expand: String = "Open player",
+    // What the button will DO, which is what a label is for. A control that
+    // announced its own state would tell a screen reader "repeat off" on a
+    // button that turns repeating on.
+    val shuffleOn: String = "Shuffle",
+    val shuffleOff: String = "Stop shuffling",
+    val repeatAll: String = "Repeat queue",
+    val repeatOne: String = "Repeat track",
+    val repeatOff: String = "Stop repeating",
 )
 
 internal const val MINI_PLAYER_TAG = "nm-mini-player"

@@ -43,6 +43,13 @@ public interface MusicCommands {
     // Named rather than stepped, so a chrome that draws three distinct icons and
     // one that cycles a single button both say what they mean.
     public fun setRepeat(repeat: RepeatState)
+
+    // By position, because that is what a queue list is: the row a listener
+    // tapped is the nth, and the same recording can legitimately be in a queue
+    // twice. Everywhere else in these libraries selects by identifier for the
+    // opposite reason — a track list has no duplicates and does reorder
+    // underneath the menu drawn from it.
+    public fun playQueueIndex(index: Int)
 }
 
 public fun musicCommandsOf(player: NMMusicPlayer, scope: CoroutineScope): MusicCommands =
@@ -86,5 +93,9 @@ private class PlayerMusicCommands(
 
     override fun setRepeat(repeat: RepeatState) {
         scope.launch { player.repeatState(repeat) }
+    }
+
+    override fun playQueueIndex(index: Int) {
+        player.seekToIndex(index)
     }
 }

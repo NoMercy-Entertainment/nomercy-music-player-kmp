@@ -47,6 +47,7 @@ abstract class MiniPlayerGate {
         override fun setMuted(muted: Boolean) = Unit
         override fun setShuffled(shuffled: Boolean) = Unit
         override fun setRepeat(repeat: RepeatState) = Unit
+        override fun playQueueIndex(index: Int) { calls += "playQueueIndex" }
     }
 
     private val commands = Recording()

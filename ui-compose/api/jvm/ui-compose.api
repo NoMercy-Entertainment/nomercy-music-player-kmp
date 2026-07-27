@@ -1,7 +1,13 @@
+public final class tv/nomercy/player/music/ui/ComposableSingletons$FullPlayerKt {
+	public static final field INSTANCE Ltv/nomercy/player/music/ui/ComposableSingletons$FullPlayerKt;
+	public fun <init> ()V
+	public final fun getLambda$622484094$ui_compose ()Lkotlin/jvm/functions/Function3;
+}
+
 public final class tv/nomercy/player/music/ui/ComposableSingletons$MiniPlayerKt {
 	public static final field INSTANCE Ltv/nomercy/player/music/ui/ComposableSingletons$MiniPlayerKt;
 	public fun <init> ()V
-	public final fun getLambda$-1968225718$ui_compose ()Lkotlin/jvm/functions/Function3;
+	public final fun getLambda$-1191523458$ui_compose ()Lkotlin/jvm/functions/Function3;
 }
 
 public final class tv/nomercy/player/music/ui/ComposableSingletons$NMMusicPlayerViewKt {
@@ -10,18 +16,27 @@ public final class tv/nomercy/player/music/ui/ComposableSingletons$NMMusicPlayer
 	public final fun getLambda$-1231502475$ui_compose ()Lkotlin/jvm/functions/Function3;
 }
 
+public final class tv/nomercy/player/music/ui/FormatTimeKt {
+	public static final fun formatTime (D)Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/ui/FullPlayerKt {
+	public static final fun FullPlayer (Ltv/nomercy/player/music/ui/MusicChromeState;Ltv/nomercy/player/music/ui/MusicCommands;Landroidx/compose/ui/Modifier;Ltv/nomercy/player/music/ui/MusicStrings;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
 public final class tv/nomercy/player/music/ui/MiniPlayerKt {
-	public static final fun MiniPlayer (Ltv/nomercy/player/music/ui/MusicChromeState;Ltv/nomercy/player/music/ui/MusicCommands;Landroidx/compose/ui/Modifier;Ltv/nomercy/player/music/ui/MusicStrings;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun MiniPlayer (Ltv/nomercy/player/music/ui/MusicChromeState;Ltv/nomercy/player/music/ui/MusicCommands;Landroidx/compose/ui/Modifier;Ltv/nomercy/player/music/ui/MusicStrings;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class tv/nomercy/player/music/ui/MusicChromeState {
 	public static final field $stable I
 	public fun <init> ()V
-	public fun <init> (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZII)V
-	public synthetic fun <init> (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIILjava/util/List;)V
+	public synthetic fun <init> (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIILjava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Z
 	public final fun component10 ()I
 	public final fun component11 ()I
+	public final fun component12 ()Ljava/util/List;
 	public final fun component2 ()Z
 	public final fun component3 ()Ltv/nomercy/player/music/ui/MusicTrack;
 	public final fun component4 ()D
@@ -30,8 +45,8 @@ public final class tv/nomercy/player/music/ui/MusicChromeState {
 	public final fun component7 ()Z
 	public final fun component8 ()Ltv/nomercy/player/core/player/RepeatState;
 	public final fun component9 ()Z
-	public final fun copy (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZII)Ltv/nomercy/player/music/ui/MusicChromeState;
-	public static synthetic fun copy$default (Ltv/nomercy/player/music/ui/MusicChromeState;ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIIILjava/lang/Object;)Ltv/nomercy/player/music/ui/MusicChromeState;
+	public final fun copy (ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIILjava/util/List;)Ltv/nomercy/player/music/ui/MusicChromeState;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/ui/MusicChromeState;ZZLtv/nomercy/player/music/ui/MusicTrack;DDIZLtv/nomercy/player/core/player/RepeatState;ZIILjava/util/List;ILjava/lang/Object;)Ltv/nomercy/player/music/ui/MusicChromeState;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBuffering ()Z
 	public final fun getDurationSeconds ()D
@@ -40,6 +55,7 @@ public final class tv/nomercy/player/music/ui/MusicChromeState {
 	public final fun getMuted ()Z
 	public final fun getPlaying ()Z
 	public final fun getProgress ()F
+	public final fun getQueue ()Ljava/util/List;
 	public final fun getQueueIndex ()I
 	public final fun getQueueSize ()I
 	public final fun getRepeat ()Ltv/nomercy/player/core/player/RepeatState;
@@ -52,13 +68,15 @@ public final class tv/nomercy/player/music/ui/MusicChromeState {
 }
 
 public final class tv/nomercy/player/music/ui/MusicChromeStateKt {
-	public static final fun musicChromeStateOf (Ltv/nomercy/player/core/player/PlayerState;Ltv/nomercy/player/music/ui/MusicTrack;)Ltv/nomercy/player/music/ui/MusicChromeState;
+	public static final fun musicChromeStateOf (Ltv/nomercy/player/core/player/PlayerState;Ltv/nomercy/player/music/ui/MusicTrack;Ljava/util/List;)Ltv/nomercy/player/music/ui/MusicChromeState;
+	public static synthetic fun musicChromeStateOf$default (Ltv/nomercy/player/core/player/PlayerState;Ltv/nomercy/player/music/ui/MusicTrack;Ljava/util/List;ILjava/lang/Object;)Ltv/nomercy/player/music/ui/MusicChromeState;
 	public static final fun musicTrackOf (Ltv/nomercy/player/core/media/PlaylistItem;)Ltv/nomercy/player/music/ui/MusicTrack;
 	public static final fun rememberMusicChromeState (Ltv/nomercy/player/music/NMMusicPlayer;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)Ltv/nomercy/player/music/ui/MusicChromeState;
 }
 
 public abstract interface class tv/nomercy/player/music/ui/MusicCommands {
 	public abstract fun next ()V
+	public abstract fun playQueueIndex (I)V
 	public abstract fun previous ()V
 	public abstract fun seekTo (D)V
 	public abstract fun setMuted (Z)V
@@ -75,34 +93,55 @@ public final class tv/nomercy/player/music/ui/MusicCommandsKt {
 public final class tv/nomercy/player/music/ui/MusicIcons {
 	public static final field $stable I
 	public static final field INSTANCE Ltv/nomercy/player/music/ui/MusicIcons;
+	public final fun getCollapse ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getNext ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getPause ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getPlay ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getPrevious ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getRepeat ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getShuffle ()Landroidx/compose/ui/graphics/vector/ImageVector;
 }
 
 public final class tv/nomercy/player/music/ui/MusicIconsKt {
 	public static final fun MusicIconButton (Landroidx/compose/ui/graphics/vector/ImageVector;Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class tv/nomercy/player/music/ui/MusicScrubberKt {
+	public static final fun MusicScrubber (Ltv/nomercy/player/music/ui/MusicChromeState;Ltv/nomercy/player/music/ui/MusicCommands;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+}
+
 public final class tv/nomercy/player/music/ui/MusicStrings {
 	public static final field $stable I
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Ljava/lang/String;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/lang/String;
 	public final fun component4 ()Ljava/lang/String;
 	public final fun component5 ()Ljava/lang/String;
-	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltv/nomercy/player/music/ui/MusicStrings;
-	public static synthetic fun copy$default (Ltv/nomercy/player/music/ui/MusicStrings;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltv/nomercy/player/music/ui/MusicStrings;
+	public final fun component6 ()Ljava/lang/String;
+	public final fun component7 ()Ljava/lang/String;
+	public final fun component8 ()Ljava/lang/String;
+	public final fun component9 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ltv/nomercy/player/music/ui/MusicStrings;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/ui/MusicStrings;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ltv/nomercy/player/music/ui/MusicStrings;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCollapse ()Ljava/lang/String;
+	public final fun getExpand ()Ljava/lang/String;
 	public final fun getNext ()Ljava/lang/String;
 	public final fun getNothingPlaying ()Ljava/lang/String;
 	public final fun getPause ()Ljava/lang/String;
 	public final fun getPlay ()Ljava/lang/String;
 	public final fun getPrevious ()Ljava/lang/String;
+	public final fun getRepeatAll ()Ljava/lang/String;
+	public final fun getRepeatOff ()Ljava/lang/String;
+	public final fun getRepeatOne ()Ljava/lang/String;
+	public final fun getShuffleOff ()Ljava/lang/String;
+	public final fun getShuffleOn ()Ljava/lang/String;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }
@@ -128,5 +167,9 @@ public final class tv/nomercy/player/music/ui/MusicTrack {
 
 public final class tv/nomercy/player/music/ui/NMMusicPlayerViewKt {
 	public static final fun NMMusicPlayerView (Ltv/nomercy/player/music/NMMusicPlayer;Landroidx/compose/ui/Modifier;Ltv/nomercy/player/music/ui/MusicStrings;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class tv/nomercy/player/music/ui/QueueListKt {
+	public static final fun QueueList (Ltv/nomercy/player/music/ui/MusicChromeState;Ltv/nomercy/player/music/ui/MusicCommands;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 }
 
