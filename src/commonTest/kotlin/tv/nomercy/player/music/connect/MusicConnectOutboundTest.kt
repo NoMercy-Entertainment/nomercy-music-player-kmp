@@ -53,9 +53,9 @@ class MusicConnectOutboundTest {
         // player's own scheduler and a frame emitted before that collection
         // starts is dropped — a shared flow with no replay behaves like a real
         // hub, which does not resend what happened before you connected.
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
         channel.broadcast(MusicPlayerState(deviceId = activeDeviceId, seq = 1, item = Track("a")))
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
 
         channel.sent.clear()
         return Rig(player, backend, channel, plugin)
@@ -150,7 +150,7 @@ class MusicConnectOutboundTest {
         assertEquals(DeviceRole.PASSIVE, rig.plugin.role)
 
         rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 2, item = Track("a")))
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(DeviceRole.ACTIVE, rig.plugin.role)
     }
@@ -164,7 +164,7 @@ class MusicConnectOutboundTest {
 
         rig.plugin.dispose()
         rig.channel.broadcast(MusicPlayerState(deviceId = "dev-a", seq = 5, item = Track("a")))
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(DeviceRole.PASSIVE, rig.plugin.role, "a disposed plugin was still listening")
     }
@@ -177,7 +177,7 @@ class MusicConnectOutboundTest {
         val rig: Rig = rig(activeDeviceId = "dev-a")
 
         rig.channel.broadcast(MusicPlayerState(deviceId = "dev-b", seq = 1, item = Track("a")))
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
 
         assertEquals(DeviceRole.ACTIVE, rig.plugin.role, "a stale frame moved playback")
     }

@@ -45,7 +45,7 @@ class MusicConnectPassiveTest {
 
         player.setup()
         player.addPlugin(plugin)
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
         return Rig(player, backend, channel, plugin)
     }
 

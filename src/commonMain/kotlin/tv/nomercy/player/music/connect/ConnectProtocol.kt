@@ -8,6 +8,8 @@
 
 package tv.nomercy.player.music.connect
 
+import tv.nomercy.player.core.player.ActionSource
+
 // Whether to act on a frame, and what the bar becomes if so.
 //
 // Frames arrive out of order and more than once. A hub redelivers on reconnect,
@@ -37,5 +39,39 @@ internal fun resolveRole(frameDeviceId: String?, myDeviceId: String): DeviceRole
     frameDeviceId.equals(myDeviceId, ignoreCase = true) -> DeviceRole.ACTIVE
     else -> DeviceRole.PASSIVE
 }
+
+// Where the active device should actually be by now.
+//
+// A frame describes a moment that has already passed by the time it arrives, so
+// seeking to the number in it lands behind — and on a handoff that is audible as
+// the new device starting a beat late.
+//
+// Where the server says when the position was taken, the correction is the time
+// since that instant. Where it does not, the frame's own send time is the best
+// anchor there is and half of the round trip is the usual guess at one-way
+// latency. An unstamped frame is not corrected at all, because a made-up
+// correction is worse than a known-stale number.
+internal fun adjustedSeekSeconds(frame: MusicPlayerState, serverNowMs: Long): Double {
+    val capturedAtMs: Long? = frame.positionCapturedAtMs
+    val elapsedMs: Long = when {
+        capturedAtMs != null -> (serverNowMs - capturedAtMs).coerceAtLeast(0)
+        frame.timestamp > 0 -> ((serverNowMs - frame.timestamp) / 2).coerceAtLeast(0)
+        else -> 0
+    }
+
+    return (frame.progressMs + elapsedMs) / MILLIS_PER_SECOND
+}
+
+// An action the server itself caused. Sending it back would be this device
+// asking the server to do what the server just told it had happened, which on a
+// hub with several listeners is a loop rather than a duplicate.
+internal fun isEcho(source: String?): Boolean = source == ActionSource.REMOTE
+
+// Far enough out that a viewer hears it. Correcting anything smaller would make
+// every frame a seek, and a seek on a music engine is an audible gap — so the
+// tolerance exists to keep the common case silent, not to save work.
+internal const val DRIFT_TOLERANCE_SECONDS = 5.0
+
+private const val MILLIS_PER_SECOND = 1000.0
 
 private const val UNSEQUENCED = 0L

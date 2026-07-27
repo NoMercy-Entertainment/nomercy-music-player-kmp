@@ -166,3 +166,31 @@ internal class SlowFadeBackend : SilentBackend(), TransitionBackend {
     override fun secondaryGain(value: Float) = Unit
 }
 
+
+// An engine that can be caught mid-load.
+//
+// Real ones take time to open a source, and everything the active device does on
+// a handoff depends on that gap existing: it loads, waits, and only then seeks
+// and plays. A fake that finishes loading inside the call cannot tell a
+// continuation that waited from one that ran too early — both look identical
+// from the outside, and only one of them works against a real engine.
+internal class ConnectBackend : SilentBackend() {
+    val loadedUrls: MutableList<String> = mutableListOf()
+
+    private var opening: CompletableDeferred<Unit>? = null
+
+    fun holdTheNextLoad() {
+        opening = CompletableDeferred()
+    }
+
+    fun finishLoading() {
+        opening?.complete(Unit)
+        opening = null
+    }
+
+    override suspend fun load(url: String, opts: LoadOptions) {
+        loadedUrls += url
+        opening?.await()
+        super.load(url, opts)
+    }
+}

@@ -46,13 +46,13 @@ class MusicConnectInboundTest {
 
         player.setup()
         player.addPlugin(plugin)
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
         return Rig(player, backend, channel, plugin)
     }
 
     private suspend fun TestScope.send(rig: Rig, frame: MusicPlayerState) {
         rig.channel.broadcast(frame)
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
     }
 
     @Test

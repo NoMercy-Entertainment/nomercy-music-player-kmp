@@ -62,7 +62,7 @@ class MusicConnectChannelTest {
         val channel = FakeMusicConnectChannel()
 
         val received = async { channel.frames.first() }
-        testScheduler.advanceUntilIdle()
+        testScheduler.runCurrent()
         channel.broadcast(MusicPlayerState(deviceId = "device-a", seq = 1, item = null))
 
         assertEquals("device-a", received.await().deviceId)

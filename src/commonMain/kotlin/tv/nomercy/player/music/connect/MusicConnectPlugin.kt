@@ -10,23 +10,21 @@ package tv.nomercy.player.music.connect
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.events.BeforeEvent
 import tv.nomercy.player.core.events.CoreEvents
 import tv.nomercy.player.core.events.SeekPosition
+import tv.nomercy.player.core.events.Subscription
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.player.ActionOptions
 import tv.nomercy.player.core.player.ActionSource
+import tv.nomercy.player.core.player.PlayState
+import tv.nomercy.player.core.player.ShuffleState
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
-import tv.nomercy.player.core.player.RepeatState
-import tv.nomercy.player.core.player.ShuffleState
-import tv.nomercy.player.core.controllers.ComposedPlayer
+import kotlin.math.abs
 
 // Music across several devices, with one of them making sound.
 //
@@ -63,17 +61,29 @@ public open class MusicConnectPlugin(
 
     private var subscription: Job? = null
 
-    private var ticking: Job? = null
+    private val ticker = ConnectMirrorTicker(scope)
 
-    private val mirrored = MutableStateFlow(ConnectMirror())
+    private var loadContinuation: List<Subscription> = emptyList()
+
+    private var playingShield: OptimisticShield? = null
 
     // What a passive device draws. Empty on the active one, which renders from
     // its own player because it is the thing actually playing.
-    public val mirror: StateFlow<ConnectMirror> = mirrored.asStateFlow()
+    public val mirror: StateFlow<ConnectMirror> get() = ticker.mirror
 
     public open val role: DeviceRole get() = resolveRole(activeDeviceId, channel.deviceId)
 
     public open val isActiveDevice: Boolean get() = role == DeviceRole.ACTIVE
+
+    // The server's clock. Identical to this device's until the offset has been
+    // measured, which is the honest starting point rather than a guess.
+    protected open fun serverNowMs(): Long = player.now()
+
+    // This device's own clock, which is what bounds the shield. Separate from
+    // the server's on purpose: a shield measured on a clock the server controls
+    // would never expire while that clock was wrong, and the point of the bound
+    // is to recover from exactly that.
+    protected open fun nowMs(): Long = player.now()
 
     override fun use() {
         on(CoreEvents.BeforePlay) { event -> guard(event, ConnectCommand.PLAY) }
@@ -97,13 +107,11 @@ public open class MusicConnectPlugin(
     override fun dispose() {
         subscription?.cancel()
         subscription = null
-        stopMirroring()
+        cancelLoadContinuation()
+        ticker.dispose()
     }
 
     // What the server said, once the gate has let it through.
-    //
-    // Open so the later halves — the passive mirror, the active reconciliation —
-    // extend it rather than replacing this dispatch.
     protected open fun applyServerFrame(frame: MusicPlayerState) {
         val nextSeq: Long = nextAppliedSeqOrNull(frame.seq, lastAppliedSeq) ?: return
         lastAppliedSeq = nextSeq
@@ -113,71 +121,130 @@ public open class MusicConnectPlugin(
         // which is why this happens before the role is reconciled — after it,
         // the device that just stopped being active would take the passive
         // branch and start following a session that no longer exists.
-        if (frame.item == null) {
+        val item: PlaylistItem = frame.item ?: run {
             activeDeviceId = null
-            stopMirroring()
+            cancelLoadContinuation()
+            ticker.clear()
             scope.launch { player.stop(remote) }
             return
         }
 
+        val wasActive: Boolean = role == DeviceRole.ACTIVE
         activeDeviceId = frame.deviceId
-        applyUniversalSettings(frame)
 
-        if (role == DeviceRole.ACTIVE) stopMirroring() else applyPassiveFrame(frame)
+        // One coroutine for the whole frame, in order. Two would race: the queue
+        // is written by the settings and read by the load, and a load that
+        // arrived first would look for a track the player has not been given.
+        scope.launch {
+            // Read before the settings rewrite the queue. Afterwards the current
+            // item IS the frame's item, so a track change compared against it
+            // always looks like no change — the engine keeps the old song while
+            // every other device moves on.
+            val heldItemId: String? = player.item()?.id
+
+            applyUniversalSettings(frame)
+            if (role == DeviceRole.ACTIVE) {
+                applyActiveFrame(frame, item, justBecameActive = !wasActive, heldItemId = heldItemId)
+            } else {
+                applyPassiveFrame(frame, item)
+            }
+        }
     }
 
     // A device that is not playing follows without ever loading anything.
     //
     // That is the invariant the whole subsystem rests on, and it is structural:
-    // nothing on this path touches the engine, so a passive device cannot become
-    // a second stream however the frames arrive. What it shows instead is the
-    // active device's track and a progress bar moved between frames.
+    // nothing on this path touches the engine except to keep it quiet, so a
+    // passive device cannot become a second stream however the frames arrive.
     //
     // It pauses rather than stops, because a stop tears the bar down and a
     // viewer watching another room's playback wants to see where it has got to.
-    protected open fun applyPassiveFrame(frame: MusicPlayerState) {
-        mirrored.value = ConnectMirror(
-            item = frame.item,
-            isPlaying = frame.isPlaying,
-            positionMs = frame.progressMs,
-            durationMs = frame.durationMs,
+    protected open suspend fun applyPassiveFrame(frame: MusicPlayerState, item: PlaylistItem) {
+        val held: Boolean = playingShield.holds(frame.serverTimeMs, nowMs())
+        if (!held) playingShield = null
+
+        ticker.show(
+            ConnectMirror(
+                item = item,
+                isPlaying = if (held) mirror.value.isPlaying else frame.isPlaying,
+                positionMs = frame.progressMs,
+                durationMs = frame.durationMs,
+            ),
         )
 
-        scope.launch { player.pause(remote) }
-
-        if (frame.isPlaying) startMirroring() else stopTicking()
+        player.pause(remote)
     }
 
-    // Between frames, the bar moves on its own.
+    // The device that is actually playing, brought back in line with the server.
     //
-    // A server broadcasts on change rather than continuously, so a bar drawn
-    // only from frames sits still for a whole track and then jumps. This walks
-    // it forward and every arriving frame corrects it, which is the same thing
-    // the platforms' own lock screens do with a position and a rate.
-    //
-    // It ends the moment the bar can no longer move — paused, or arrived at the
-    // end of the track. A ticker that kept waking four times a second to write
-    // the value it already holds is a wakeup per second per idle device, and on
-    // a phone that is battery spent drawing nothing.
-    private fun startMirroring() {
-        if (ticking?.isActive == true) return
+    // Three cases, and they are not interchangeable. Taking over from another
+    // device, or a track change, means the engine holds the wrong source or none
+    // — so it loads and waits, because seeking a source that is not set yet does
+    // nothing and playing it starts the wrong track. The same track already
+    // loaded is a correction: seek only if the drift is audible, then match the
+    // server's play or pause.
+    protected open suspend fun applyActiveFrame(
+        frame: MusicPlayerState,
+        item: PlaylistItem,
+        justBecameActive: Boolean,
+        heldItemId: String?,
+    ) {
+        ticker.clear()
+        playingShield = null
 
-        ticking = scope.launch {
-            while (isActive && mirrored.value.isAdvancing) {
-                delay(MIRROR_TICK_MS)
-                mirrored.value = mirrored.value.advancedBy(MIRROR_TICK_MS)
+        val target: Double = adjustedSeekSeconds(frame, serverNowMs())
+
+        if (justBecameActive || heldItemId != item.id) {
+            // Armed before the load, not after. The load reports readiness the
+            // moment the engine holds the source, and against a fast engine that
+            // is inside this call — a continuation armed afterwards would wait
+            // for a signal that had already gone past.
+            armLoadContinuation(frame, target)
+            player.item(item.id)
+            return
+        }
+
+        if (abs(player.time() - target) > DRIFT_TOLERANCE_SECONDS) player.time(target, remote)
+        matchPlaybackTo(frame)
+    }
+
+    // What happens once the engine has the track.
+    //
+    // Both arms end the continuation, including the failure one: a load that
+    // errored is never going to report ready, and leaving the subscription armed
+    // means the NEXT track's readiness runs this frame's stale seek.
+    private fun armLoadContinuation(frame: MusicPlayerState, seekSeconds: Double) {
+        cancelLoadContinuation()
+
+        val ready: Subscription = on(CoreEvents.MediaReady) {
+            cancelLoadContinuation()
+            scope.launch {
+                player.time(seekSeconds, remote)
+                matchPlaybackTo(frame)
             }
         }
+        // Both failure surfaces. A stream that would not open reports one, a
+        // playlist that would not resolve reports the other, and either of them
+        // means the readiness this is waiting for is never coming.
+        val streamFailed: Subscription = on(CoreEvents.StreamError) { cancelLoadContinuation() }
+        val failed: Subscription = on(CoreEvents.Error) { cancelLoadContinuation() }
+
+        loadContinuation = listOf(ready, streamFailed, failed)
     }
 
-    private fun stopTicking() {
-        ticking?.cancel()
-        ticking = null
+    private fun cancelLoadContinuation() {
+        loadContinuation.forEach { it.dispose() }
+        loadContinuation = emptyList()
     }
 
-    private fun stopMirroring() {
-        stopTicking()
-        mirrored.value = ConnectMirror()
+    // Only when it differs. Playing a player that is already playing is an event
+    // a chrome renders as a fresh start, and on a hub that broadcasts several
+    // times a second it would render one per frame.
+    private suspend fun matchPlaybackTo(frame: MusicPlayerState) {
+        val playing: Boolean = player.playState() == PlayState.PLAYING
+
+        if (frame.isPlaying && !playing) player.play(remote)
+        else if (!frame.isPlaying && playing) player.pause(remote)
     }
 
     // What every device follows, whichever role it is in.
@@ -186,17 +253,15 @@ public open class MusicConnectPlugin(
     // passive device showing a different queue from the one playing is a viewer
     // looking at the wrong list, and it becomes the wrong list to play from the
     // moment they take over.
-    protected open fun applyUniversalSettings(frame: MusicPlayerState) {
+    protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
-        scope.launch {
-            player.queue(upcoming)
-            player.repeatState(frame.repeatState, remote)
-            player.shuffleState(
-                if (frame.shuffleState) ShuffleState.ON else ShuffleState.OFF,
-                remote,
-            )
-        }
+        player.queue(upcoming)
+        player.repeatState(frame.repeatState, remote)
+        player.shuffleState(
+            if (frame.shuffleState) ShuffleState.ON else ShuffleState.OFF,
+            remote,
+        )
     }
 
     // Marked as the server's doing, which is what stops every one of these
@@ -218,16 +283,25 @@ public open class MusicConnectPlugin(
     private fun guard(event: BeforeEvent<ActionOptions>, command: String) {
         if (isEcho(event.data.source)) return
 
-        if (!isActiveDevice) event.preventDefault()
+        if (!isActiveDevice) {
+            showIntentBeforeTheServerAnswers(command)
+            event.preventDefault()
+        }
         scope.launch { channel.playbackCommand(command) }
     }
 
-    // An action the server itself caused. Sending it back would be this device
-    // asking the server to do what the server just told it had happened, which
-    // on a hub with several listeners is a loop rather than a duplicate.
-    private fun isEcho(source: String?): Boolean = source == ActionSource.REMOTE
-}
+    // A press on a device that is not the one playing still has to look like it
+    // did something. The button flips now and is defended for a moment against
+    // frames the server produced before it heard the press; a later frame is a
+    // real answer, including a refusal, and it wins.
+    private fun showIntentBeforeTheServerAnswers(command: String) {
+        val intent: Boolean = when (command) {
+            ConnectCommand.PLAY -> true
+            ConnectCommand.PAUSE -> false
+            else -> return
+        }
 
-// Four times a second, which is what a progress bar needs to look continuous and
-// is cheap enough to run on a device that is otherwise doing nothing.
-private const val MIRROR_TICK_MS = 250L
+        playingShield = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
+        ticker.intend(intent)
+    }
+}
