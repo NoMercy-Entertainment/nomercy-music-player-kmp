@@ -143,6 +143,11 @@ public final class tv/nomercy/player/music/connect/MusicConnectChannel$DefaultIm
 	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 }
 
+public final class tv/nomercy/player/music/connect/MusicConnectKt {
+	public static final fun connectMusic (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun connectMusic$default (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
 public class tv/nomercy/player/music/connect/MusicConnectPlugin : tv/nomercy/player/core/plugin/Plugin {
 	public static final field Manifest Ltv/nomercy/player/music/connect/MusicConnectPlugin$Manifest;
 	public fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/connect/MusicConnectChannel;Lkotlinx/coroutines/CoroutineScope;)V
