@@ -48,6 +48,12 @@ internal open class SilentBackend : MediaBackend {
     // before-hook test asks.
     val seekedTo: MutableList<Double> = mutableListOf()
 
+    // Every source this engine was told to open. "Did it reload the track" is a
+    // question several Connect rules turn on, and only a record answers it — a
+    // cursor that ends up on the right song looks the same whether the audio was
+    // re-fetched or left alone.
+    val loadedUrls: MutableList<String> = mutableListOf()
+
     private val listeners: MutableMap<String, MutableList<(Any?) -> Unit>> = mutableMapOf()
 
     fun fire(event: String, data: Any? = null) {
@@ -55,6 +61,7 @@ internal open class SilentBackend : MediaBackend {
     }
 
     override suspend fun load(url: String, opts: LoadOptions) {
+        loadedUrls += url
         // What a real engine reports once it has read the container.
         fire(CanonicalBackendEvent.LOAD_START)
         fire(CanonicalBackendEvent.LOADED_METADATA)
@@ -175,8 +182,6 @@ internal class SlowFadeBackend : SilentBackend(), TransitionBackend {
 // continuation that waited from one that ran too early — both look identical
 // from the outside, and only one of them works against a real engine.
 internal class ConnectBackend : SilentBackend() {
-    val loadedUrls: MutableList<String> = mutableListOf()
-
     private var opening: CompletableDeferred<Unit>? = null
 
     fun holdTheNextLoad() {
@@ -189,7 +194,6 @@ internal class ConnectBackend : SilentBackend() {
     }
 
     override suspend fun load(url: String, opts: LoadOptions) {
-        loadedUrls += url
         opening?.await()
         super.load(url, opts)
     }

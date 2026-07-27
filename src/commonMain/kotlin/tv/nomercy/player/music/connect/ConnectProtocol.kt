@@ -67,6 +67,37 @@ internal fun adjustedSeekSeconds(frame: MusicPlayerState, serverNowMs: Long): Do
 // hub with several listeners is a loop rather than a duplicate.
 internal fun isEcho(source: String?): Boolean = source == ActionSource.REMOTE
 
+// This device's own remembered level, out of the map the server keeps per
+// device.
+//
+// Never a mirrored value. A phone at thirty percent and a television at eighty
+// are both correct, and adopting the other's would make one of them wrong every
+// time the session moved — which is why this is read for every device whatever
+// its role, while the session's single volume figure is not.
+//
+// Matched without case for the same reason the role is: the identifiers come
+// from a stored preference, a handshake and a server record, and one of them
+// upper-casing a hexadecimal id would silently leave the level unapplied.
+internal fun ownVolumeIn(frame: MusicPlayerState, deviceId: String): Int? =
+    frame.deviceVolumes.entries
+        .firstOrNull { it.key.equals(deviceId, ignoreCase = true) }
+        ?.value
+        ?.coerceIn(0, MAX_VOLUME_PERCENT)
+
+// How long a device that has just been promoted ignores a pause.
+//
+// Taking over is two messages: this device says it is taking the session, the
+// old one says it has let go. They cross, and the release arrives after the
+// promotion — so a device that applied it would pause the track it had just
+// been handed, about half a second after the viewer moved it.
+//
+// Only the pause direction is suppressed. A stale frame still saying "playing"
+// catches up harmlessly, and suppressing a real pause for half a second is a
+// button that answers late rather than a session that stops on its own.
+internal const val SETTLEMENT_MS = 500L
+
+private const val MAX_VOLUME_PERCENT = 100
+
 // Far enough out that a viewer hears it. Correcting anything smaller would make
 // every frame a seek, and a seek on a music engine is an audible gap — so the
 // tolerance exists to keep the common case silent, not to save work.

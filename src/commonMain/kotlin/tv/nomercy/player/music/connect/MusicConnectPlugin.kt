@@ -24,6 +24,7 @@ import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.player.ShuffleState
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
+import tv.nomercy.player.music.MusicEvents
 import kotlin.math.abs
 
 // Music across several devices, with one of them making sound.
@@ -67,6 +68,21 @@ public open class MusicConnectPlugin(
 
     private var playingShield: OptimisticShield? = null
 
+    // Until when a freshly promoted device ignores a pause. Zero means it is not
+    // settling, which is the state it spends nearly all its life in.
+    private var settlingUntilMs: Long = 0
+
+    // The track a local crossfade has already swapped the audio to, while the
+    // server is still broadcasting the one before it. Null whenever no crossfade
+    // is outstanding.
+    private var crossfadeTargetId: String? = null
+
+    // When this device last moved itself past a track. The hub keeps sending the
+    // old one for a moment afterwards, and those frames have to be told apart
+    // from a viewer deliberately choosing that track from somewhere else — which
+    // is a question about when the server sent it, not about which track it is.
+    private var advanceShield: OptimisticShield? = null
+
     // What a passive device draws. Empty on the active one, which renders from
     // its own player because it is the thing actually playing.
     public val mirror: StateFlow<ConnectMirror> get() = ticker.mirror
@@ -93,6 +109,15 @@ public open class MusicConnectPlugin(
         on(CoreEvents.BeforePrevious) { event -> guard(event, ConnectCommand.PREVIOUS) }
 
         on(CoreEvents.BeforeSeek, ::guardSeek)
+
+        // Watched rather than reported to. A crossfade is started through the
+        // player, and requiring the caller to also tell this plugin about it
+        // would make correctness depend on two calls being kept in step by
+        // whoever wires them up.
+        on(MusicEvents.CrossfadeStart) { crossfade ->
+            crossfadeTargetId = crossfade.to.id
+            advanceShield = armed()
+        }
 
         // Collected on the scope this plugin was given rather than on the
         // player's own, so one scope owns both directions of the conversation
@@ -142,11 +167,20 @@ public open class MusicConnectPlugin(
             // every other device moves on.
             val heldItemId: String? = player.item()?.id
 
-            applyUniversalSettings(frame)
-            if (role == DeviceRole.ACTIVE) {
-                applyActiveFrame(frame, item, justBecameActive = !wasActive, heldItemId = heldItemId)
-            } else {
-                applyPassiveFrame(frame, item)
+            // A frame the server sent before it heard this device move on is
+            // dropped whole rather than partly applied. Letting it through to
+            // the settings would rewrite the queue around the song that just
+            // ended, and the next frame would rewrite it back.
+            val overtaken: Boolean = heldItemId != item.id && item.id != crossfadeTargetId
+            val stale: Boolean = overtaken && advanceShield.precedes(frame.serverTimeMs, nowMs())
+
+            if (!stale) {
+                applyUniversalSettings(frame)
+                if (role == DeviceRole.ACTIVE) {
+                    applyActiveFrame(frame, item, justBecameActive = !wasActive, heldItemId = heldItemId)
+                } else {
+                    applyPassiveFrame(frame, item)
+                }
             }
         }
     }
@@ -191,10 +225,22 @@ public open class MusicConnectPlugin(
     ) {
         ticker.clear()
         playingShield = null
+        if (justBecameActive) settlingUntilMs = nowMs() + SETTLEMENT_MS
 
         val target: Double = adjustedSeekSeconds(frame, serverNowMs())
+        val isTrackChange: Boolean = heldItemId != item.id
 
-        if (justBecameActive || heldItemId != item.id) {
+        // The server catching up to a crossfade this device already performed.
+        // The audio is on the new track, so reloading it would restart the song
+        // the viewer is a few seconds into — the cursor moves and nothing else.
+        if (isTrackChange && item.id == crossfadeTargetId) {
+            crossfadeTargetId = null
+            advanceCursorTo(item)
+            matchPlaybackTo(frame)
+            return
+        }
+
+        if (justBecameActive || isTrackChange) {
             // Armed before the load, not after. The load reports readiness the
             // moment the engine holds the source, and against a fast engine that
             // is inside this call — a continuation armed afterwards would wait
@@ -232,6 +278,13 @@ public open class MusicConnectPlugin(
         loadContinuation = listOf(ready, streamFailed, failed)
     }
 
+    // Moves the queue cursor without asking the engine for anything, which is
+    // the whole point: the audio is already there.
+    private fun advanceCursorTo(item: PlaylistItem) {
+        val index: Int = player.queue().indexOfFirst { it.id == item.id }
+        if (index >= 0) player.seekToIndex(index + 1)
+    }
+
     private fun cancelLoadContinuation() {
         loadContinuation.forEach { it.dispose() }
         loadContinuation = emptyList()
@@ -243,8 +296,13 @@ public open class MusicConnectPlugin(
     private suspend fun matchPlaybackTo(frame: MusicPlayerState) {
         val playing: Boolean = player.playState() == PlayState.PLAYING
 
+        // A pause this device is willing to hear. Inside the settlement window
+        // it is a release from the device that just let go, arriving after the
+        // promotion it crossed with.
+        val pauseIsWanted: Boolean = !frame.isPlaying && nowMs() >= settlingUntilMs
+
         if (frame.isPlaying && !playing) player.play(remote)
-        else if (!frame.isPlaying && playing) player.pause(remote)
+        else if (pauseIsWanted && playing) player.pause(remote)
     }
 
     // What every device follows, whichever role it is in.
@@ -254,6 +312,8 @@ public open class MusicConnectPlugin(
     // looking at the wrong list, and it becomes the wrong list to play from the
     // moment they take over.
     protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
+        ownVolumeIn(frame, channel.deviceId)?.let { own -> player.volume(own, remote) }
+
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
         player.queue(upcoming)
@@ -283,12 +343,16 @@ public open class MusicConnectPlugin(
     private fun guard(event: BeforeEvent<ActionOptions>, command: String) {
         if (isEcho(event.data.source)) return
 
+        if (isActiveDevice && command in ADVANCING_COMMANDS) advanceShield = armed()
+
         if (!isActiveDevice) {
             showIntentBeforeTheServerAnswers(command)
             event.preventDefault()
         }
         scope.launch { channel.playbackCommand(command) }
     }
+
+    private fun armed() = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
 
     // A press on a device that is not the one playing still has to look like it
     // did something. The button flips now and is defended for a moment against
@@ -301,7 +365,10 @@ public open class MusicConnectPlugin(
             else -> return
         }
 
-        playingShield = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
+        playingShield = armed()
         ticker.intend(intent)
     }
 }
+
+// The two that move this device off the track the server last named.
+private val ADVANCING_COMMANDS = setOf(ConnectCommand.NEXT, ConnectCommand.PREVIOUS)

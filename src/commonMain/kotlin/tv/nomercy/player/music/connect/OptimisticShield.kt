@@ -37,3 +37,17 @@ internal fun OptimisticShield?.holds(frameServerTimeMs: Long?, nowMs: Long): Boo
     frameServerTimeMs != null -> frameServerTimeMs < sentAtServerMs
     else -> true
 }
+
+// The same question asked about a track rather than a button, and stricter by
+// one case: an unstamped frame is applied here rather than held.
+//
+// The asymmetry is deliberate. Holding a button through an unstamped frame costs
+// a flicker and corrects itself; dropping a track change costs the wrong song
+// playing, so a server too old to stamp its frames gets the benefit of the doubt
+// on this side and not on the other.
+internal fun OptimisticShield?.precedes(frameServerTimeMs: Long?, nowMs: Long): Boolean = when {
+    this == null -> false
+    nowMs - sentAtLocalMs >= OPTIMISTIC_SHIELD_MS -> false
+    frameServerTimeMs == null -> false
+    else -> frameServerTimeMs < sentAtServerMs
+}
