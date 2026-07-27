@@ -10,6 +10,11 @@ package tv.nomercy.player.music.connect
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import tv.nomercy.player.core.events.BeforeEvent
 import tv.nomercy.player.core.events.CoreEvents
@@ -58,6 +63,14 @@ public open class MusicConnectPlugin(
 
     private var subscription: Job? = null
 
+    private var ticking: Job? = null
+
+    private val mirrored = MutableStateFlow(ConnectMirror())
+
+    // What a passive device draws. Empty on the active one, which renders from
+    // its own player because it is the thing actually playing.
+    public val mirror: StateFlow<ConnectMirror> = mirrored.asStateFlow()
+
     public open val role: DeviceRole get() = resolveRole(activeDeviceId, channel.deviceId)
 
     public open val isActiveDevice: Boolean get() = role == DeviceRole.ACTIVE
@@ -84,6 +97,7 @@ public open class MusicConnectPlugin(
     override fun dispose() {
         subscription?.cancel()
         subscription = null
+        stopMirroring()
     }
 
     // What the server said, once the gate has let it through.
@@ -101,12 +115,69 @@ public open class MusicConnectPlugin(
         // branch and start following a session that no longer exists.
         if (frame.item == null) {
             activeDeviceId = null
+            stopMirroring()
             scope.launch { player.stop(remote) }
             return
         }
 
         activeDeviceId = frame.deviceId
         applyUniversalSettings(frame)
+
+        if (role == DeviceRole.ACTIVE) stopMirroring() else applyPassiveFrame(frame)
+    }
+
+    // A device that is not playing follows without ever loading anything.
+    //
+    // That is the invariant the whole subsystem rests on, and it is structural:
+    // nothing on this path touches the engine, so a passive device cannot become
+    // a second stream however the frames arrive. What it shows instead is the
+    // active device's track and a progress bar moved between frames.
+    //
+    // It pauses rather than stops, because a stop tears the bar down and a
+    // viewer watching another room's playback wants to see where it has got to.
+    protected open fun applyPassiveFrame(frame: MusicPlayerState) {
+        mirrored.value = ConnectMirror(
+            item = frame.item,
+            isPlaying = frame.isPlaying,
+            positionMs = frame.progressMs,
+            durationMs = frame.durationMs,
+        )
+
+        scope.launch { player.pause(remote) }
+
+        if (frame.isPlaying) startMirroring() else stopTicking()
+    }
+
+    // Between frames, the bar moves on its own.
+    //
+    // A server broadcasts on change rather than continuously, so a bar drawn
+    // only from frames sits still for a whole track and then jumps. This walks
+    // it forward and every arriving frame corrects it, which is the same thing
+    // the platforms' own lock screens do with a position and a rate.
+    //
+    // It ends the moment the bar can no longer move — paused, or arrived at the
+    // end of the track. A ticker that kept waking four times a second to write
+    // the value it already holds is a wakeup per second per idle device, and on
+    // a phone that is battery spent drawing nothing.
+    private fun startMirroring() {
+        if (ticking?.isActive == true) return
+
+        ticking = scope.launch {
+            while (isActive && mirrored.value.isAdvancing) {
+                delay(MIRROR_TICK_MS)
+                mirrored.value = mirrored.value.advancedBy(MIRROR_TICK_MS)
+            }
+        }
+    }
+
+    private fun stopTicking() {
+        ticking?.cancel()
+        ticking = null
+    }
+
+    private fun stopMirroring() {
+        stopTicking()
+        mirrored.value = ConnectMirror()
     }
 
     // What every device follows, whichever role it is in.
@@ -156,3 +227,7 @@ public open class MusicConnectPlugin(
     // on a hub with several listeners is a loop rather than a duplicate.
     private fun isEcho(source: String?): Boolean = source == ActionSource.REMOTE
 }
+
+// Four times a second, which is what a progress bar needs to look continuous and
+// is cheap enough to run on a device that is otherwise doing nothing.
+private const val MIRROR_TICK_MS = 250L
