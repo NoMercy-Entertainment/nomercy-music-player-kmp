@@ -17,6 +17,15 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        // Only under the flag, and only so the flag is usable at all. The point
+        // of -PusePublishedPlayerCore is to build the way a consumer does, and
+        // before a release the only place the published core exists is the local
+        // Maven repository. Unconditional mavenLocal() is the shape that lets a
+        // stale hand-installed artifact shadow the real one for months.
+        if (providers.gradleProperty("usePublishedPlayerCore").isPresent) {
+            mavenLocal()
+        }
     }
 }
 
@@ -35,8 +44,21 @@ rootProject.name = "nomercy-music-player-kmp"
 // through the publish plugin, which is too late for automatic substitution to
 // see it, and the failure mode is a "could not find tv.nomercy:..." that looks
 // like a missing artifact rather than a composite that did not engage.
+//
+// Off on demand, because "it works here" has to be checkable. A developer with
+// the sibling checkout always builds against it, which is what you want day to
+// day and exactly what hides a release where the published core is missing a
+// declaration the video surface uses. -PusePublishedPlayerCore forces the
+// resolution a consumer gets.
+//
+// Opt-OUT rather than opt-in, which is the reverse of what the plan wrote. The
+// composite already keys on the sibling being there, and CI clones one repo, so
+// CI is on the published path with no flag at all. Making the local path opt-in
+// instead would mean every ordinary build silently resolved a published core
+// that may be older than the checkout sitting next to it.
 val coreCheckout: java.io.File = file("../nomercy-player-core-kmp")
-if (coreCheckout.resolve("settings.gradle.kts").exists()) {
+val preferPublishedCore: Boolean = providers.gradleProperty("usePublishedPlayerCore").isPresent
+if (!preferPublishedCore && coreCheckout.resolve("settings.gradle.kts").exists()) {
     includeBuild(coreCheckout) {
         dependencySubstitution {
             substitute(module("tv.nomercy:nomercy-player-core-kmp")).using(project(":"))
