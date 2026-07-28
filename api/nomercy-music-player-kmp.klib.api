@@ -43,6 +43,14 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
 }
 
+abstract interface tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomercy.player.music.queue/PlaylistGenerator|null[0]
+    abstract val id // tv.nomercy.player.music.queue/PlaylistGenerator.id|{}id[0]
+        abstract fun <get-id>(): kotlin/String // tv.nomercy.player.music.queue/PlaylistGenerator.id.<get-id>|<get-id>(){}[0]
+
+    abstract fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
+    abstract fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
+}
+
 final class tv.nomercy.player.music.connect/ConnectMirror { // tv.nomercy.player.music.connect/ConnectMirror|null[0]
     constructor <init>(tv.nomercy.player.core.media/PlaylistItem? = ..., kotlin/Boolean = ..., kotlin/Long = ..., kotlin/Long = ...) // tv.nomercy.player.music.connect/ConnectMirror.<init>|<init>(tv.nomercy.player.core.media.PlaylistItem?;kotlin.Boolean;kotlin.Long;kotlin.Long){}[0]
 
@@ -137,6 +145,26 @@ final class tv.nomercy.player.music.input/MusicKeyBinding { // tv.nomercy.player
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.input/MusicKeyBinding.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.input/MusicKeyBinding.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.input/MusicKeyBinding.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.queue/LinearPlaylistGenerator : tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomercy.player.music.queue/LinearPlaylistGenerator|null[0]
+    constructor <init>() // tv.nomercy.player.music.queue/LinearPlaylistGenerator.<init>|<init>(){}[0]
+
+    final val id // tv.nomercy.player.music.queue/LinearPlaylistGenerator.id|{}id[0]
+        final fun <get-id>(): kotlin/String // tv.nomercy.player.music.queue/LinearPlaylistGenerator.id.<get-id>|<get-id>(){}[0]
+
+    final fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/LinearPlaylistGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
+    final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/LinearPlaylistGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
+}
+
+final class tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator : tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator|null[0]
+    constructor <init>(kotlin/Function1<kotlin/Int, kotlin/Int> = ...) // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.<init>|<init>(kotlin.Function1<kotlin.Int,kotlin.Int>){}[0]
+
+    final val id // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.id|{}id[0]
+        final fun <get-id>(): kotlin/String // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.id.<get-id>|<get-id>(){}[0]
+
+    final fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
+    final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
 }
 
 final class tv.nomercy.player.music/AudioBackendChange { // tv.nomercy.player.music/AudioBackendChange|null[0]
