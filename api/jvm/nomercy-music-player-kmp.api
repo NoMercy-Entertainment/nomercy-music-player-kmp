@@ -221,3 +221,33 @@ public final class tv/nomercy/player/music/connect/MusicPlayerState {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class tv/nomercy/player/music/input/MusicKeyAction : java/lang/Enum {
+	public static final field CYCLE_REPEAT Ltv/nomercy/player/music/input/MusicKeyAction;
+	public static final field NEXT Ltv/nomercy/player/music/input/MusicKeyAction;
+	public static final field PREVIOUS Ltv/nomercy/player/music/input/MusicKeyAction;
+	public static final field TOGGLE_SHUFFLE Ltv/nomercy/player/music/input/MusicKeyAction;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Ltv/nomercy/player/music/input/MusicKeyAction;
+	public static fun values ()[Ltv/nomercy/player/music/input/MusicKeyAction;
+}
+
+public final class tv/nomercy/player/music/input/MusicKeyBinding {
+	public fun <init> (Ljava/lang/String;Ltv/nomercy/player/music/input/MusicKeyAction;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ltv/nomercy/player/music/input/MusicKeyAction;
+	public final fun copy (Ljava/lang/String;Ltv/nomercy/player/music/input/MusicKeyAction;)Ltv/nomercy/player/music/input/MusicKeyBinding;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/input/MusicKeyBinding;Ljava/lang/String;Ltv/nomercy/player/music/input/MusicKeyAction;ILjava/lang/Object;)Ltv/nomercy/player/music/input/MusicKeyBinding;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Ltv/nomercy/player/music/input/MusicKeyAction;
+	public final fun getCombo ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/input/MusicKeyBindingsKt {
+	public static final fun getMUSIC_KEY_BINDINGS ()Ljava/util/List;
+	public static final fun getMUSIC_KEY_COMBOS ()Ljava/util/Set;
+	public static final fun nextRepeatState (Ltv/nomercy/player/core/player/RepeatState;)Ltv/nomercy/player/core/player/RepeatState;
+	public static final fun nextShuffleState (Ltv/nomercy/player/core/player/ShuffleState;)Ltv/nomercy/player/core/player/ShuffleState;
+}
+

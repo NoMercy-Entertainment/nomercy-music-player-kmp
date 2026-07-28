@@ -18,6 +18,19 @@ final enum class tv.nomercy.player.music.connect/DeviceRole : kotlin/Enum<tv.nom
     final fun values(): kotlin/Array<tv.nomercy.player.music.connect/DeviceRole> // tv.nomercy.player.music.connect/DeviceRole.values|values#static(){}[0]
 }
 
+final enum class tv.nomercy.player.music.input/MusicKeyAction : kotlin/Enum<tv.nomercy.player.music.input/MusicKeyAction> { // tv.nomercy.player.music.input/MusicKeyAction|null[0]
+    enum entry CYCLE_REPEAT // tv.nomercy.player.music.input/MusicKeyAction.CYCLE_REPEAT|null[0]
+    enum entry NEXT // tv.nomercy.player.music.input/MusicKeyAction.NEXT|null[0]
+    enum entry PREVIOUS // tv.nomercy.player.music.input/MusicKeyAction.PREVIOUS|null[0]
+    enum entry TOGGLE_SHUFFLE // tv.nomercy.player.music.input/MusicKeyAction.TOGGLE_SHUFFLE|null[0]
+
+    final val entries // tv.nomercy.player.music.input/MusicKeyAction.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<tv.nomercy.player.music.input/MusicKeyAction> // tv.nomercy.player.music.input/MusicKeyAction.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): tv.nomercy.player.music.input/MusicKeyAction // tv.nomercy.player.music.input/MusicKeyAction.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<tv.nomercy.player.music.input/MusicKeyAction> // tv.nomercy.player.music.input/MusicKeyAction.values|values#static(){}[0]
+}
+
 abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.nomercy.player.music.connect/MusicConnectChannel|null[0]
     abstract val deviceId // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId|{}deviceId[0]
         abstract fun <get-deviceId>(): kotlin/String // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId.<get-deviceId>|<get-deviceId>(){}[0]
@@ -108,6 +121,22 @@ final class tv.nomercy.player.music.connect/MusicPlayerState { // tv.nomercy.pla
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.connect/MusicPlayerState.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.connect/MusicPlayerState.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.connect/MusicPlayerState.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.input/MusicKeyBinding { // tv.nomercy.player.music.input/MusicKeyBinding|null[0]
+    constructor <init>(kotlin/String, tv.nomercy.player.music.input/MusicKeyAction) // tv.nomercy.player.music.input/MusicKeyBinding.<init>|<init>(kotlin.String;tv.nomercy.player.music.input.MusicKeyAction){}[0]
+
+    final val action // tv.nomercy.player.music.input/MusicKeyBinding.action|{}action[0]
+        final fun <get-action>(): tv.nomercy.player.music.input/MusicKeyAction // tv.nomercy.player.music.input/MusicKeyBinding.action.<get-action>|<get-action>(){}[0]
+    final val combo // tv.nomercy.player.music.input/MusicKeyBinding.combo|{}combo[0]
+        final fun <get-combo>(): kotlin/String // tv.nomercy.player.music.input/MusicKeyBinding.combo.<get-combo>|<get-combo>(){}[0]
+
+    final fun component1(): kotlin/String // tv.nomercy.player.music.input/MusicKeyBinding.component1|component1(){}[0]
+    final fun component2(): tv.nomercy.player.music.input/MusicKeyAction // tv.nomercy.player.music.input/MusicKeyBinding.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., tv.nomercy.player.music.input/MusicKeyAction = ...): tv.nomercy.player.music.input/MusicKeyBinding // tv.nomercy.player.music.input/MusicKeyBinding.copy|copy(kotlin.String;tv.nomercy.player.music.input.MusicKeyAction){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.input/MusicKeyBinding.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music.input/MusicKeyBinding.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music.input/MusicKeyBinding.toString|toString(){}[0]
 }
 
 final class tv.nomercy.player.music/AudioBackendChange { // tv.nomercy.player.music/AudioBackendChange|null[0]
@@ -255,6 +284,13 @@ final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/Mu
         final fun <get-all>(): kotlin.collections/List<tv.nomercy.player.core.events/EventKey<*>> // tv.nomercy.player.music/MusicEvents.all.<get-all>|<get-all>(){}[0]
 }
 
+final val tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS // tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS|{}MUSIC_KEY_BINDINGS[0]
+    final fun <get-MUSIC_KEY_BINDINGS>(): kotlin.collections/List<tv.nomercy.player.music.input/MusicKeyBinding> // tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS.<get-MUSIC_KEY_BINDINGS>|<get-MUSIC_KEY_BINDINGS>(){}[0]
+final val tv.nomercy.player.music.input/MUSIC_KEY_COMBOS // tv.nomercy.player.music.input/MUSIC_KEY_COMBOS|{}MUSIC_KEY_COMBOS[0]
+    final fun <get-MUSIC_KEY_COMBOS>(): kotlin.collections/Set<kotlin/String> // tv.nomercy.player.music.input/MUSIC_KEY_COMBOS.<get-MUSIC_KEY_COMBOS>|<get-MUSIC_KEY_COMBOS>(){}[0]
+
+final fun tv.nomercy.player.music.input/nextRepeatState(tv.nomercy.player.core.player/RepeatState): tv.nomercy.player.core.player/RepeatState // tv.nomercy.player.music.input/nextRepeatState|nextRepeatState(tv.nomercy.player.core.player.RepeatState){}[0]
+final fun tv.nomercy.player.music.input/nextShuffleState(tv.nomercy.player.core.player/ShuffleState): tv.nomercy.player.core.player/ShuffleState // tv.nomercy.player.music.input/nextShuffleState|nextShuffleState(tv.nomercy.player.core.player.ShuffleState){}[0]
 final fun tv.nomercy.player.music/defaultAudioBackend(): tv.nomercy.player.core.ports/AudioBackend // tv.nomercy.player.music/defaultAudioBackend|defaultAudioBackend(){}[0]
 final fun tv.nomercy.player.music/nmMusicPlayer(kotlin/String = ..., tv.nomercy.player.core.ports/AudioBackend? = ...): tv.nomercy.player.music/NMMusicPlayer // tv.nomercy.player.music/nmMusicPlayer|nmMusicPlayer(kotlin.String;tv.nomercy.player.core.ports.AudioBackend?){}[0]
 final suspend fun tv.nomercy.player.music.connect/connectMusic(tv.nomercy.player.core.controllers/ComposedPlayer, tv.nomercy.player.music.connect/MusicConnectChannel, kotlinx.coroutines/CoroutineScope, kotlin/Boolean = ...): tv.nomercy.player.music.connect/MusicConnectPlugin // tv.nomercy.player.music.connect/connectMusic|connectMusic(tv.nomercy.player.core.controllers.ComposedPlayer;tv.nomercy.player.music.connect.MusicConnectChannel;kotlinx.coroutines.CoroutineScope;kotlin.Boolean){}[0]
