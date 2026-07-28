@@ -50,6 +50,18 @@ kotlin {
             baseName = "NoMercyMusicPlayer"
             isStatic = true
             binaryOption("bundleId", "tv.nomercy.player.music")
+
+            // Core's declarations are named all over this library's public API —
+            // PlayState, the event registry, the error catalogue — so without
+            // this the framework ships signatures a Swift file cannot write
+            // down. It is linked either way; exporting is what puts it in the
+            // headers.
+            //
+            // The video framework has done this since a tvOS view could see one
+            // of its own types and not the key type its method took. This one
+            // never did, and the Swift surface gate is what finally said so.
+            export(libs.nomercy.player.core)
+
             musicXcf.add(this)
         }
     }
