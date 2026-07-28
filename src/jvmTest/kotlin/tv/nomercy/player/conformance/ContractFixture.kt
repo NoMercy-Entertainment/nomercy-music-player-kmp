@@ -64,9 +64,21 @@ public object ContractFixture {
             .map { it.jsonPrimitive.content }
             .toSet()
 
-    public fun eventNames(path: String = PATH): Set<String> =
+    // Every event in one of the contract's maps.
+    //
+    // The map is required rather than defaulted. Beside an overload that took
+    // only a path, eventNames("base") bound to the path one and reported a
+    // missing file called "base" — a wrong answer dressed as a setup problem.
+    //
+    // The map matters: base is what core owns, and video and music each own
+    // theirs. A gate comparing a library against the whole contract would
+    // demand that core declare a subtitle event and that video declare a
+    // now-playing one, which is not a hole — it is the boundary working.
+    public fun eventNames(map: String, path: String = PATH): Set<String> =
         read(path).getValue("events").jsonArray
-            .map { it.jsonObject.getValue("name").jsonPrimitive.content }
+            .map { it.jsonObject }
+            .filter { it.getValue("map").jsonPrimitive.content == map }
+            .map { it.getValue("name").jsonPrimitive.content }
             .toSet()
 
     public fun version(path: String = PATH): String =
