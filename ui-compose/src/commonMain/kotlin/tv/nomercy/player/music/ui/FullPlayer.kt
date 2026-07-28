@@ -111,7 +111,7 @@ private fun FullTransport(state: MusicChromeState, commands: MusicCommands, stri
         )
 
         MusicIconButton(
-            icon = MusicIcons.Previous,
+            icon = FluentIcons.Previous,
             description = strings.previous,
             onClick = commands::previous,
             modifier = Modifier.testTag(FULL_PREVIOUS_TAG),
@@ -120,7 +120,7 @@ private fun FullTransport(state: MusicChromeState, commands: MusicCommands, stri
         PlayPause(state, commands, strings)
 
         MusicIconButton(
-            icon = MusicIcons.Next,
+            icon = FluentIcons.Next,
             description = strings.next,
             onClick = commands::next,
             modifier = Modifier.testTag(FULL_NEXT_TAG),
@@ -141,9 +141,9 @@ private fun FullTransport(state: MusicChromeState, commands: MusicCommands, stri
 @Composable
 private fun PlayPause(state: MusicChromeState, commands: MusicCommands, strings: MusicStrings) {
     val control: FullControl = if (state.playing) {
-        FullControl(MusicIcons.Pause, strings.pause)
+        FullControl(FluentIcons.Pause, strings.pause)
     } else {
-        FullControl(MusicIcons.Play, strings.play)
+        FullControl(FluentIcons.Play, strings.play)
     }
 
     MusicIconButton(

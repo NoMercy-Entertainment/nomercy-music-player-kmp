@@ -117,7 +117,7 @@ private fun TrackLines(state: MusicChromeState, strings: MusicStrings, modifier:
 private fun Transport(state: MusicChromeState, commands: MusicCommands, strings: MusicStrings) {
     if (state.hasPrevious) {
         MusicIconButton(
-            icon = MusicIcons.Previous,
+            icon = FluentIcons.Previous,
             description = strings.previous,
             onClick = commands::previous,
             modifier = Modifier.testTag(PREVIOUS_TAG),
@@ -129,9 +129,9 @@ private fun Transport(state: MusicChromeState, commands: MusicCommands, strings:
     // half of it — a pause glyph announcing itself as Play, which is invisible
     // to anyone looking at the screen and wrong for everyone who is not.
     val control: TransportControl = if (state.playing) {
-        TransportControl(MusicIcons.Pause, strings.pause)
+        TransportControl(FluentIcons.Pause, strings.pause)
     } else {
-        TransportControl(MusicIcons.Play, strings.play)
+        TransportControl(FluentIcons.Play, strings.play)
     }
 
     MusicIconButton(
@@ -143,7 +143,7 @@ private fun Transport(state: MusicChromeState, commands: MusicCommands, strings:
 
     if (state.hasNext) {
         MusicIconButton(
-            icon = MusicIcons.Next,
+            icon = FluentIcons.Next,
             description = strings.next,
             onClick = commands::next,
             modifier = Modifier.testTag(NEXT_TAG),

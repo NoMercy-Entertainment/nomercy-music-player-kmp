@@ -16,6 +16,91 @@ public final class tv/nomercy/player/music/ui/ComposableSingletons$NMMusicPlayer
 	public final fun getLambda$-1231502475$ui_compose ()Lkotlin/jvm/functions/Function3;
 }
 
+public final class tv/nomercy/player/music/ui/FluentIcons {
+	public static final field $stable I
+	public static final field INSTANCE Ltv/nomercy/player/music/ui/FluentIcons;
+	public final fun getAspectFill ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getAspectFillHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getAspectFit ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getAspectFitHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getAspectOriginal ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getAspectOriginalHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getBack ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getBackHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getBigPlay ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getCast ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getCastHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChapterBack ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChapterForward ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getCheckmark ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChevronL ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChevronLHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChevronR ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getChevronRHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getClose ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getCloseHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getExitFullscreen ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getFullscreen ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getFullscreenHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getHome ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getHomeHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getLanguage ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getLanguageHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getLanguageOff ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getLanguageOffHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getMenu ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getMenuHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getNext ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getNextHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPause ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPauseHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPipEnter ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPipEnterHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPipExit ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPipExitHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPlay ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPlayHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPlaylist ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPlaylistHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPrevious ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getPreviousHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getQuality ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getQualityHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getRestart ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getRestartHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSeekBack ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSeekBackHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSeekForward ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSeekForwardHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSettings ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSettingsHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getShare ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getShareHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSpeed ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSpeedHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getStyled ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getStyledHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitleSettings ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitleSettingsHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitles ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitlesHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitlesOff ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getSubtitlesOffHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getTemplate ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getTheater ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getTheaterExit ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getTheaterExitHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getTheaterHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeHigh ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeHighHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeLow ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeLowHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeMedium ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeMediumHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeMuted ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun getVolumeMutedHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+}
+
 public final class tv/nomercy/player/music/ui/FormatTimeKt {
 	public static final fun formatTime (D)Ljava/lang/String;
 }
@@ -94,10 +179,6 @@ public final class tv/nomercy/player/music/ui/MusicIcons {
 	public static final field $stable I
 	public static final field INSTANCE Ltv/nomercy/player/music/ui/MusicIcons;
 	public final fun getCollapse ()Landroidx/compose/ui/graphics/vector/ImageVector;
-	public final fun getNext ()Landroidx/compose/ui/graphics/vector/ImageVector;
-	public final fun getPause ()Landroidx/compose/ui/graphics/vector/ImageVector;
-	public final fun getPlay ()Landroidx/compose/ui/graphics/vector/ImageVector;
-	public final fun getPrevious ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getRepeat ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getShuffle ()Landroidx/compose/ui/graphics/vector/ImageVector;
 }

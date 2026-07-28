@@ -35,45 +35,20 @@ import androidx.compose.ui.unit.dp
 // takes music without video and the other way round — and the only place that
 // could hold one copy is core, which has no Compose in it and should not.
 // Four vector paths is a smaller price than a UI toolkit in the engine.
+// The three glyphs the generated Fluent table does not carry.
+//
+// Play, Pause, Next and Previous lived here too, hand-drawn, which is a second
+// set of the same pictures that drifts from the first the moment either is
+// touched. They come from FluentIcons now — the same path data the browser
+// renders, generated from the web's own table.
+//
+// Shuffle, Repeat and Collapse are genuinely absent from it: that table is the
+// VIDEO chrome's icon set and a video player has no shuffle. Their reference is
+// nomercy-app-web's music player, which is what draws the web music chrome.
+// Until that is read the way dom.ts was, these are the last hand-drawn glyphs
+// in the trio, and web-music-fidelity-spec.md says so rather than letting them
+// look finished.
 public object MusicIcons {
-
-    public val Play: ImageVector by lazy {
-        glyph("Play") {
-            moveTo(8f, 5f)
-            lineTo(19f, 12f)
-            lineTo(8f, 19f)
-            close()
-        }
-    }
-
-    public val Pause: ImageVector by lazy {
-        glyph("Pause") {
-            moveTo(6f, 5f)
-            horizontalLineTo(10f)
-            verticalLineTo(19f)
-            horizontalLineTo(6f)
-            close()
-            moveTo(14f, 5f)
-            horizontalLineTo(18f)
-            verticalLineTo(19f)
-            horizontalLineTo(14f)
-            close()
-        }
-    }
-
-    public val Next: ImageVector by lazy {
-        glyph("Next") {
-            moveTo(6f, 5f)
-            lineTo(15f, 12f)
-            lineTo(6f, 19f)
-            close()
-            moveTo(16f, 5f)
-            horizontalLineTo(19f)
-            verticalLineTo(19f)
-            horizontalLineTo(16f)
-            close()
-        }
-    }
 
     // The way back to the row. A chevron pointing down, because that is the
     // direction the full player goes when it closes.
@@ -142,19 +117,6 @@ public object MusicIcons {
         }
     }
 
-    public val Previous: ImageVector by lazy {
-        glyph("Previous") {
-            moveTo(18f, 5f)
-            lineTo(9f, 12f)
-            lineTo(18f, 19f)
-            close()
-            moveTo(5f, 5f)
-            horizontalLineTo(8f)
-            verticalLineTo(19f)
-            horizontalLineTo(5f)
-            close()
-        }
-    }
 }
 
 // One button, with the label a screen reader announces and a test finds it by.
