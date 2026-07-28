@@ -151,7 +151,7 @@ class MusicSurfaceConformanceTest {
         val NATIVE_ONLY = setOf(
             "context", "transport", "volume", "time", "state", "lifecycle", "bridge", "activity",
             "cueParsers", "streamFactories", "metrics", "bandwidth", "plugins", "queue",
-            "stateFlow", "rootLogger", "rootStorage", "emit", "on", "once", "off",
+            "stateFlow", "rootLogger", "rootStorage", "emit", "on", "onAll", "once", "off",
             "dispatchBefore", "fetch", "websocket", "report", "aspectRatio", "formatTitle",
             "pluginList", "contributions", "coreVersion", "playerId",
             // Music-specific and native-shaped: announceBackend tells listeners
