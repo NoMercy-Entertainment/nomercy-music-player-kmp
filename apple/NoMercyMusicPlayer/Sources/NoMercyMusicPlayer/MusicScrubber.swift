@@ -36,7 +36,7 @@ public final class MusicScrubberModel<Player: MusicChromePlayer>: ObservableObje
     public func dragMoved(toX x: Double, width: Double) {
         guard player.durationSeconds > 0, width > 0 else { return }
 
-        dragSeconds = (x / width) * player.durationSeconds
+        dragSeconds = min(1, max(0, x / width)) * player.durationSeconds
     }
 
     /// Only a completed drag moves the track.
