@@ -1,0 +1,12 @@
+
+
+# Byte-for-byte, because their hash is committed.
+#
+# The conformance lock records the sha256 of these files and the tests refuse
+# to run against a copy that does not match. Let git normalise the line
+# endings and the hash changes on checkout alone: the file is identical, the
+# check fails, and the failure says the fixture was edited when nobody
+# touched it. That happened on Windows within an hour of writing the check.
+contract/*.json -text
+scenarios/*.json -text
+*.lock -text

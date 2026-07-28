@@ -40,5 +40,11 @@ fi
 
 sha256sum "$here/contract/contract.json" | awk '{print $1}' > "$here/contract.lock"
 
+# The scenarios too. The contract says what the surface is and the scenarios say
+# how it behaves, and a repo measuring behaviour with an edited copy is the
+# quieter of the two failures: the shape gate still passes and the ordering it
+# asserts is whatever somebody typed.
+sha256sum "$here/scenarios/scenarios.json" | awk '{print $1}' > "$here/scenarios.lock"
+
 echo "vendored $(ls "$kit_dst" | wc -l | tr -d ' ') kit file(s)"
-echo "locked $(cat "$here/contract.lock")"
+echo "locked contract $(cut -c1-16 < "$here/contract.lock") scenarios $(cut -c1-16 < "$here/scenarios.lock")"

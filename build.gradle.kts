@@ -127,3 +127,21 @@ mavenPublishing {
         signAllPublications()
     }
 }
+
+// The conformance fixtures are inputs to the tests that read them.
+//
+// They are read off disk by path rather than loaded as test resources, so
+// without this Gradle sees no change when one is edited and reports the whole
+// suite UP-TO-DATE. A vendored scenario nudged until a port passes it would
+// then never even be measured — the gate does not fail, it does not run, and
+// the build is green either way.
+//
+// Found by editing one on purpose and watching nothing happen.
+tasks.withType<Test>().configureEach {
+    inputs.files(
+        fileTree("contract") { include("*.json") },
+        fileTree("scenarios") { include("*.json") },
+    )
+        .withPropertyName("conformanceFixtures")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+}
