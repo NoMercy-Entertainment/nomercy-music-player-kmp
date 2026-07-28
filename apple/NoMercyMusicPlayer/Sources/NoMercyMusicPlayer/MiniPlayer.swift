@@ -8,28 +8,6 @@
 
 import SwiftUI
 
-/// A glyph and what it announces itself as, which are one choice.
-///
-/// Written apart, an edit to one is an edit to half of it — a pause glyph
-/// announcing itself as Play. Both other chromes in this ecosystem shipped that
-/// defect, and only a planted test found it.
-public struct MusicGlyph: Equatable, Sendable {
-    public let symbol: String
-    public let label: String
-}
-
-/// The strings the row shows.
-public struct MusicStrings: Sendable {
-    public var play: String = "Play"
-    public var pause: String = "Pause"
-    public var next: String = "Next"
-    public var previous: String = "Previous"
-    public var nothingPlaying: String = "Nothing playing"
-    public var expand: String = "Open player"
-
-    public init() {}
-}
-
 /// What the row draws, derived in one place.
 @MainActor
 public struct MiniPlayerModel<Player: MusicChromePlayer> {
