@@ -167,6 +167,37 @@ final class tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator : tv.nome
     final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
 }
 
+final class tv.nomercy.player.music.scrobble/ScrobbleRules { // tv.nomercy.player.music.scrobble/ScrobbleRules|null[0]
+    constructor <init>(kotlin/Double = ..., kotlin/Double = ..., kotlin/Double = ...) // tv.nomercy.player.music.scrobble/ScrobbleRules.<init>|<init>(kotlin.Double;kotlin.Double;kotlin.Double){}[0]
+
+    final val minDurationSeconds // tv.nomercy.player.music.scrobble/ScrobbleRules.minDurationSeconds|{}minDurationSeconds[0]
+        final fun <get-minDurationSeconds>(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.minDurationSeconds.<get-minDurationSeconds>|<get-minDurationSeconds>(){}[0]
+    final val thresholdRatio // tv.nomercy.player.music.scrobble/ScrobbleRules.thresholdRatio|{}thresholdRatio[0]
+        final fun <get-thresholdRatio>(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.thresholdRatio.<get-thresholdRatio>|<get-thresholdRatio>(){}[0]
+    final val thresholdSeconds // tv.nomercy.player.music.scrobble/ScrobbleRules.thresholdSeconds|{}thresholdSeconds[0]
+        final fun <get-thresholdSeconds>(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.thresholdSeconds.<get-thresholdSeconds>|<get-thresholdSeconds>(){}[0]
+
+    final fun component1(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.component1|component1(){}[0]
+    final fun component2(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.component2|component2(){}[0]
+    final fun component3(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleRules.component3|component3(){}[0]
+    final fun copy(kotlin/Double = ..., kotlin/Double = ..., kotlin/Double = ...): tv.nomercy.player.music.scrobble/ScrobbleRules // tv.nomercy.player.music.scrobble/ScrobbleRules.copy|copy(kotlin.Double;kotlin.Double;kotlin.Double){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.scrobble/ScrobbleRules.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music.scrobble/ScrobbleRules.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleRules.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.scrobble/ScrobbleTracker { // tv.nomercy.player.music.scrobble/ScrobbleTracker|null[0]
+    constructor <init>(tv.nomercy.player.music.scrobble/ScrobbleRules = ...) // tv.nomercy.player.music.scrobble/ScrobbleTracker.<init>|<init>(tv.nomercy.player.music.scrobble.ScrobbleRules){}[0]
+
+    final fun advanceTo(kotlin/Double) // tv.nomercy.player.music.scrobble/ScrobbleTracker.advanceTo|advanceTo(kotlin.Double){}[0]
+    final fun currentTrack(): kotlin/String? // tv.nomercy.player.music.scrobble/ScrobbleTracker.currentTrack|currentTrack(){}[0]
+    final fun hasScrobbled(): kotlin/Boolean // tv.nomercy.player.music.scrobble/ScrobbleTracker.hasScrobbled|hasScrobbled(){}[0]
+    final fun listenedSeconds(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleTracker.listenedSeconds|listenedSeconds(){}[0]
+    final fun reset() // tv.nomercy.player.music.scrobble/ScrobbleTracker.reset|reset(){}[0]
+    final fun shouldScrobble(kotlin/Double): kotlin/Boolean // tv.nomercy.player.music.scrobble/ScrobbleTracker.shouldScrobble|shouldScrobble(kotlin.Double){}[0]
+    final fun startTrack(kotlin/String) // tv.nomercy.player.music.scrobble/ScrobbleTracker.startTrack|startTrack(kotlin.String){}[0]
+}
+
 final class tv.nomercy.player.music/AudioBackendChange { // tv.nomercy.player.music/AudioBackendChange|null[0]
     constructor <init>(kotlin/String) // tv.nomercy.player.music/AudioBackendChange.<init>|<init>(kotlin.String){}[0]
 
@@ -311,6 +342,15 @@ final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/Mu
     final val all // tv.nomercy.player.music/MusicEvents.all|{}all[0]
         final fun <get-all>(): kotlin.collections/List<tv.nomercy.player.core.events/EventKey<*>> // tv.nomercy.player.music/MusicEvents.all.<get-all>|<get-all>(){}[0]
 }
+
+final const val tv.nomercy.player.music.scrobble/LASTFM_CAP_SECONDS // tv.nomercy.player.music.scrobble/LASTFM_CAP_SECONDS|{}LASTFM_CAP_SECONDS[0]
+    final fun <get-LASTFM_CAP_SECONDS>(): kotlin/Double // tv.nomercy.player.music.scrobble/LASTFM_CAP_SECONDS.<get-LASTFM_CAP_SECONDS>|<get-LASTFM_CAP_SECONDS>(){}[0]
+final const val tv.nomercy.player.music.scrobble/LASTFM_FLOOR_SECONDS // tv.nomercy.player.music.scrobble/LASTFM_FLOOR_SECONDS|{}LASTFM_FLOOR_SECONDS[0]
+    final fun <get-LASTFM_FLOOR_SECONDS>(): kotlin/Double // tv.nomercy.player.music.scrobble/LASTFM_FLOOR_SECONDS.<get-LASTFM_FLOOR_SECONDS>|<get-LASTFM_FLOOR_SECONDS>(){}[0]
+final const val tv.nomercy.player.music.scrobble/LASTFM_RATIO // tv.nomercy.player.music.scrobble/LASTFM_RATIO|{}LASTFM_RATIO[0]
+    final fun <get-LASTFM_RATIO>(): kotlin/Double // tv.nomercy.player.music.scrobble/LASTFM_RATIO.<get-LASTFM_RATIO>|<get-LASTFM_RATIO>(){}[0]
+final const val tv.nomercy.player.music.scrobble/MAX_PLAUSIBLE_TICK_SECONDS // tv.nomercy.player.music.scrobble/MAX_PLAUSIBLE_TICK_SECONDS|{}MAX_PLAUSIBLE_TICK_SECONDS[0]
+    final fun <get-MAX_PLAUSIBLE_TICK_SECONDS>(): kotlin/Double // tv.nomercy.player.music.scrobble/MAX_PLAUSIBLE_TICK_SECONDS.<get-MAX_PLAUSIBLE_TICK_SECONDS>|<get-MAX_PLAUSIBLE_TICK_SECONDS>(){}[0]
 
 final val tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS // tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS|{}MUSIC_KEY_BINDINGS[0]
     final fun <get-MUSIC_KEY_BINDINGS>(): kotlin.collections/List<tv.nomercy.player.music.input/MusicKeyBinding> // tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS.<get-MUSIC_KEY_BINDINGS>|<get-MUSIC_KEY_BINDINGS>(){}[0]

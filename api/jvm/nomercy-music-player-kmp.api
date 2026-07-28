@@ -273,3 +273,40 @@ public abstract interface class tv/nomercy/player/music/queue/PlaylistGenerator 
 	public abstract fun previous (II)Ljava/lang/Integer;
 }
 
+public final class tv/nomercy/player/music/scrobble/ScrobbleRules {
+	public fun <init> ()V
+	public fun <init> (DDD)V
+	public synthetic fun <init> (DDDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()D
+	public final fun component2 ()D
+	public final fun component3 ()D
+	public final fun copy (DDD)Ltv/nomercy/player/music/scrobble/ScrobbleRules;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/scrobble/ScrobbleRules;DDDILjava/lang/Object;)Ltv/nomercy/player/music/scrobble/ScrobbleRules;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getMinDurationSeconds ()D
+	public final fun getThresholdRatio ()D
+	public final fun getThresholdSeconds ()D
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobbleTracker {
+	public fun <init> ()V
+	public fun <init> (Ltv/nomercy/player/music/scrobble/ScrobbleRules;)V
+	public synthetic fun <init> (Ltv/nomercy/player/music/scrobble/ScrobbleRules;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun advanceTo (D)V
+	public final fun currentTrack ()Ljava/lang/String;
+	public final fun hasScrobbled ()Z
+	public final fun listenedSeconds ()D
+	public final fun reset ()V
+	public final fun shouldScrobble (D)Z
+	public final fun startTrack (Ljava/lang/String;)V
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobbleTrackerKt {
+	public static final field LASTFM_CAP_SECONDS D
+	public static final field LASTFM_FLOOR_SECONDS D
+	public static final field LASTFM_RATIO D
+	public static final field MAX_PLAUSIBLE_TICK_SECONDS D
+}
+
