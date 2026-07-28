@@ -14,7 +14,13 @@
 set -euo pipefail
 
 group_path="tv/nomercy"
-artifact="${1:?usage: verify-maven-artifacts.sh <artifact-id> <version>}"
+artifact="${1:?usage: verify-maven-artifacts.sh <artifact-id> <version> [targets]}"
+
+# Which variants this artifact is expected to carry. The engines carry all
+# seven; the Compose chrome carries two, because a Compose surface on iOS
+# fights the native app it would be embedded in and Apple gets SwiftUI
+# instead. Hardcoding seven made the chrome unverifiable rather than wrong.
+targets="${3:-androidRelease jvm iosArm64 iosSimulatorArm64 iosX64 tvosArm64 tvosSimulatorArm64}"
 version="${2:?version required}"
 here="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -42,7 +48,7 @@ present="$(grep -oE '"name": "[^"]+"' "$module" | sed 's/.*: "//;s/"//' | sort -
 # subtitle module does needs the Xcode toolchain. That is P29 Task 5's gate, not
 # this one's.
 missing=0
-for target in androidRelease jvm iosArm64 iosSimulatorArm64 iosX64 tvosArm64 tvosSimulatorArm64; do
+for target in $targets; do
   # androidRelease publishes as "android*"; the rest carry their own name.
   prefix="$target"
   [ "$target" = "androidRelease" ] && prefix="android"

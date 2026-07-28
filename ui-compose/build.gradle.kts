@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.kmp.library)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.maven.publish)
 }
 
 // Android and JVM only, the same split the video chrome makes. Apple gets
@@ -82,5 +83,20 @@ tasks.withType<Test>().configureEach {
     testLogging {
         events("started", "passed", "failed", "skipped")
         showStandardStreams = false
+    }
+}
+
+// Its own coordinate.
+//
+// Without this the chrome is a module in a repository rather than something
+// an application can depend on: the engine published alone, and the drop-in
+// view reachable only by checking the repository out. An application that
+// draws its own is meant to be able to take the engine and leave this, which
+// is the whole reason it is a second artifact and not a source set.
+mavenPublishing {
+    publishToMavenCentral()
+
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
     }
 }
