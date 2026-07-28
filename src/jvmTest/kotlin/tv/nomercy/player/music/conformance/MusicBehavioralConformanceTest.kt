@@ -9,8 +9,6 @@
 package tv.nomercy.player.music.conformance
 
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import tv.nomercy.player.conformance.Scenario
 import tv.nomercy.player.conformance.ScenarioAction
 import tv.nomercy.player.conformance.firstUnmatched
@@ -85,7 +83,10 @@ class MusicBehavioralConformanceTest {
         // What the engine did on its own. A scenario about the film ending is
         // about an event the backend raises, not a method anybody called.
         if (action.backend != null) {
-            backend.fire(action.backend!!, backendPayload(action))
+            // Bare, unlike video's. No music scenario carries a payload with a
+            // backend event, and a stub that always returned null would be a
+            // seam suggesting one exists.
+            backend.fire(action.backend!!)
             return
         }
 
@@ -110,20 +111,6 @@ class MusicBehavioralConformanceTest {
             // doing nothing is a scenario asserting an event order produced by
             // an empty run.
             else -> error("scenario verb '${action.method}' is not driven here")
-        }
-    }
-
-    // What the engine hands over with the event.
-    //
-    // Fired bare, the bridge drops it: forwarding casts the payload to the
-    // event's type and a null is not a LevelSwitchedPayload, so the event never
-    // reaches anybody and the scenario reads as an unimplemented feature rather
-    // than a driver that threw the arguments away.
-    private fun backendPayload(action: ScenarioAction): Any? {
-        val first = action.args.firstOrNull() as? JsonObject ?: return null
-
-        return when (action.backend) {
-            else -> null
         }
     }
 
@@ -170,10 +157,12 @@ class MusicBehavioralConformanceTest {
     fun theComparisonRejectsAReorderedExpectation() {
         // The runner has to be seen failing. A comparison that accepts any order
         // is a green tick over a port that emits everything backwards.
-        val expected = listOf("first", "second", "third")
+        val one = "one"
+        val two = "two"
+        val three = "three"
 
-        assertEquals(-1, firstUnmatched(expected, listOf("first", "extra", "second", "third")))
-        assertTrue(firstUnmatched(listOf("second", "first"), listOf("first", "second")) != -1)
+        assertEquals(-1, firstUnmatched(listOf(one, two, three), listOf(one, "extra", two, three)))
+        assertTrue(firstUnmatched(listOf(two, one), listOf(one, two)) != -1)
     }
 
     @Test

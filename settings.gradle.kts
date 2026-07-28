@@ -62,6 +62,12 @@ if (!preferPublishedCore && coreCheckout.resolve("settings.gradle.kts").exists()
     includeBuild(coreCheckout) {
         dependencySubstitution {
             substitute(module("tv.nomercy:nomercy-player-core-kmp")).using(project(":"))
+
+            // The shipped fakes come from the same checkout as the engine.
+            // Substituting one and not the other resolves the tests against a
+            // published stand-in while the engine is local, which is two
+            // versions of the same library in one compile.
+            substitute(module("tv.nomercy:nomercy-player-core-kmp-testing")).using(project(":testing"))
         }
     }
 }
