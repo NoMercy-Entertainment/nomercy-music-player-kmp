@@ -145,3 +145,30 @@ tasks.withType<Test>().configureEach {
         .withPropertyName("conformanceFixtures")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 }
+
+
+// The conformance gate, by name.
+//
+// These tests already run inside jvmTest, so a red gate blocks `build` whether
+// or not this task exists. What it adds is time and a name: it answers "has this
+// port drifted from the ecosystem contract" in seconds, before the multiplatform
+// build spends ten minutes arriving at the same answer under a heading that says
+// nothing.
+tasks.register<Test>("parityConformance") {
+    group = "verification"
+    description = "Checks the port against the vendored contract: surface, fixtures and behaviour."
+
+    val jvmTest: Test = tasks.named<Test>("jvmTest").get()
+    testClassesDirs = jvmTest.testClassesDirs
+    classpath = jvmTest.classpath
+
+    filter {
+        includeTestsMatching("tv.nomercy.player.music.conformance.*")
+        includeTestsMatching("tv.nomercy.player.conformance.*")
+    }
+
+    testLogging {
+        events("failed")
+        showStandardStreams = false
+    }
+}

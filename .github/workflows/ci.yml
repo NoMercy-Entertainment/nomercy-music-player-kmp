@@ -32,5 +32,13 @@ jobs:
           java-version: 21
 
       - name: Build
+      # First, and on its own, because drift from the ecosystem contract is the
+      # one failure whose cause is not in this repo's diff. Named, so a red run
+      # says which question was answered no rather than burying it in a build
+      # that takes ten minutes to reach the same conclusion.
+      - name: Conformance gate
+        working-directory: packages-native/nomercy-music-player-kmp
+        run: ./gradlew parityConformance
+
         working-directory: packages-native/nomercy-music-player-kmp
         run: ./gradlew build --stacktrace
