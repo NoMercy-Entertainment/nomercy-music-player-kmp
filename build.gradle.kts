@@ -78,6 +78,12 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation(libs.kotlinx.coroutines.test)
+
+            // The plugin harness. Without it a plugin here could only be tested
+            // through its tracker, which is why scrobble and auto-advance had
+            // rules under test and no proof either one was ever reachable
+            // through addPlugin.
+            implementation(libs.nomercy.player.core.testing)
         }
         jvmTest.dependencies {
             // The surface gate asks the class what it exposes, which is the only

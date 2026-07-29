@@ -27,6 +27,7 @@ robolectric = "4.14.1"
 
 [libraries]
 nomercy-player-core = { module = "tv.nomercy:nomercy-player-core-kmp", version.ref = "nomercyPlayerCore" }
+nomercy-player-core-testing = { module = "tv.nomercy:nomercy-player-core-kmp-testing", version.ref = "nomercyPlayerCore" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidxStartup" }

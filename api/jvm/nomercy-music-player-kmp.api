@@ -251,6 +251,112 @@ public final class tv/nomercy/player/music/input/MusicKeyBindingsKt {
 	public static final fun nextShuffleState (Ltv/nomercy/player/core/player/ShuffleState;)Ltv/nomercy/player/core/player/ShuffleState;
 }
 
+public final class tv/nomercy/player/music/lyrics/LyricsEvents {
+	public static final field INSTANCE Ltv/nomercy/player/music/lyrics/LyricsEvents;
+	public final fun getCleared ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getClearedOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLine ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLineEnter ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLineEnterOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLineExit ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLineExitOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLineOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLoaded ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getLoadedOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getNoParser ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getNoParserOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getUnavailable ()Ltv/nomercy/player/core/events/EventKey;
+	public final fun getUnavailableOnPlayer ()Ltv/nomercy/player/core/events/EventKey;
+}
+
+public final class tv/nomercy/player/music/lyrics/LyricsOptions {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/jvm/functions/Function1;Z)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lkotlin/jvm/functions/Function1;
+	public final fun component2 ()Z
+	public final fun copy (Lkotlin/jvm/functions/Function1;Z)Ltv/nomercy/player/music/lyrics/LyricsOptions;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/lyrics/LyricsOptions;Lkotlin/jvm/functions/Function1;ZILjava/lang/Object;)Ltv/nomercy/player/music/lyrics/LyricsOptions;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAutoFetch ()Z
+	public final fun getGetLyricsUrl ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public class tv/nomercy/player/music/lyrics/LyricsPlugin : tv/nomercy/player/core/plugin/Plugin {
+	public static final field Manifest Ltv/nomercy/player/music/lyrics/LyricsPlugin$Manifest;
+	public fun <init> ()V
+	public fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/core/ports/CueParserRegistry;Ltv/nomercy/player/music/lyrics/LyricsOptions;)V
+	public synthetic fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/core/ports/CueParserRegistry;Ltv/nomercy/player/music/lyrics/LyricsOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun attach (Ljava/util/List;)V
+	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
+	public synthetic fun getOptions ()Ljava/lang/Object;
+	public fun getOptions ()Ltv/nomercy/player/music/lyrics/LyricsOptions;
+	public final fun line ()Ltv/nomercy/player/core/events/CueEvent;
+	public final fun lines ()Ljava/util/List;
+	public final fun load (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun use ()V
+}
+
+public final class tv/nomercy/player/music/lyrics/LyricsPlugin$Manifest : tv/nomercy/player/core/plugin/PluginManifest {
+	public fun getContributions ()Ljava/util/List;
+	public fun getId ()Ljava/lang/String;
+	public fun getMinCoreVersion ()Ljava/lang/String;
+	public fun getPriority ()I
+	public fun getReplaces ()Ljava/util/List;
+	public fun getRequires ()Ljava/util/List;
+	public fun getTranslations ()Ljava/util/Map;
+	public fun getVersion ()Ljava/lang/String;
+}
+
+public abstract interface class tv/nomercy/player/music/lyrics/LyricsSource {
+	public abstract fun fetch (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/lyrics/NoLyricsSource : tv/nomercy/player/music/lyrics/LyricsSource {
+	public static final field INSTANCE Ltv/nomercy/player/music/lyrics/NoLyricsSource;
+	public fun fetch (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/queue/AutoAdvanceOptions {
+	public fun <init> ()V
+	public fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;)V
+	public synthetic fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Ltv/nomercy/player/music/queue/PlaylistGenerator;
+	public final fun copy (ZLtv/nomercy/player/music/queue/PlaylistGenerator;)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/queue/AutoAdvanceOptions;ZLtv/nomercy/player/music/queue/PlaylistGenerator;ILjava/lang/Object;)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEnabled ()Z
+	public final fun getGenerator ()Ltv/nomercy/player/music/queue/PlaylistGenerator;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public class tv/nomercy/player/music/queue/AutoAdvancePlugin : tv/nomercy/player/core/plugin/Plugin {
+	public static final field Manifest Ltv/nomercy/player/music/queue/AutoAdvancePlugin$Manifest;
+	public fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/queue/AutoAdvanceOptions;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/queue/AutoAdvanceOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun advance (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
+	public synthetic fun getOptions ()Ljava/lang/Object;
+	public fun getOptions ()Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
+	public final fun peekNext ()Ljava/lang/Integer;
+	public fun use ()V
+}
+
+public final class tv/nomercy/player/music/queue/AutoAdvancePlugin$Manifest : tv/nomercy/player/core/plugin/PluginManifest {
+	public fun getContributions ()Ljava/util/List;
+	public fun getId ()Ljava/lang/String;
+	public fun getMinCoreVersion ()Ljava/lang/String;
+	public fun getPriority ()I
+	public fun getReplaces ()Ljava/util/List;
+	public fun getRequires ()Ljava/util/List;
+	public fun getTranslations ()Ljava/util/Map;
+	public fun getVersion ()Ljava/lang/String;
+}
+
 public final class tv/nomercy/player/music/queue/LinearPlaylistGenerator : tv/nomercy/player/music/queue/PlaylistGenerator {
 	public fun <init> ()V
 	public fun getId ()Ljava/lang/String;
@@ -271,6 +377,54 @@ public abstract interface class tv/nomercy/player/music/queue/PlaylistGenerator 
 	public abstract fun getId ()Ljava/lang/String;
 	public abstract fun next (II)Ljava/lang/Integer;
 	public abstract fun previous (II)Ljava/lang/Integer;
+}
+
+public final class tv/nomercy/player/music/scrobble/NoScrobbler : tv/nomercy/player/music/scrobble/Scrobbler {
+	public static final field INSTANCE Ltv/nomercy/player/music/scrobble/NoScrobbler;
+	public fun nowPlaying (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun scrobble (Ljava/lang/String;DLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public class tv/nomercy/player/music/scrobble/ScrobblePlugin : tv/nomercy/player/core/plugin/Plugin {
+	public static final field Manifest Ltv/nomercy/player/music/scrobble/ScrobblePlugin$Manifest;
+	public fun <init> ()V
+	public fun <init> (Ltv/nomercy/player/music/scrobble/Scrobbler;Ltv/nomercy/player/music/scrobble/ScrobbleRules;)V
+	public synthetic fun <init> (Ltv/nomercy/player/music/scrobble/Scrobbler;Ltv/nomercy/player/music/scrobble/ScrobbleRules;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun dispose ()V
+	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
+	public synthetic fun getOptions ()Ljava/lang/Object;
+	public fun getOptions ()Ltv/nomercy/player/music/scrobble/ScrobbleRules;
+	public final fun isScrobbled ()Z
+	public final fun listened ()D
+	public fun use ()V
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobblePlugin$Manifest : tv/nomercy/player/core/plugin/PluginManifest {
+	public fun getContributions ()Ljava/util/List;
+	public fun getId ()Ljava/lang/String;
+	public fun getMinCoreVersion ()Ljava/lang/String;
+	public fun getPriority ()I
+	public fun getReplaces ()Ljava/util/List;
+	public fun getRequires ()Ljava/util/List;
+	public fun getTranslations ()Ljava/util/Map;
+	public fun getVersion ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobblePluginKt {
+	public static final fun getScrobbled ()Ltv/nomercy/player/core/events/EventKey;
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobbleReport {
+	public fun <init> (Ljava/lang/String;D)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()D
+	public final fun copy (Ljava/lang/String;D)Ltv/nomercy/player/music/scrobble/ScrobbleReport;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/scrobble/ScrobbleReport;Ljava/lang/String;DILjava/lang/Object;)Ltv/nomercy/player/music/scrobble/ScrobbleReport;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getListenedSeconds ()D
+	public final fun getTrackId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class tv/nomercy/player/music/scrobble/ScrobbleRules {
@@ -308,5 +462,10 @@ public final class tv/nomercy/player/music/scrobble/ScrobbleTrackerKt {
 	public static final field LASTFM_FLOOR_SECONDS D
 	public static final field LASTFM_RATIO D
 	public static final field MAX_PLAUSIBLE_TICK_SECONDS D
+}
+
+public abstract interface class tv/nomercy/player/music/scrobble/Scrobbler {
+	public abstract fun nowPlaying (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun scrobble (Ljava/lang/String;DLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

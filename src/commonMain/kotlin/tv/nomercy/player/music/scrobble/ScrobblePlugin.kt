@@ -110,7 +110,15 @@ public interface Scrobbler {
     public suspend fun scrobble(trackId: String, listenedSeconds: Double)
 }
 
-/** The default: reports nowhere. The web's `NoopScrobbler`. */
+/**
+ * The default: reports nowhere. The web's `NoopScrobbler`.
+ *
+ * The empty bodies are the whole point rather than an oversight -- adding the
+ * plugin must not start sending a listener's history to a service nobody
+ * configured -- so they are suppressed here rather than filled with something
+ * that would make the default do work.
+ */
+@Suppress("EmptyFunctionBlock")
 public object NoScrobbler : Scrobbler {
     override suspend fun nowPlaying(trackId: String) {}
 
