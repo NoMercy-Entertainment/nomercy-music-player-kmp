@@ -8,6 +8,7 @@
 
 package tv.nomercy.player.music.lyrics
 
+import tv.nomercy.player.core.cues.registerBuiltIns
 import tv.nomercy.player.core.events.CoreEvents
 import tv.nomercy.player.core.events.CueEvent
 import tv.nomercy.player.core.events.EventKey
@@ -74,7 +75,16 @@ public object NoLyricsSource : LyricsSource {
  */
 public open class LyricsPlugin(
     private val source: LyricsSource = NoLyricsSource,
-    private val parsers: CueParserRegistry = CueParserRegistry(),
+    // The built-ins, so a plugin whose whole job is synced lyrics can read an
+    // LRC file without a consumer registering a parser for the format everybody
+    // ships. An empty registry was the default and it made the default plugin
+    // inert: every url reported noParser.
+    //
+    // Pass `player.cueParsers` to share the player's registry, which is what a
+    // host that has registered its own format wants — this default cannot see
+    // those, because a plugin here reaches the host through PluginHost and cue
+    // resolution is not on it.
+    private val parsers: CueParserRegistry = CueParserRegistry().registerBuiltIns(),
     private val opts: LyricsOptions = LyricsOptions(),
 ) : Plugin<LyricsOptions>() {
 

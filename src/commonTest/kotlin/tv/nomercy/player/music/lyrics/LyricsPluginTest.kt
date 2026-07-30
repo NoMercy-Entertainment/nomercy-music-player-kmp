@@ -15,39 +15,12 @@ import tv.nomercy.player.core.events.CueEvent
 import tv.nomercy.player.core.events.ItemChange
 import tv.nomercy.player.core.events.TimeUpdate
 import tv.nomercy.player.core.media.MediaItem
-import tv.nomercy.player.core.ports.CueParser
-import tv.nomercy.player.core.ports.CueParserRegistry
 import tv.nomercy.player.testing.FakePlayer
 import tv.nomercy.player.testing.testPlugin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-
-// Two lines of LRC, parsed by a real parser through the real registry.
-//
-// A stub that returned cues directly would skip the half most likely to be
-// wrong: whether the url reaches a parser at all. This registers one and lets
-// the plugin find it, which is the path a consumer takes.
-private class LrcParser : CueParser {
-    override val id: String = "lrc"
-
-    override fun canParse(url: String, contentType: String?): Boolean = url.endsWith(".lrc")
-
-    override fun parse(raw: String, baseUrl: String?): List<CueEvent> =
-        raw.lineSequence()
-            .filter { it.isNotBlank() }
-            .mapIndexed { index, line ->
-                val at: Double = line.substringAfter('[').substringBefore(']').toDouble()
-                CueEvent(
-                    id = "line-$index",
-                    startTime = at,
-                    endTime = at + LINE_SECONDS,
-                    text = line.substringAfter(']'),
-                )
-            }
-            .toList()
-}
 
 private class Canned(private val body: String?) : LyricsSource {
     var asked: String? = null
@@ -58,9 +31,16 @@ private class Canned(private val body: String?) : LyricsSource {
     }
 }
 
-private const val LINE_SECONDS = 2.0
 private const val TRACK_SECONDS = 10.0
-private const val LYRICS = "[0.0]first\n[2.0]second"
+
+// A real LRC file, read by the parser the plugin ships with.
+//
+// The test used to hand the plugin a registry holding a hand-written parser, and
+// that is exactly what production did not have: the registry was empty, so every
+// url reported noParser and the plugin could not read a lyric file on any
+// platform. A test that supplies the missing piece proves the piece works and
+// says nothing about whether anybody installed it.
+private const val LYRICS = "[00:00.00]first\n[00:02.00]second"
 
 class LyricsPluginTest {
 
@@ -70,11 +50,9 @@ class LyricsPluginTest {
     private fun timeUpdate(seconds: Double) =
         TimeUpdate(time = seconds, duration = TRACK_SECONDS, percentage = seconds / TRACK_SECONDS)
 
-    private fun registry(): CueParserRegistry = CueParserRegistry().apply { register(LrcParser()) }
-
+    // No `parsers` argument, deliberately. The default is what a consumer gets.
     private fun plugin(source: LyricsSource, autoFetch: Boolean = true) = LyricsPlugin(
         source = source,
-        parsers = registry(),
         opts = LyricsOptions(getLyricsUrl = { "https://example.test/${it.id}.lrc" }, autoFetch = autoFetch),
     )
 
@@ -92,6 +70,23 @@ class LyricsPluginTest {
 
             assertEquals("https://example.test/song.lrc", source.asked)
             assertEquals(listOf("first", "second"), subject.lines().map { it.text })
+        }
+    }
+
+    // The plugin's own promise: an LRC file and a VTT file both work. Neither did
+    // — the registry it defaulted to was empty.
+    @Test
+    fun aVttLyricFileReadsAsWellAsAnLrcOne() = runTest {
+        val subject = LyricsPlugin(
+            source = Canned("WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nfirst\n"),
+            opts = LyricsOptions(getLyricsUrl = { "https://example.test/${it.id}.vtt" }),
+        )
+
+        testPlugin(subject, FakePlayer(scope = this)) { player, _ ->
+            player.emit(CoreEvents.Item, itemChange("song"))
+            advanceUntilIdle()
+
+            assertEquals(listOf("first"), subject.lines().map { it.text })
         }
     }
 
@@ -133,9 +128,11 @@ class LyricsPluginTest {
     // setup, and reporting "no lyrics" would send them looking at the file.
     @Test
     fun anUnknownFormatSaysSoRatherThanReportingNoLyrics() = runTest {
+        // The default registry, so this also proves the built-ins do not answer
+        // for a format they cannot read: a wrong parser fails after claiming the
+        // file, which is worse than no parser.
         val subject = LyricsPlugin(
             source = Canned("whatever this is"),
-            parsers = CueParserRegistry(),
             opts = LyricsOptions(getLyricsUrl = { "https://example.test/song.karaoke" }),
         )
         var reported: String? = null
