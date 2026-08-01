@@ -8,9 +8,9 @@
 
 package tv.nomercy.player.music.lyrics
 
-import tv.nomercy.player.core.cues.registerBuiltIns
+import tv.nomercy.player.core.cues.Cue
+import tv.nomercy.player.core.cues.TextPayload
 import tv.nomercy.player.core.events.CoreEvents
-import tv.nomercy.player.core.events.CueEvent
 import tv.nomercy.player.core.events.EventKey
 import tv.nomercy.player.core.events.ItemChange
 import tv.nomercy.player.core.events.TimeUpdate
@@ -20,7 +20,7 @@ import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
 import tv.nomercy.player.core.plugin.pluginEventKey
-import tv.nomercy.player.core.ports.CueParserRegistry
+import tv.nomercy.player.core.ports.CueParser
 
 public data class LyricsOptions(
     /**
@@ -65,9 +65,15 @@ public object NoLyricsSource : LyricsSource {
  *     player.addPlugin(LyricsPlugin(source = MyBackend()))
  *
  * On every item change it resolves a url, fetches it, parses it through the
- * kit's [CueParserRegistry] — so an LRC file and a VTT file both work, and a
- * consumer's own format works by registering a parser — and hands the cues to a
- * [CueTracker]. Time updates then produce line crossings.
+ * HOST's cue-parser registry — reached via [resolveCueParser], the same seam
+ * `player.resolveCueParser(url)` gives a consumer — so an LRC file and a VTT
+ * file both work, and a consumer's own format works by registering a parser on
+ * the player. This used to carry a private [tv.nomercy.player.core.ports.CueParserRegistry]
+ * seeded with the built-ins, which could read the two formats everybody ships
+ * but never a format the host itself had registered — a consumer's own parser
+ * was invisible to it. There is no such registry here now; there is one
+ * registry, the player's, and this plugin asks it the way every other consumer
+ * does.
  *
  * Publishes lines and draws nothing. The web plugin owns a DOM node because a
  * browser gives it one; here a Compose or SwiftUI surface renders [line] and
@@ -75,16 +81,6 @@ public object NoLyricsSource : LyricsSource {
  */
 public open class LyricsPlugin(
     private val source: LyricsSource = NoLyricsSource,
-    // The built-ins, so a plugin whose whole job is synced lyrics can read an
-    // LRC file without a consumer registering a parser for the format everybody
-    // ships. An empty registry was the default and it made the default plugin
-    // inert: every url reported noParser.
-    //
-    // Pass `player.cueParsers` to share the player's registry, which is what a
-    // host that has registered its own format wants — this default cannot see
-    // those, because a plugin here reaches the host through PluginHost and cue
-    // resolution is not on it.
-    private val parsers: CueParserRegistry = CueParserRegistry().registerBuiltIns(),
     private val opts: LyricsOptions = LyricsOptions(),
 ) : Plugin<LyricsOptions>() {
 
@@ -99,13 +95,13 @@ public open class LyricsPlugin(
 
     override val options: LyricsOptions get() = opts
 
-    private val tracker = CueTracker()
+    private val tracker = CueTracker<TextPayload>()
 
     /** Every line of the current track, in order. Empty when there are none. */
-    public fun lines(): List<CueEvent> = tracker.cues()
+    public fun lines(): List<Cue<TextPayload>> = tracker.cues()
 
     /** The line at the current position, or null between lines. */
-    public fun line(): CueEvent? = tracker.line
+    public fun line(): Cue<TextPayload>? = tracker.line
 
     override fun use() {
         on(CoreEvents.Item) { change: ItemChange ->
@@ -122,7 +118,7 @@ public open class LyricsPlugin(
         }
 
         on(CoreEvents.Time) { update: TimeUpdate ->
-            val crossing: CueCrossing = tracker.advanceTo(update.time)
+            val crossing: CueCrossing<TextPayload> = tracker.advanceTo(update.time)
 
             if (crossing.changed) {
                 crossing.exited.forEach { emit(LyricsEvents.LineExit, it) }
@@ -148,7 +144,7 @@ public open class LyricsPlugin(
     }
 
     /** Attach cues that are already parsed. */
-    public fun attach(cues: List<CueEvent>) {
+    public fun attach(cues: List<Cue<TextPayload>>) {
         tracker.load(cues)
         emit(LyricsEvents.Loaded, cues.size)
     }
@@ -159,7 +155,8 @@ public open class LyricsPlugin(
             return
         }
 
-        val parser = parsers.resolve(url) ?: run {
+        val parser: CueParser<*>? = resolveCueParser(url)
+        if (parser == null) {
             // Named, not swallowed. A karaoke format nobody registered a parser
             // for is a consumer's missing line of setup, and a plugin that
             // reported "no lyrics" would send them looking at the file.
@@ -167,7 +164,24 @@ public open class LyricsPlugin(
             return
         }
 
-        attach(parser.parse(raw, baseUrl = url))
+        // The registry is heterogeneous by design — it also holds sprite and
+        // arbitrary-format parsers — so nothing proves its T from here. Narrowing
+        // to TextPayload rather than to LrcPayload is deliberate: this url can
+        // resolve to the LRC parser or the VTT subtitle parser (both work, and
+        // the test suite pins that), and their payloads are LrcPayload and
+        // VttSubtitlePayload — two different concrete types with one field in
+        // common, `text`. Casting straight to LrcPayload compiled and then threw
+        // a ClassCastException the first time a VTT file went through the seam;
+        // TextPayload is the shape every built-in payload actually shares, which
+        // is also exactly how the web's own LyricsPlugin gets away with a single
+        // cast here — its local `LyricPayload` type is `{ text: string }`, an
+        // open shape a lyrics or a subtitle payload equally satisfies. The second
+        // suppression is the detekt-player rule that flags the first; both apply
+        // to this one documented erasure boundary, not a second one anywhere else.
+        @Suppress("UNCHECKED_CAST", "NoUncheckedCast")
+        val lyricsParser = parser as CueParser<TextPayload>
+
+        attach(lyricsParser.parse(raw, baseUrl = url))
     }
 }
 
@@ -179,11 +193,11 @@ public object LyricsEvents {
 
     public val Loaded: EventKey<Int> = EventKey("loaded")
 
-    public val Line: EventKey<CueEvent?> = EventKey("line")
+    public val Line: EventKey<Cue<TextPayload>?> = EventKey("line")
 
-    public val LineEnter: EventKey<CueEvent> = EventKey("lineEnter")
+    public val LineEnter: EventKey<Cue<TextPayload>> = EventKey("lineEnter")
 
-    public val LineExit: EventKey<CueEvent> = EventKey("lineExit")
+    public val LineExit: EventKey<Cue<TextPayload>> = EventKey("lineExit")
 
     public val Cleared: EventKey<Unit> = EventKey("cleared")
 
@@ -194,13 +208,13 @@ public object LyricsEvents {
     public val LoadedOnPlayer: EventKey<Int> =
         pluginEventKey(LyricsPlugin.Manifest, "loaded")
 
-    public val LineOnPlayer: EventKey<CueEvent?> =
+    public val LineOnPlayer: EventKey<Cue<TextPayload>?> =
         pluginEventKey(LyricsPlugin.Manifest, "line")
 
-    public val LineEnterOnPlayer: EventKey<CueEvent> =
+    public val LineEnterOnPlayer: EventKey<Cue<TextPayload>> =
         pluginEventKey(LyricsPlugin.Manifest, "lineEnter")
 
-    public val LineExitOnPlayer: EventKey<CueEvent> =
+    public val LineExitOnPlayer: EventKey<Cue<TextPayload>> =
         pluginEventKey(LyricsPlugin.Manifest, "lineExit")
 
     public val ClearedOnPlayer: EventKey<Unit> =

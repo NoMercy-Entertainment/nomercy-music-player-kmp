@@ -287,13 +287,13 @@ public final class tv/nomercy/player/music/lyrics/LyricsOptions {
 public class tv/nomercy/player/music/lyrics/LyricsPlugin : tv/nomercy/player/core/plugin/Plugin {
 	public static final field Manifest Ltv/nomercy/player/music/lyrics/LyricsPlugin$Manifest;
 	public fun <init> ()V
-	public fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/core/ports/CueParserRegistry;Ltv/nomercy/player/music/lyrics/LyricsOptions;)V
-	public synthetic fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/core/ports/CueParserRegistry;Ltv/nomercy/player/music/lyrics/LyricsOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/music/lyrics/LyricsOptions;)V
+	public synthetic fun <init> (Ltv/nomercy/player/music/lyrics/LyricsSource;Ltv/nomercy/player/music/lyrics/LyricsOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun attach (Ljava/util/List;)V
 	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
 	public synthetic fun getOptions ()Ljava/lang/Object;
 	public fun getOptions ()Ltv/nomercy/player/music/lyrics/LyricsOptions;
-	public final fun line ()Ltv/nomercy/player/core/events/CueEvent;
+	public final fun line ()Ltv/nomercy/player/core/cues/Cue;
 	public final fun lines ()Ljava/util/List;
 	public final fun load (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun use ()V
