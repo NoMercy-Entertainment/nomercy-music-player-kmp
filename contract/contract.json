@@ -1,8 +1,8 @@
 {
-  "version": "2.0.2",
+  "version": "2.0.3",
   "provenance": {
-    "version": "2.0.2",
-    "commit": "dcbb912",
+    "version": "2.0.3",
+    "commit": "555e07f",
     "commitsAheadOfTag": 0,
     "dirty": false
   },
@@ -2400,6 +2400,7 @@
     "plugin:octopus/render-error",
     "plugin:scrobble/now-playing-failed",
     "plugin:scrobble/scrobble-failed",
+    "video:media/hdr-unplayable",
     "visualization:render/failed"
   ]
 }
