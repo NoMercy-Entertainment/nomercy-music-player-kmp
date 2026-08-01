@@ -251,6 +251,21 @@ public final class tv/nomercy/player/music/input/MusicKeyBindingsKt {
 	public static final fun nextShuffleState (Ltv/nomercy/player/core/player/ShuffleState;)Ltv/nomercy/player/core/player/ShuffleState;
 }
 
+public abstract interface class tv/nomercy/player/music/item/MusicPlaylistItem : tv/nomercy/player/core/media/PlaylistItem {
+	public fun getAlbum ()Ljava/lang/String;
+	public fun getArtist ()Ljava/lang/String;
+	public fun getCover ()Ljava/lang/String;
+	public fun getImage ()Ljava/lang/String;
+	public abstract fun getName ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/item/MusicPlaylistItem$DefaultImpls {
+	public static fun getAlbum (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+	public static fun getArtist (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+	public static fun getCover (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+	public static fun getImage (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+}
+
 public final class tv/nomercy/player/music/lyrics/LyricsEvents {
 	public static final field INSTANCE Ltv/nomercy/player/music/lyrics/LyricsEvents;
 	public final fun getCleared ()Ltv/nomercy/player/core/events/EventKey;
@@ -467,5 +482,11 @@ public final class tv/nomercy/player/music/scrobble/ScrobbleTrackerKt {
 public abstract interface class tv/nomercy/player/music/scrobble/Scrobbler {
 	public abstract fun nowPlaying (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun scrobble (Ljava/lang/String;DLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public class tv/nomercy/player/music/session/MusicMediaSessionPlugin : tv/nomercy/player/core/plugin/MediaSessionPlugin {
+	public fun <init> (Ltv/nomercy/player/core/plugin/TransportCommands;Lkotlin/jvm/functions/Function0;)V
+	public synthetic fun <init> (Ltv/nomercy/player/core/plugin/TransportCommands;Lkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	protected fun nowPlayingFor (Ltv/nomercy/player/core/media/PlaylistItem;)Ltv/nomercy/player/core/ports/NowPlaying;
 }
 

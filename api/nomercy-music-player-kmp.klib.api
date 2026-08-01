@@ -43,6 +43,19 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
 }
 
+abstract interface tv.nomercy.player.music.item/MusicPlaylistItem : tv.nomercy.player.core.media/PlaylistItem { // tv.nomercy.player.music.item/MusicPlaylistItem|null[0]
+    abstract val name // tv.nomercy.player.music.item/MusicPlaylistItem.name|{}name[0]
+        abstract fun <get-name>(): kotlin/String // tv.nomercy.player.music.item/MusicPlaylistItem.name.<get-name>|<get-name>(){}[0]
+    open val album // tv.nomercy.player.music.item/MusicPlaylistItem.album|{}album[0]
+        open fun <get-album>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.album.<get-album>|<get-album>(){}[0]
+    open val artist // tv.nomercy.player.music.item/MusicPlaylistItem.artist|{}artist[0]
+        open fun <get-artist>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.artist.<get-artist>|<get-artist>(){}[0]
+    open val cover // tv.nomercy.player.music.item/MusicPlaylistItem.cover|{}cover[0]
+        open fun <get-cover>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.cover.<get-cover>|<get-cover>(){}[0]
+    open val image // tv.nomercy.player.music.item/MusicPlaylistItem.image|{}image[0]
+        open fun <get-image>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.image.<get-image>|<get-image>(){}[0]
+}
+
 abstract interface tv.nomercy.player.music.lyrics/LyricsSource { // tv.nomercy.player.music.lyrics/LyricsSource|null[0]
     abstract suspend fun fetch(kotlin/String): kotlin/String? // tv.nomercy.player.music.lyrics/LyricsSource.fetch|fetch(kotlin.String){}[0]
 }
@@ -412,6 +425,12 @@ open class tv.nomercy.player.music.scrobble/ScrobblePlugin : tv.nomercy.player.c
         final val version // tv.nomercy.player.music.scrobble/ScrobblePlugin.Manifest.version|{}version[0]
             final fun <get-version>(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobblePlugin.Manifest.version.<get-version>|<get-version>(){}[0]
     }
+}
+
+open class tv.nomercy.player.music.session/MusicMediaSessionPlugin : tv.nomercy.player.core.plugin/MediaSessionPlugin { // tv.nomercy.player.music.session/MusicMediaSessionPlugin|null[0]
+    constructor <init>(tv.nomercy.player.core.plugin/TransportCommands, kotlin/Function0<tv.nomercy.player.core.ports/SystemTransport> = ...) // tv.nomercy.player.music.session/MusicMediaSessionPlugin.<init>|<init>(tv.nomercy.player.core.plugin.TransportCommands;kotlin.Function0<tv.nomercy.player.core.ports.SystemTransport>){}[0]
+
+    open fun nowPlayingFor(tv.nomercy.player.core.media/PlaylistItem): tv.nomercy.player.core.ports/NowPlaying // tv.nomercy.player.music.session/MusicMediaSessionPlugin.nowPlayingFor|nowPlayingFor(tv.nomercy.player.core.media.PlaylistItem){}[0]
 }
 
 open class tv.nomercy.player.music/NMMusicPlayer : tv.nomercy.player.core.controllers/ComposedPlayer { // tv.nomercy.player.music/NMMusicPlayer|null[0]
