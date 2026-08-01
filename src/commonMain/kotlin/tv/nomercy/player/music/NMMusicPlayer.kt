@@ -8,6 +8,7 @@
 
 package tv.nomercy.player.music
 
+import kotlinx.coroutines.CoroutineScope
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.ports.AudioBackend
@@ -37,12 +38,16 @@ public open class NMMusicPlayer(
     // not bend is that a caller says what it has instead of the library
     // guessing. The convenience constructor below covers the ordinary case.
     private val transitions: TransitionBackend? = null,
+    // Where this player's own suspending work runs. Injectable for the same
+    // reason core's is: a test that cannot control the scheduler is asserting
+    // against whichever thread happened to win.
+    scope: CoroutineScope? = null,
     // Names this player, and is what the factory looks it up by.
     id: String = "nmmusic",
-) : ComposedPlayer(backend, playerId = id) {
+) : ComposedPlayer(backend, scope = scope, playerId = id) {
 
     // An audio backend is both, so a caller with one says so once.
-    public constructor(audio: AudioBackend, id: String = "nmmusic") : this(audio, audio, id)
+    public constructor(audio: AudioBackend, id: String = "nmmusic") : this(audio, audio, id = id)
 
     private var crossfadeSeconds: Double = 0.0
 

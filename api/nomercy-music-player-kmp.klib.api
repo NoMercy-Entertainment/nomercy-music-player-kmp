@@ -70,7 +70,7 @@ abstract interface tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomer
 
 abstract interface tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/Scrobbler|null[0]
     abstract suspend fun nowPlaying(kotlin/String) // tv.nomercy.player.music.scrobble/Scrobbler.nowPlaying|nowPlaying(kotlin.String){}[0]
-    abstract suspend fun scrobble(kotlin/String, kotlin/Double) // tv.nomercy.player.music.scrobble/Scrobbler.scrobble|scrobble(kotlin.String;kotlin.Double){}[0]
+    abstract suspend fun scrobble(kotlin/String, tv.nomercy.player.music.scrobble/ScrobbleContext) // tv.nomercy.player.music.scrobble/Scrobbler.scrobble|scrobble(kotlin.String;tv.nomercy.player.music.scrobble.ScrobbleContext){}[0]
 }
 
 final class tv.nomercy.player.music.connect/ConnectMirror { // tv.nomercy.player.music.connect/ConnectMirror|null[0]
@@ -186,8 +186,12 @@ final class tv.nomercy.player.music.lyrics/LyricsOptions { // tv.nomercy.player.
 }
 
 final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.player.music.queue/AutoAdvanceOptions|null[0]
-    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?){}[0]
+    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
 
+    final val crossfade // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade|{}crossfade[0]
+        final fun <get-crossfade>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade.<get-crossfade>|<get-crossfade>(){}[0]
+    final val crossfadeDuration // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfadeDuration|{}crossfadeDuration[0]
+        final fun <get-crossfadeDuration>(): kotlin/Double // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfadeDuration.<get-crossfadeDuration>|<get-crossfadeDuration>(){}[0]
     final val enabled // tv.nomercy.player.music.queue/AutoAdvanceOptions.enabled|{}enabled[0]
         final fun <get-enabled>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.enabled.<get-enabled>|<get-enabled>(){}[0]
     final val generator // tv.nomercy.player.music.queue/AutoAdvanceOptions.generator|{}generator[0]
@@ -195,7 +199,9 @@ final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.pla
 
     final fun component1(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component1|component1(){}[0]
     final fun component2(): tv.nomercy.player.music.queue/PlaylistGenerator? // tv.nomercy.player.music.queue/AutoAdvanceOptions.component2|component2(){}[0]
-    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?){}[0]
+    final fun component3(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component3|component3(){}[0]
+    final fun component4(): kotlin/Double // tv.nomercy.player.music.queue/AutoAdvanceOptions.component4|component4(){}[0]
+    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.queue/AutoAdvanceOptions.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.queue/AutoAdvanceOptions.toString|toString(){}[0]
@@ -219,6 +225,41 @@ final class tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator : tv.nome
 
     final fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
     final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
+}
+
+final class tv.nomercy.player.music.scrobble/NowPlayingReport { // tv.nomercy.player.music.scrobble/NowPlayingReport|null[0]
+    constructor <init>(kotlin/String) // tv.nomercy.player.music.scrobble/NowPlayingReport.<init>|<init>(kotlin.String){}[0]
+
+    final val trackId // tv.nomercy.player.music.scrobble/NowPlayingReport.trackId|{}trackId[0]
+        final fun <get-trackId>(): kotlin/String // tv.nomercy.player.music.scrobble/NowPlayingReport.trackId.<get-trackId>|<get-trackId>(){}[0]
+
+    final fun component1(): kotlin/String // tv.nomercy.player.music.scrobble/NowPlayingReport.component1|component1(){}[0]
+    final fun copy(kotlin/String = ...): tv.nomercy.player.music.scrobble/NowPlayingReport // tv.nomercy.player.music.scrobble/NowPlayingReport.copy|copy(kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.scrobble/NowPlayingReport.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music.scrobble/NowPlayingReport.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music.scrobble/NowPlayingReport.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.scrobble/ScrobbleContext { // tv.nomercy.player.music.scrobble/ScrobbleContext|null[0]
+    constructor <init>(kotlin/Long, kotlin/Double, kotlin/Double, kotlin/String = ...) // tv.nomercy.player.music.scrobble/ScrobbleContext.<init>|<init>(kotlin.Long;kotlin.Double;kotlin.Double;kotlin.String){}[0]
+
+    final val durationSeconds // tv.nomercy.player.music.scrobble/ScrobbleContext.durationSeconds|{}durationSeconds[0]
+        final fun <get-durationSeconds>(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleContext.durationSeconds.<get-durationSeconds>|<get-durationSeconds>(){}[0]
+    final val listenedSeconds // tv.nomercy.player.music.scrobble/ScrobbleContext.listenedSeconds|{}listenedSeconds[0]
+        final fun <get-listenedSeconds>(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleContext.listenedSeconds.<get-listenedSeconds>|<get-listenedSeconds>(){}[0]
+    final val source // tv.nomercy.player.music.scrobble/ScrobbleContext.source|{}source[0]
+        final fun <get-source>(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleContext.source.<get-source>|<get-source>(){}[0]
+    final val startedAt // tv.nomercy.player.music.scrobble/ScrobbleContext.startedAt|{}startedAt[0]
+        final fun <get-startedAt>(): kotlin/Long // tv.nomercy.player.music.scrobble/ScrobbleContext.startedAt.<get-startedAt>|<get-startedAt>(){}[0]
+
+    final fun component1(): kotlin/Long // tv.nomercy.player.music.scrobble/ScrobbleContext.component1|component1(){}[0]
+    final fun component2(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleContext.component2|component2(){}[0]
+    final fun component3(): kotlin/Double // tv.nomercy.player.music.scrobble/ScrobbleContext.component3|component3(){}[0]
+    final fun component4(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleContext.component4|component4(){}[0]
+    final fun copy(kotlin/Long = ..., kotlin/Double = ..., kotlin/Double = ..., kotlin/String = ...): tv.nomercy.player.music.scrobble/ScrobbleContext // tv.nomercy.player.music.scrobble/ScrobbleContext.copy|copy(kotlin.Long;kotlin.Double;kotlin.Double;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.scrobble/ScrobbleContext.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music.scrobble/ScrobbleContext.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleContext.toString|toString(){}[0]
 }
 
 final class tv.nomercy.player.music.scrobble/ScrobbleReport { // tv.nomercy.player.music.scrobble/ScrobbleReport|null[0]
@@ -396,6 +437,7 @@ open class tv.nomercy.player.music.queue/AutoAdvancePlugin : tv.nomercy.player.c
 
     final fun peekNext(): kotlin/Int? // tv.nomercy.player.music.queue/AutoAdvancePlugin.peekNext|peekNext(){}[0]
     final suspend fun advance() // tv.nomercy.player.music.queue/AutoAdvancePlugin.advance|advance(){}[0]
+    final suspend fun onItemEndingSoon() // tv.nomercy.player.music.queue/AutoAdvancePlugin.onItemEndingSoon|onItemEndingSoon(){}[0]
     open fun use() // tv.nomercy.player.music.queue/AutoAdvancePlugin.use|use(){}[0]
 
     final object Manifest : tv.nomercy.player.core.plugin/PluginManifest { // tv.nomercy.player.music.queue/AutoAdvancePlugin.Manifest|null[0]
@@ -407,7 +449,7 @@ open class tv.nomercy.player.music.queue/AutoAdvancePlugin : tv.nomercy.player.c
 }
 
 open class tv.nomercy.player.music.scrobble/ScrobblePlugin : tv.nomercy.player.core.plugin/Plugin<tv.nomercy.player.music.scrobble/ScrobbleRules> { // tv.nomercy.player.music.scrobble/ScrobblePlugin|null[0]
-    constructor <init>(tv.nomercy.player.music.scrobble/Scrobbler = ..., tv.nomercy.player.music.scrobble/ScrobbleRules = ...) // tv.nomercy.player.music.scrobble/ScrobblePlugin.<init>|<init>(tv.nomercy.player.music.scrobble.Scrobbler;tv.nomercy.player.music.scrobble.ScrobbleRules){}[0]
+    constructor <init>(tv.nomercy.player.music.scrobble/Scrobbler = ..., tv.nomercy.player.music.scrobble/ScrobbleRules = ..., tv.nomercy.player.core.ports/Clock = ...) // tv.nomercy.player.music.scrobble/ScrobblePlugin.<init>|<init>(tv.nomercy.player.music.scrobble.Scrobbler;tv.nomercy.player.music.scrobble.ScrobbleRules;tv.nomercy.player.core.ports.Clock){}[0]
 
     open val manifest // tv.nomercy.player.music.scrobble/ScrobblePlugin.manifest|{}manifest[0]
         open fun <get-manifest>(): tv.nomercy.player.core.plugin/PluginManifest // tv.nomercy.player.music.scrobble/ScrobblePlugin.manifest.<get-manifest>|<get-manifest>(){}[0]
@@ -435,7 +477,7 @@ open class tv.nomercy.player.music.session/MusicMediaSessionPlugin : tv.nomercy.
 
 open class tv.nomercy.player.music/NMMusicPlayer : tv.nomercy.player.core.controllers/ComposedPlayer { // tv.nomercy.player.music/NMMusicPlayer|null[0]
     constructor <init>(tv.nomercy.player.core.ports/AudioBackend, kotlin/String = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.AudioBackend;kotlin.String){}[0]
-    constructor <init>(tv.nomercy.player.core.ports/MediaBackend? = ..., tv.nomercy.player.core.ports/TransitionBackend? = ..., kotlin/String = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.MediaBackend?;tv.nomercy.player.core.ports.TransitionBackend?;kotlin.String){}[0]
+    constructor <init>(tv.nomercy.player.core.ports/MediaBackend? = ..., tv.nomercy.player.core.ports/TransitionBackend? = ..., kotlinx.coroutines/CoroutineScope? = ..., kotlin/String = ...) // tv.nomercy.player.music/NMMusicPlayer.<init>|<init>(tv.nomercy.player.core.ports.MediaBackend?;tv.nomercy.player.core.ports.TransitionBackend?;kotlinx.coroutines.CoroutineScope?;kotlin.String){}[0]
 
     open fun announceBackend(kotlin/String) // tv.nomercy.player.music/NMMusicPlayer.announceBackend|announceBackend(kotlin.String){}[0]
     open fun configureCrossfade(kotlin/Double) // tv.nomercy.player.music/NMMusicPlayer.configureCrossfade|configureCrossfade(kotlin.Double){}[0]
@@ -504,7 +546,7 @@ final object tv.nomercy.player.music.lyrics/NoLyricsSource : tv.nomercy.player.m
 
 final object tv.nomercy.player.music.scrobble/NoScrobbler : tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/NoScrobbler|null[0]
     final suspend fun nowPlaying(kotlin/String) // tv.nomercy.player.music.scrobble/NoScrobbler.nowPlaying|nowPlaying(kotlin.String){}[0]
-    final suspend fun scrobble(kotlin/String, kotlin/Double) // tv.nomercy.player.music.scrobble/NoScrobbler.scrobble|scrobble(kotlin.String;kotlin.Double){}[0]
+    final suspend fun scrobble(kotlin/String, tv.nomercy.player.music.scrobble/ScrobbleContext) // tv.nomercy.player.music.scrobble/NoScrobbler.scrobble|scrobble(kotlin.String;tv.nomercy.player.music.scrobble.ScrobbleContext){}[0]
 }
 
 final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/MusicEvents|null[0]
@@ -535,6 +577,8 @@ final val tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS // tv.nomercy.player.
     final fun <get-MUSIC_KEY_BINDINGS>(): kotlin.collections/List<tv.nomercy.player.music.input/MusicKeyBinding> // tv.nomercy.player.music.input/MUSIC_KEY_BINDINGS.<get-MUSIC_KEY_BINDINGS>|<get-MUSIC_KEY_BINDINGS>(){}[0]
 final val tv.nomercy.player.music.input/MUSIC_KEY_COMBOS // tv.nomercy.player.music.input/MUSIC_KEY_COMBOS|{}MUSIC_KEY_COMBOS[0]
     final fun <get-MUSIC_KEY_COMBOS>(): kotlin.collections/Set<kotlin/String> // tv.nomercy.player.music.input/MUSIC_KEY_COMBOS.<get-MUSIC_KEY_COMBOS>|<get-MUSIC_KEY_COMBOS>(){}[0]
+final val tv.nomercy.player.music.scrobble/NowPlaying // tv.nomercy.player.music.scrobble/NowPlaying|{}NowPlaying[0]
+    final fun <get-NowPlaying>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music.scrobble/NowPlayingReport> // tv.nomercy.player.music.scrobble/NowPlaying.<get-NowPlaying>|<get-NowPlaying>(){}[0]
 final val tv.nomercy.player.music.scrobble/Scrobbled // tv.nomercy.player.music.scrobble/Scrobbled|{}Scrobbled[0]
     final fun <get-Scrobbled>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music.scrobble/ScrobbleReport> // tv.nomercy.player.music.scrobble/Scrobbled.<get-Scrobbled>|<get-Scrobbled>(){}[0]
 

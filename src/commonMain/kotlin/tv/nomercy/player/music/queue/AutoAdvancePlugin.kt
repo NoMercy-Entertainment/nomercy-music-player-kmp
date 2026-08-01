@@ -10,8 +10,10 @@ package tv.nomercy.player.music.queue
 
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.events.CoreEvents
+import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
+import tv.nomercy.player.music.NMMusicPlayer
 
 /** What the plugin is allowed to do at the end of a track. */
 public data class AutoAdvanceOptions(
@@ -21,6 +23,10 @@ public data class AutoAdvanceOptions(
      * means by "no generator" — identical behaviour, one less thing to pass.
      */
     val generator: PlaylistGenerator? = null,
+    /** On `itemEndingSoon`, hand off to `NMMusicPlayer.crossfadeTo`. Default `false`. */
+    val crossfade: Boolean = false,
+    /** Crossfade duration in seconds. Default `0` — a hard cut. */
+    val crossfadeDuration: Double = 0.0,
 )
 
 /**
@@ -61,6 +67,46 @@ public open class AutoAdvancePlugin(
         on(CoreEvents.Ended) {
             if (opts.enabled) launch { advance() }
         }
+
+        // The other half of the dispatch list, and the one that was missing.
+        // `itemEndingSoon` has a producer and had no consumer at all, so the
+        // hand-off window this plugin exists to use went by untouched: every
+        // track change was a hard cut into a load that started at silence.
+        on(CoreEvents.ItemEndingSoon) {
+            if (opts.enabled) launch { onItemEndingSoon() }
+        }
+    }
+
+    /**
+     * Warm the next track and, when configured, start the crossfade into it.
+     *
+     * Public for the same reason [advance] is: a chrome that shows an "up next"
+     * card wants the same preparation the timer would have done.
+     */
+    public suspend fun onItemEndingSoon() {
+        if (!opts.crossfade) return
+
+        // Only a music player can crossfade — the method is not on the core
+        // composition — so a plugin registered on a video player skips it
+        // rather than failing at a cast.
+        val music: NMMusicPlayer = player as? NMMusicPlayer ?: return
+        val next: PlaylistItem = resolveNext() ?: return
+
+        // The crossfade IS the head start: it loads the coming track into the
+        // engine's secondary slot and primes it before the fade begins. The
+        // reference's separate preloadNextOnEnding exists because a browser has
+        // no such slot and warms the HTTP cache instead.
+        music.crossfadeTo(next, opts.crossfadeDuration)
+    }
+
+    // What plays next, through the generator when there is one and the player's
+    // own order when there is not — the same answer [advance] acts on, so a
+    // preload cannot warm a track the advance is not going to play.
+    private fun resolveNext(): PlaylistItem? {
+        val generator: PlaylistGenerator = opts.generator ?: return player.peekNext()
+        val queue: List<PlaylistItem> = player.queue()
+        val target: Int = generator.next(queue.size, player.index()) ?: return null
+        return queue.getOrNull(target)
     }
 
     /**
