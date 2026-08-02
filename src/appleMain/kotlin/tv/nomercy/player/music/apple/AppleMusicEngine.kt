@@ -84,6 +84,12 @@ public data class AppleMusicSnapshot(
  * difference between Apple and Compose has exactly one place it could have come
  * from and this is not it.
  */
+// Wide because the surface is. This is the whole player as Swift sees it, and a
+// narrower facade would mean a Swift file reaching past it at NMMusicPlayer —
+// which is the one thing the facade exists to prevent, since Player.on is
+// generic and the state is a StateFlow. AppleVideoEngine carries the same
+// suppression for the same reason.
+@Suppress("TooManyFunctions")
 public class AppleMusicEngine(
     public val backend: AudioBackend,
 ) {
