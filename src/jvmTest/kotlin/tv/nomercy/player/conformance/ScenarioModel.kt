@@ -11,6 +11,8 @@ package tv.nomercy.player.conformance
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 
@@ -73,6 +75,21 @@ public data class ScenarioItem(
     val id: String,
     val url: String,
     val title: String?,
+    // Read here because the two ecosystems take them by different routes and
+    // the scenario should not have to know which. The web carries chapters on
+    // the playlist item; this port publishes them through chapters(list). Same
+    // fixture, one translation per repo, which is exactly the split this file
+    // draws everywhere else.
+    val chapters: List<ScenarioChapter> = emptyList(),
+)
+
+// Only what a scenario can state. The web's entry also carries an index and an
+// end, both of which this port derives — an end from the next chapter's start,
+// an index from position — so reading them would invite a fixture to assert a
+// number no port stores.
+public data class ScenarioChapter(
+    val start: Double,
+    val title: String,
 )
 
 public fun scenarioItems(scenario: Scenario): List<ScenarioItem> =
@@ -81,6 +98,14 @@ public fun scenarioItems(scenario: Scenario): List<ScenarioItem> =
             id = entry["id"]?.jsonPrimitive?.content ?: "item",
             url = entry["url"]?.jsonPrimitive?.content ?: "https://example.test/item",
             title = entry["title"]?.jsonPrimitive?.content,
+            chapters = entry["chapters"]?.let { element ->
+                element.jsonArray.map { chapter ->
+                    ScenarioChapter(
+                        start = chapter.jsonObject["start"]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0,
+                        title = chapter.jsonObject["title"]?.jsonPrimitive?.content ?: "",
+                    )
+                }
+            } ?: emptyList(),
         )
     }
 
