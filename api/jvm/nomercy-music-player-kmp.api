@@ -438,7 +438,9 @@ public final class tv/nomercy/player/music/queue/LinearPlaylistGenerator : tv/no
 	public fun <init> ()V
 	public fun getId ()Ljava/lang/String;
 	public fun next (II)Ljava/lang/Integer;
+	public fun next (Ljava/util/List;I)Ljava/lang/Integer;
 	public fun previous (II)Ljava/lang/Integer;
+	public fun previous (Ljava/util/List;I)Ljava/lang/Integer;
 }
 
 public final class tv/nomercy/player/music/queue/NonRepeatingShuffleGenerator : tv/nomercy/player/music/queue/PlaylistGenerator {
@@ -447,13 +449,22 @@ public final class tv/nomercy/player/music/queue/NonRepeatingShuffleGenerator : 
 	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun getId ()Ljava/lang/String;
 	public fun next (II)Ljava/lang/Integer;
+	public fun next (Ljava/util/List;I)Ljava/lang/Integer;
 	public fun previous (II)Ljava/lang/Integer;
+	public fun previous (Ljava/util/List;I)Ljava/lang/Integer;
 }
 
 public abstract interface class tv/nomercy/player/music/queue/PlaylistGenerator {
 	public abstract fun getId ()Ljava/lang/String;
 	public abstract fun next (II)Ljava/lang/Integer;
+	public fun next (Ljava/util/List;I)Ljava/lang/Integer;
 	public abstract fun previous (II)Ljava/lang/Integer;
+	public fun previous (Ljava/util/List;I)Ljava/lang/Integer;
+}
+
+public final class tv/nomercy/player/music/queue/PlaylistGenerator$DefaultImpls {
+	public static fun next (Ltv/nomercy/player/music/queue/PlaylistGenerator;Ljava/util/List;I)Ljava/lang/Integer;
+	public static fun previous (Ltv/nomercy/player/music/queue/PlaylistGenerator;Ljava/util/List;I)Ljava/lang/Integer;
 }
 
 public abstract interface class tv/nomercy/player/music/queue/SimilarityEngine {
@@ -481,6 +492,27 @@ public final class tv/nomercy/player/music/queue/SimilarityQuery {
 	public final fun getMinScore ()Ljava/lang/Double;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/queue/SmartShuffleGenerator : tv/nomercy/player/music/queue/PlaylistGenerator {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/jvm/functions/Function0;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function0;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getId ()Ljava/lang/String;
+	public fun next (II)Ljava/lang/Integer;
+	public fun next (Ljava/util/List;I)Ljava/lang/Integer;
+	public fun previous (II)Ljava/lang/Integer;
+	public fun previous (Ljava/util/List;I)Ljava/lang/Integer;
+}
+
+public abstract interface class tv/nomercy/player/music/queue/TaggedMusicItem : tv/nomercy/player/core/media/PlaylistItem {
+	public fun getDecade ()Ljava/lang/String;
+	public fun getGenres ()Ljava/util/List;
+}
+
+public final class tv/nomercy/player/music/queue/TaggedMusicItem$DefaultImpls {
+	public static fun getDecade (Ltv/nomercy/player/music/queue/TaggedMusicItem;)Ljava/lang/String;
+	public static fun getGenres (Ltv/nomercy/player/music/queue/TaggedMusicItem;)Ljava/util/List;
 }
 
 public final class tv/nomercy/player/music/scrobble/NoScrobbler : tv/nomercy/player/music/scrobble/Scrobbler {

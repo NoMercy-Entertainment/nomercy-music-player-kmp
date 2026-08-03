@@ -105,7 +105,10 @@ public open class AutoAdvancePlugin(
     private fun resolveNext(): PlaylistItem? {
         val generator: PlaylistGenerator = opts.generator ?: return player.peekNext()
         val queue: List<PlaylistItem> = player.queue()
-        val target: Int = generator.next(queue.size, player.index()) ?: return null
+        // The items, not the count. A generator that scores tracks by what they
+        // are cannot do it from a size, and the count-only overload is what it
+        // falls back to.
+        val target: Int = generator.next(queue, player.index()) ?: return null
         return queue.getOrNull(target)
     }
 
@@ -122,7 +125,7 @@ public open class AutoAdvancePlugin(
         }
 
         val queue = player.queue()
-        val target: Int? = generator.next(queue.size, player.index())
+        val target: Int? = generator.next(queue, player.index())
 
         // Null is end of queue, which is a normal outcome. Falling back to the
         // player's own next() here would make a generator that said "stop"
@@ -138,6 +141,6 @@ public open class AutoAdvancePlugin(
     /** What the generator says is next, without moving. */
     public fun peekNext(): Int? {
         val generator: PlaylistGenerator = opts.generator ?: return null
-        return generator.next(player.queue().size, player.index())
+        return generator.next(player.queue(), player.index())
     }
 }

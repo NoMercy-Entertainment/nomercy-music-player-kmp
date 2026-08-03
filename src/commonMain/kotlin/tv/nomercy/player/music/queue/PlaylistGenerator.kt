@@ -8,6 +8,8 @@
 
 package tv.nomercy.player.music.queue
 
+import tv.nomercy.player.core.media.PlaylistItem
+
 // What comes next, as a decision the consumer can replace.
 //
 // From the web's `auto-advance` plugin and its IPlaylistGenerator port. The
@@ -35,6 +37,24 @@ public interface PlaylistGenerator {
     public fun next(size: Int, currentIndex: Int): Int?
 
     public fun previous(size: Int, currentIndex: Int): Int?
+
+    /**
+     * The same two questions, for a generator that has to look at the tracks.
+     *
+     * A size is enough to order a queue and not enough to order it WELL: the
+     * reference's smart shuffle scores candidates by the genre and decade on
+     * the item, and a generator handed only a count cannot see either. That
+     * limit was written down in [NonRepeatingShuffleGenerator] as the reason
+     * its tag-aware half was not ported, and this is the seam that removes it.
+     *
+     * Defaulted to the count-only form, so every generator written against the
+     * older pair keeps working untouched. The plugin calls these, so a
+     * generator that overrides them gets the items and one that does not is
+     * asked exactly what it was asked before.
+     */
+    public fun next(items: List<PlaylistItem>, currentIndex: Int): Int? = next(items.size, currentIndex)
+
+    public fun previous(items: List<PlaylistItem>, currentIndex: Int): Int? = previous(items.size, currentIndex)
 }
 
 /**

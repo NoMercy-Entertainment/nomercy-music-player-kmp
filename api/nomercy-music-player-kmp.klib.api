@@ -82,6 +82,15 @@ abstract interface tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomer
 
     abstract fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
     abstract fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
+    open fun next(kotlin.collections/List<tv.nomercy.player.core.media/PlaylistItem>, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.next|next(kotlin.collections.List<tv.nomercy.player.core.media.PlaylistItem>;kotlin.Int){}[0]
+    open fun previous(kotlin.collections/List<tv.nomercy.player.core.media/PlaylistItem>, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/PlaylistGenerator.previous|previous(kotlin.collections.List<tv.nomercy.player.core.media.PlaylistItem>;kotlin.Int){}[0]
+}
+
+abstract interface tv.nomercy.player.music.queue/TaggedMusicItem : tv.nomercy.player.core.media/PlaylistItem { // tv.nomercy.player.music.queue/TaggedMusicItem|null[0]
+    open val decade // tv.nomercy.player.music.queue/TaggedMusicItem.decade|{}decade[0]
+        open fun <get-decade>(): kotlin/String? // tv.nomercy.player.music.queue/TaggedMusicItem.decade.<get-decade>|<get-decade>(){}[0]
+    open val genres // tv.nomercy.player.music.queue/TaggedMusicItem.genres|{}genres[0]
+        open fun <get-genres>(): kotlin.collections/List<kotlin/String> // tv.nomercy.player.music.queue/TaggedMusicItem.genres.<get-genres>|<get-genres>(){}[0]
 }
 
 abstract interface tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/Scrobbler|null[0]
@@ -387,6 +396,18 @@ final class tv.nomercy.player.music.queue/SimilarityQuery { // tv.nomercy.player
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.queue/SimilarityQuery.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.queue/SimilarityQuery.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.queue/SimilarityQuery.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.queue/SmartShuffleGenerator : tv.nomercy.player.music.queue/PlaylistGenerator { // tv.nomercy.player.music.queue/SmartShuffleGenerator|null[0]
+    constructor <init>(kotlin/Function0<kotlin/Double> = ...) // tv.nomercy.player.music.queue/SmartShuffleGenerator.<init>|<init>(kotlin.Function0<kotlin.Double>){}[0]
+
+    final val id // tv.nomercy.player.music.queue/SmartShuffleGenerator.id|{}id[0]
+        final fun <get-id>(): kotlin/String // tv.nomercy.player.music.queue/SmartShuffleGenerator.id.<get-id>|<get-id>(){}[0]
+
+    final fun next(kotlin.collections/List<tv.nomercy.player.core.media/PlaylistItem>, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/SmartShuffleGenerator.next|next(kotlin.collections.List<tv.nomercy.player.core.media.PlaylistItem>;kotlin.Int){}[0]
+    final fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/SmartShuffleGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
+    final fun previous(kotlin.collections/List<tv.nomercy.player.core.media/PlaylistItem>, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/SmartShuffleGenerator.previous|previous(kotlin.collections.List<tv.nomercy.player.core.media.PlaylistItem>;kotlin.Int){}[0]
+    final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/SmartShuffleGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
 }
 
 final class tv.nomercy.player.music.scrobble/NowPlayingReport { // tv.nomercy.player.music.scrobble/NowPlayingReport|null[0]
