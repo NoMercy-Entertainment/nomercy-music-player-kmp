@@ -98,16 +98,21 @@ public fun scenarioItems(scenario: Scenario): List<ScenarioItem> =
             id = entry["id"]?.jsonPrimitive?.content ?: "item",
             url = entry["url"]?.jsonPrimitive?.content ?: "https://example.test/item",
             title = entry["title"]?.jsonPrimitive?.content,
-            chapters = entry["chapters"]?.let { element ->
-                element.jsonArray.map { chapter ->
-                    ScenarioChapter(
-                        start = chapter.jsonObject["start"]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0,
-                        title = chapter.jsonObject["title"]?.jsonPrimitive?.content ?: "",
-                    )
-                }
-            } ?: emptyList(),
+            chapters = scenarioChapters(entry["chapters"]),
         )
     }
+
+private fun scenarioChapters(element: JsonElement?): List<ScenarioChapter> {
+    if (element == null) return emptyList()
+
+    return element.jsonArray.map { entry ->
+        val fields = entry.jsonObject
+        ScenarioChapter(
+            start = fields["start"]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0,
+            title = fields["title"]?.jsonPrimitive?.content ?: "",
+        )
+    }
+}
 
 // Where an observed order first stops matching an expected one.
 //

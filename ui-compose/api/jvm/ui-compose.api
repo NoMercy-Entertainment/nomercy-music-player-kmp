@@ -99,6 +99,7 @@ public final class tv/nomercy/player/music/ui/FluentIcons {
 	public final fun getVolumeMediumHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getVolumeMuted ()Landroidx/compose/ui/graphics/vector/ImageVector;
 	public final fun getVolumeMutedHover ()Landroidx/compose/ui/graphics/vector/ImageVector;
+	public final fun hoverFor (Landroidx/compose/ui/graphics/vector/ImageVector;)Landroidx/compose/ui/graphics/vector/ImageVector;
 }
 
 public final class tv/nomercy/player/music/ui/FormatTimeKt {

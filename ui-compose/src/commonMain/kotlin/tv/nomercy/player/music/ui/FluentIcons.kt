@@ -196,6 +196,65 @@ public object FluentIcons {
     /** Template */
     public val Template: ImageVector by lazy { vector("template", NORMAL_TEMPLATE) }
 
+    /**
+     * The inverted variant a control draws while a pointer is on it, or
+     * while it is active.
+     *
+     * `.btn:hover .icon-normal { display: none }` and
+     * `.btn:hover .icon-hover { display: inline }`, with `.btn.is-active`
+     * on the same rule. Every one of these was generated and none was ever
+     * drawn: the port scaled the normal glyph by 1.1 and stopped, so the
+     * whole filled-versus-outlined language the bar is built on was missing.
+     *
+     * Keyed on the vector's own name rather than passed in at each of the
+     * seventeen call sites, because a pairing every caller has to remember
+     * is one a caller will forget - and this table is generated from the
+     * same rows the icons are.
+     */
+    public fun hoverFor(icon: ImageVector): ImageVector? = HOVER_BY_NAME[icon.name]
+
+    private val HOVER_BY_NAME: Map<String, ImageVector> by lazy {
+        mapOf(
+            "back" to BackHover,
+            "chevronL" to ChevronLHover,
+            "chevronR" to ChevronRHover,
+            "close" to CloseHover,
+            "fullscreen" to FullscreenHover,
+            "home" to HomeHover,
+            "language" to LanguageHover,
+            "languageOff" to LanguageOffHover,
+            "next" to NextHover,
+            "pause" to PauseHover,
+            "pipEnter" to PipEnterHover,
+            "pipExit" to PipExitHover,
+            "play" to PlayHover,
+            "playlist" to PlaylistHover,
+            "previous" to PreviousHover,
+            "quality" to QualityHover,
+            "seekBack" to SeekBackHover,
+            "seekForward" to SeekForwardHover,
+            "settings" to SettingsHover,
+            "subtitleSettings" to SubtitleSettingsHover,
+            "speed" to SpeedHover,
+            "subtitles" to SubtitlesHover,
+            "subtitlesOff" to SubtitlesOffHover,
+            "theater" to TheaterHover,
+            "theaterExit" to TheaterExitHover,
+            "volumeHigh" to VolumeHighHover,
+            "volumeLow" to VolumeLowHover,
+            "volumeMedium" to VolumeMediumHover,
+            "volumeMuted" to VolumeMutedHover,
+            "cast" to CastHover,
+            "aspectFit" to AspectFitHover,
+            "aspectFill" to AspectFillHover,
+            "aspectOriginal" to AspectOriginalHover,
+            "share" to ShareHover,
+            "menu" to MenuHover,
+            "styled" to StyledHover,
+            "restart" to RestartHover,
+        )
+    }
+
     // One builder, so every icon is on the same grid. Fluent draws on
     // 24x24 and the table carries no viewBox; the web's renderer hardcodes
     // it too, and an icon on a different grid is the same picture at the
