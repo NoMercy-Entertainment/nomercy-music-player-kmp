@@ -424,6 +424,33 @@ public abstract interface class tv/nomercy/player/music/queue/PlaylistGenerator 
 	public abstract fun previous (II)Ljava/lang/Integer;
 }
 
+public abstract interface class tv/nomercy/player/music/queue/SimilarityEngine {
+	public abstract fun findSimilar (Ltv/nomercy/player/core/media/PlaylistItem;Ltv/nomercy/player/music/queue/SimilarityQuery;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun findSimilar$default (Ltv/nomercy/player/music/queue/SimilarityEngine;Ltv/nomercy/player/core/media/PlaylistItem;Ltv/nomercy/player/music/queue/SimilarityQuery;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun getId ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/queue/SimilarityEngine$DefaultImpls {
+	public static synthetic fun findSimilar$default (Ltv/nomercy/player/music/queue/SimilarityEngine;Ltv/nomercy/player/core/media/PlaylistItem;Ltv/nomercy/player/music/queue/SimilarityQuery;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class tv/nomercy/player/music/queue/SimilarityQuery {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/Integer;Ljava/util/List;Ljava/lang/Double;)V
+	public synthetic fun <init> (Ljava/lang/Integer;Ljava/util/List;Ljava/lang/Double;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Integer;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/lang/Double;
+	public final fun copy (Ljava/lang/Integer;Ljava/util/List;Ljava/lang/Double;)Ltv/nomercy/player/music/queue/SimilarityQuery;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/queue/SimilarityQuery;Ljava/lang/Integer;Ljava/util/List;Ljava/lang/Double;ILjava/lang/Object;)Ltv/nomercy/player/music/queue/SimilarityQuery;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getExcludeIds ()Ljava/util/List;
+	public final fun getLimit ()Ljava/lang/Integer;
+	public final fun getMinScore ()Ljava/lang/Double;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class tv/nomercy/player/music/scrobble/NoScrobbler : tv/nomercy/player/music/scrobble/Scrobbler {
 	public static final field INSTANCE Ltv/nomercy/player/music/scrobble/NoScrobbler;
 	public fun nowPlaying (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

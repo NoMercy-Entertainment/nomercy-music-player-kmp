@@ -31,6 +31,13 @@ final enum class tv.nomercy.player.music.input/MusicKeyAction : kotlin/Enum<tv.n
     final fun values(): kotlin/Array<tv.nomercy.player.music.input/MusicKeyAction> // tv.nomercy.player.music.input/MusicKeyAction.values|values#static(){}[0]
 }
 
+abstract interface <#A: tv.nomercy.player.core.media/PlaylistItem> tv.nomercy.player.music.queue/SimilarityEngine { // tv.nomercy.player.music.queue/SimilarityEngine|null[0]
+    abstract val id // tv.nomercy.player.music.queue/SimilarityEngine.id|{}id[0]
+        abstract fun <get-id>(): kotlin/String // tv.nomercy.player.music.queue/SimilarityEngine.id.<get-id>|<get-id>(){}[0]
+
+    abstract suspend fun findSimilar(#A, tv.nomercy.player.music.queue/SimilarityQuery = ...): kotlin.collections/List<#A> // tv.nomercy.player.music.queue/SimilarityEngine.findSimilar|findSimilar(1:0;tv.nomercy.player.music.queue.SimilarityQuery){}[0]
+}
+
 abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.nomercy.player.music.connect/MusicConnectChannel|null[0]
     abstract val deviceId // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId|{}deviceId[0]
         abstract fun <get-deviceId>(): kotlin/String // tv.nomercy.player.music.connect/MusicConnectChannel.deviceId.<get-deviceId>|<get-deviceId>(){}[0]
@@ -352,6 +359,25 @@ final class tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator : tv.nome
 
     final fun next(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.next|next(kotlin.Int;kotlin.Int){}[0]
     final fun previous(kotlin/Int, kotlin/Int): kotlin/Int? // tv.nomercy.player.music.queue/NonRepeatingShuffleGenerator.previous|previous(kotlin.Int;kotlin.Int){}[0]
+}
+
+final class tv.nomercy.player.music.queue/SimilarityQuery { // tv.nomercy.player.music.queue/SimilarityQuery|null[0]
+    constructor <init>(kotlin/Int? = ..., kotlin.collections/List<kotlin/String> = ..., kotlin/Double? = ...) // tv.nomercy.player.music.queue/SimilarityQuery.<init>|<init>(kotlin.Int?;kotlin.collections.List<kotlin.String>;kotlin.Double?){}[0]
+
+    final val excludeIds // tv.nomercy.player.music.queue/SimilarityQuery.excludeIds|{}excludeIds[0]
+        final fun <get-excludeIds>(): kotlin.collections/List<kotlin/String> // tv.nomercy.player.music.queue/SimilarityQuery.excludeIds.<get-excludeIds>|<get-excludeIds>(){}[0]
+    final val limit // tv.nomercy.player.music.queue/SimilarityQuery.limit|{}limit[0]
+        final fun <get-limit>(): kotlin/Int? // tv.nomercy.player.music.queue/SimilarityQuery.limit.<get-limit>|<get-limit>(){}[0]
+    final val minScore // tv.nomercy.player.music.queue/SimilarityQuery.minScore|{}minScore[0]
+        final fun <get-minScore>(): kotlin/Double? // tv.nomercy.player.music.queue/SimilarityQuery.minScore.<get-minScore>|<get-minScore>(){}[0]
+
+    final fun component1(): kotlin/Int? // tv.nomercy.player.music.queue/SimilarityQuery.component1|component1(){}[0]
+    final fun component2(): kotlin.collections/List<kotlin/String> // tv.nomercy.player.music.queue/SimilarityQuery.component2|component2(){}[0]
+    final fun component3(): kotlin/Double? // tv.nomercy.player.music.queue/SimilarityQuery.component3|component3(){}[0]
+    final fun copy(kotlin/Int? = ..., kotlin.collections/List<kotlin/String> = ..., kotlin/Double? = ...): tv.nomercy.player.music.queue/SimilarityQuery // tv.nomercy.player.music.queue/SimilarityQuery.copy|copy(kotlin.Int?;kotlin.collections.List<kotlin.String>;kotlin.Double?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.queue/SimilarityQuery.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // tv.nomercy.player.music.queue/SimilarityQuery.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // tv.nomercy.player.music.queue/SimilarityQuery.toString|toString(){}[0]
 }
 
 final class tv.nomercy.player.music.scrobble/NowPlayingReport { // tv.nomercy.player.music.scrobble/NowPlayingReport|null[0]
