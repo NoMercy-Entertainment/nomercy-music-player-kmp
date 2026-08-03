@@ -50,6 +50,15 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
 }
 
+abstract interface tv.nomercy.player.music.input/MusicCommands { // tv.nomercy.player.music.input/MusicCommands|null[0]
+    abstract fun next() // tv.nomercy.player.music.input/MusicCommands.next|next(){}[0]
+    abstract fun previous() // tv.nomercy.player.music.input/MusicCommands.previous|previous(){}[0]
+    abstract fun repeatState(): tv.nomercy.player.core.player/RepeatState // tv.nomercy.player.music.input/MusicCommands.repeatState|repeatState(){}[0]
+    abstract fun repeatState(tv.nomercy.player.core.player/RepeatState) // tv.nomercy.player.music.input/MusicCommands.repeatState|repeatState(tv.nomercy.player.core.player.RepeatState){}[0]
+    abstract fun shuffleState(): tv.nomercy.player.core.player/ShuffleState // tv.nomercy.player.music.input/MusicCommands.shuffleState|shuffleState(){}[0]
+    abstract fun shuffleState(tv.nomercy.player.core.player/ShuffleState) // tv.nomercy.player.music.input/MusicCommands.shuffleState|shuffleState(tv.nomercy.player.core.player.ShuffleState){}[0]
+}
+
 abstract interface tv.nomercy.player.music.item/MusicPlaylistItem : tv.nomercy.player.core.media/PlaylistItem { // tv.nomercy.player.music.item/MusicPlaylistItem|null[0]
     abstract val name // tv.nomercy.player.music.item/MusicPlaylistItem.name|{}name[0]
         abstract fun <get-name>(): kotlin/String // tv.nomercy.player.music.item/MusicPlaylistItem.name.<get-name>|<get-name>(){}[0]
@@ -558,6 +567,24 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
     }
 }
 
+open class tv.nomercy.player.music.input/MusicKeyHandlerPlugin : tv.nomercy.player.core.input/KeyHandlerPlugin<kotlin/Unit> { // tv.nomercy.player.music.input/MusicKeyHandlerPlugin|null[0]
+    constructor <init>(tv.nomercy.player.music.input/MusicCommands, kotlin/Function0<kotlin/Long>) // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.<init>|<init>(tv.nomercy.player.music.input.MusicCommands;kotlin.Function0<kotlin.Long>){}[0]
+
+    final val commands // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.commands|{}commands[0]
+        final fun <get-commands>(): tv.nomercy.player.music.input/MusicCommands // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.commands.<get-commands>|<get-commands>(){}[0]
+    open val manifest // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.manifest|{}manifest[0]
+        open fun <get-manifest>(): tv.nomercy.player.core.plugin/PluginManifest // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.manifest.<get-manifest>|<get-manifest>(){}[0]
+
+    open fun addDefaults() // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.addDefaults|addDefaults(){}[0]
+
+    final object Manifest : tv.nomercy.player.core.plugin/PluginManifest { // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.Manifest|null[0]
+        final val id // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.Manifest.id|{}id[0]
+            final fun <get-id>(): kotlin/String // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.Manifest.id.<get-id>|<get-id>(){}[0]
+        final val version // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.Manifest.version|{}version[0]
+            final fun <get-version>(): kotlin/String // tv.nomercy.player.music.input/MusicKeyHandlerPlugin.Manifest.version.<get-version>|<get-version>(){}[0]
+    }
+}
+
 open class tv.nomercy.player.music.lyrics/LyricsPlugin : tv.nomercy.player.core.plugin/Plugin<tv.nomercy.player.music.lyrics/LyricsOptions> { // tv.nomercy.player.music.lyrics/LyricsPlugin|null[0]
     constructor <init>(tv.nomercy.player.music.lyrics/LyricsSource = ..., tv.nomercy.player.music.lyrics/LyricsOptions = ...) // tv.nomercy.player.music.lyrics/LyricsPlugin.<init>|<init>(tv.nomercy.player.music.lyrics.LyricsSource;tv.nomercy.player.music.lyrics.LyricsOptions){}[0]
 
@@ -735,6 +762,7 @@ final val tv.nomercy.player.music.scrobble/NowPlaying // tv.nomercy.player.music
 final val tv.nomercy.player.music.scrobble/Scrobbled // tv.nomercy.player.music.scrobble/Scrobbled|{}Scrobbled[0]
     final fun <get-Scrobbled>(): tv.nomercy.player.core.events/EventKey<tv.nomercy.player.music.scrobble/ScrobbleReport> // tv.nomercy.player.music.scrobble/Scrobbled.<get-Scrobbled>|<get-Scrobbled>(){}[0]
 
+final fun tv.nomercy.player.music.input/musicCommandsOf(tv.nomercy.player.music/NMMusicPlayer, kotlinx.coroutines/CoroutineScope): tv.nomercy.player.music.input/MusicCommands // tv.nomercy.player.music.input/musicCommandsOf|musicCommandsOf(tv.nomercy.player.music.NMMusicPlayer;kotlinx.coroutines.CoroutineScope){}[0]
 final fun tv.nomercy.player.music.input/nextRepeatState(tv.nomercy.player.core.player/RepeatState): tv.nomercy.player.core.player/RepeatState // tv.nomercy.player.music.input/nextRepeatState|nextRepeatState(tv.nomercy.player.core.player.RepeatState){}[0]
 final fun tv.nomercy.player.music.input/nextShuffleState(tv.nomercy.player.core.player/ShuffleState): tv.nomercy.player.core.player/ShuffleState // tv.nomercy.player.music.input/nextShuffleState|nextShuffleState(tv.nomercy.player.core.player.ShuffleState){}[0]
 final fun tv.nomercy.player.music/defaultAudioBackend(): tv.nomercy.player.core.ports/AudioBackend // tv.nomercy.player.music/defaultAudioBackend|defaultAudioBackend(){}[0]

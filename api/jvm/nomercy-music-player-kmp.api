@@ -221,6 +221,19 @@ public final class tv/nomercy/player/music/connect/MusicPlayerState {
 	public fun toString ()Ljava/lang/String;
 }
 
+public abstract interface class tv/nomercy/player/music/input/MusicCommands {
+	public abstract fun next ()V
+	public abstract fun previous ()V
+	public abstract fun repeatState ()Ltv/nomercy/player/core/player/RepeatState;
+	public abstract fun repeatState (Ltv/nomercy/player/core/player/RepeatState;)V
+	public abstract fun shuffleState ()Ltv/nomercy/player/core/player/ShuffleState;
+	public abstract fun shuffleState (Ltv/nomercy/player/core/player/ShuffleState;)V
+}
+
+public final class tv/nomercy/player/music/input/MusicCommandsOfKt {
+	public static final fun musicCommandsOf (Ltv/nomercy/player/music/NMMusicPlayer;Lkotlinx/coroutines/CoroutineScope;)Ltv/nomercy/player/music/input/MusicCommands;
+}
+
 public final class tv/nomercy/player/music/input/MusicKeyAction : java/lang/Enum {
 	public static final field CYCLE_REPEAT Ltv/nomercy/player/music/input/MusicKeyAction;
 	public static final field NEXT Ltv/nomercy/player/music/input/MusicKeyAction;
@@ -249,6 +262,25 @@ public final class tv/nomercy/player/music/input/MusicKeyBindingsKt {
 	public static final fun getMUSIC_KEY_COMBOS ()Ljava/util/Set;
 	public static final fun nextRepeatState (Ltv/nomercy/player/core/player/RepeatState;)Ltv/nomercy/player/core/player/RepeatState;
 	public static final fun nextShuffleState (Ltv/nomercy/player/core/player/ShuffleState;)Ltv/nomercy/player/core/player/ShuffleState;
+}
+
+public class tv/nomercy/player/music/input/MusicKeyHandlerPlugin : tv/nomercy/player/core/input/KeyHandlerPlugin {
+	public static final field Manifest Ltv/nomercy/player/music/input/MusicKeyHandlerPlugin$Manifest;
+	public fun <init> (Ltv/nomercy/player/music/input/MusicCommands;Lkotlin/jvm/functions/Function0;)V
+	protected fun addDefaults ()V
+	protected final fun getCommands ()Ltv/nomercy/player/music/input/MusicCommands;
+	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
+}
+
+public final class tv/nomercy/player/music/input/MusicKeyHandlerPlugin$Manifest : tv/nomercy/player/core/plugin/PluginManifest {
+	public fun getContributions ()Ljava/util/List;
+	public fun getId ()Ljava/lang/String;
+	public fun getMinCoreVersion ()Ljava/lang/String;
+	public fun getPriority ()I
+	public fun getReplaces ()Ljava/util/List;
+	public fun getRequires ()Ljava/util/List;
+	public fun getTranslations ()Ljava/util/Map;
+	public fun getVersion ()Ljava/lang/String;
 }
 
 public final class tv/nomercy/player/music/item/MusicItem : tv/nomercy/player/music/item/MusicPlaylistItem {
