@@ -151,6 +151,11 @@ public open class LyricsPlugin(
 
     private suspend fun fetchInto(url: String) {
         val raw: String = source.fetch(url) ?: run {
+            // The event says what happened to a lyrics view; the code says it
+            // in the ecosystem's words, which is what a consumer's single error
+            // surface and a dashboard both match on. Reported as well as
+            // emitted, because until now this failure had no code at all.
+            report(LyricsErrorCodes.FETCH_FAILED, "Failed to fetch lyrics from $url", context = mapOf("url" to url))
             emit(LyricsEvents.Unavailable, url)
             return
         }
@@ -160,6 +165,7 @@ public open class LyricsPlugin(
             // Named, not swallowed. A karaoke format nobody registered a parser
             // for is a consumer's missing line of setup, and a plugin that
             // reported "no lyrics" would send them looking at the file.
+            report(LyricsErrorCodes.NO_PARSER, "No cue parser registered for $url", context = mapOf("url" to url))
             emit(LyricsEvents.NoParser, url)
             return
         }

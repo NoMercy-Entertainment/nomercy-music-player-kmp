@@ -18,6 +18,10 @@ import tv.nomercy.player.core.ports.CrossfadeCurve
 import tv.nomercy.player.core.ports.TransitionBackend
 import tv.nomercy.player.core.ports.LoadOptions
 import tv.nomercy.player.core.ports.MediaBackend
+import tv.nomercy.player.core.errors.CoreErrorCodes
+import tv.nomercy.player.core.errors.MediaFormatError
+import tv.nomercy.player.core.errors.StateError
+import kotlin.test.assertFailsWith
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -259,22 +263,37 @@ class NMMusicPlayerTest {
 
     @Test
     fun anEngineThatCannotCrossfadeSaysSoRatherThanPretending() = runTest {
-        // Emitting a start and a completion with nothing between them is what
-        // this did before the transition seam existed, and it looked exactly
-        // like a working crossfade.
+        // This used to come back as false with a crossfadePrevented reason,
+        // alongside the refusals a listener or a zero duration produce. It is
+        // not the same kind of answer: those are decisions, and asking an
+        // engine that holds one track to hold two is a mistake in the calling
+        // code. The web raises core:player/crossfade-unsupported for it, and a
+        // consumer that ported a catch found a silent false instead.
         val (subject, backend) = player()
         backend.canCrossfade = false
         subject.configureCrossfade(3.0)
         subject.queue(listOf(Track("a")))
         subject.item("a")
-        var refusal: String? = null
-        subject.on(MusicEvents.CrossfadePrevented) { refusal = it.reason }
 
-        val ran: Boolean = subject.crossfadeTo(Track("b"))
+        val raised = assertFailsWith<StateError> { subject.crossfadeTo(Track("b")) }
 
-        assertFalse(ran)
-        assertEquals("backend-cannot-crossfade", refusal)
+        assertEquals(CoreErrorCodes.CROSSFADE_UNSUPPORTED, raised.code)
         assertTrue(backend.calls.isEmpty(), "an engine that refused was still driven")
+    }
+
+    @Test
+    fun aTrackWithNoUrlIsRefusedBeforeAnyFadeStarts() = runTest {
+        val (subject, backend) = player()
+        subject.configureCrossfade(3.0)
+        subject.queue(listOf(Track("a")))
+        subject.item("a")
+
+        val raised = assertFailsWith<MediaFormatError> {
+            subject.crossfadeTo(Track("b").copy(url = ""))
+        }
+
+        assertEquals(CoreErrorCodes.MISSING_URL, raised.code)
+        assertTrue(backend.calls.isEmpty(), "the engine was driven with nothing to play")
     }
 
     @Test

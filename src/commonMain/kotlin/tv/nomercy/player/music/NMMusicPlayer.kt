@@ -13,6 +13,9 @@ import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.ports.AudioBackend
 import tv.nomercy.player.core.player.PlayerConfig
+import tv.nomercy.player.core.errors.CoreErrorCodes
+import tv.nomercy.player.core.errors.mediaFormatError
+import tv.nomercy.player.core.errors.stateError
 import tv.nomercy.player.core.ports.CrossfadeCurve
 import tv.nomercy.player.core.ports.CrossfadeTransitionStrategy
 import tv.nomercy.player.core.ports.TransitionStrategy
@@ -91,6 +94,28 @@ public open class NMMusicPlayer(
         // a second request is about a track that is no longer the one coming up.
         if (transitioning) return refuse(ALREADY_TRANSITIONING)
 
+        // Two of the ways this can decline are not declines at all — they are
+        // programming errors the web raises, and folding them into "false with
+        // a reason" left a caller to discover from an event that the track it
+        // handed over had no url. The other refusals stay refusals.
+        if (next.url.isBlank()) {
+            throw mediaFormatError(
+                CoreErrorCodes.MISSING_URL,
+                "crossfadeTo(item) requires item.url to be present.",
+                mapOf("id" to next.id),
+            )
+        }
+
+        transitions?.let { engine ->
+            if (!engine.supportsCrossfade()) {
+                throw stateError(
+                    CoreErrorCodes.CROSSFADE_UNSUPPORTED,
+                    "crossfadeTo() requires a backend with dual-playback support — " +
+                        "the active backend returned supportsCrossfade() == false.",
+                )
+            }
+        }
+
         val outcome = dispatchBefore(
             MusicEvents.BeforeCrossfade,
             Crossfade(from = item(), to = next, duration = seconds ?: crossfadeSeconds),
@@ -108,7 +133,6 @@ public open class NMMusicPlayer(
             outcome.prevented -> outcome.reason
             resolved.duration <= 0.0 -> "zero-duration"
             engine == null -> "no-transition-backend"
-            !engine.supportsCrossfade() -> "backend-cannot-crossfade"
             else -> null
         }
         if (engine == null || refusal != null) return refuse(refusal)

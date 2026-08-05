@@ -710,6 +710,16 @@ final object tv.nomercy.player.music.connect/ConnectCommand { // tv.nomercy.play
         final fun <get-STOP>(): kotlin/String // tv.nomercy.player.music.connect/ConnectCommand.STOP.<get-STOP>|<get-STOP>(){}[0]
 }
 
+final object tv.nomercy.player.music.lyrics/LyricsErrorCodes { // tv.nomercy.player.music.lyrics/LyricsErrorCodes|null[0]
+    final const val FETCH_FAILED // tv.nomercy.player.music.lyrics/LyricsErrorCodes.FETCH_FAILED|{}FETCH_FAILED[0]
+        final fun <get-FETCH_FAILED>(): kotlin/String // tv.nomercy.player.music.lyrics/LyricsErrorCodes.FETCH_FAILED.<get-FETCH_FAILED>|<get-FETCH_FAILED>(){}[0]
+    final const val NO_PARSER // tv.nomercy.player.music.lyrics/LyricsErrorCodes.NO_PARSER|{}NO_PARSER[0]
+        final fun <get-NO_PARSER>(): kotlin/String // tv.nomercy.player.music.lyrics/LyricsErrorCodes.NO_PARSER.<get-NO_PARSER>|<get-NO_PARSER>(){}[0]
+
+    final val all // tv.nomercy.player.music.lyrics/LyricsErrorCodes.all|{}all[0]
+        final fun <get-all>(): kotlin.collections/Set<kotlin/String> // tv.nomercy.player.music.lyrics/LyricsErrorCodes.all.<get-all>|<get-all>(){}[0]
+}
+
 final object tv.nomercy.player.music.lyrics/LyricsEvents { // tv.nomercy.player.music.lyrics/LyricsEvents|null[0]
     final val Cleared // tv.nomercy.player.music.lyrics/LyricsEvents.Cleared|{}Cleared[0]
         final fun <get-Cleared>(): tv.nomercy.player.core.events/EventKey<kotlin/Unit> // tv.nomercy.player.music.lyrics/LyricsEvents.Cleared.<get-Cleared>|<get-Cleared>(){}[0]
@@ -748,6 +758,16 @@ final object tv.nomercy.player.music.lyrics/NoLyricsSource : tv.nomercy.player.m
 final object tv.nomercy.player.music.scrobble/NoScrobbler : tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/NoScrobbler|null[0]
     final suspend fun nowPlaying(kotlin/String) // tv.nomercy.player.music.scrobble/NoScrobbler.nowPlaying|nowPlaying(kotlin.String){}[0]
     final suspend fun scrobble(kotlin/String, tv.nomercy.player.music.scrobble/ScrobbleContext) // tv.nomercy.player.music.scrobble/NoScrobbler.scrobble|scrobble(kotlin.String;tv.nomercy.player.music.scrobble.ScrobbleContext){}[0]
+}
+
+final object tv.nomercy.player.music.scrobble/ScrobbleErrorCodes { // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes|null[0]
+    final const val NOW_PLAYING_FAILED // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.NOW_PLAYING_FAILED|{}NOW_PLAYING_FAILED[0]
+        final fun <get-NOW_PLAYING_FAILED>(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.NOW_PLAYING_FAILED.<get-NOW_PLAYING_FAILED>|<get-NOW_PLAYING_FAILED>(){}[0]
+    final const val SCROBBLE_FAILED // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.SCROBBLE_FAILED|{}SCROBBLE_FAILED[0]
+        final fun <get-SCROBBLE_FAILED>(): kotlin/String // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.SCROBBLE_FAILED.<get-SCROBBLE_FAILED>|<get-SCROBBLE_FAILED>(){}[0]
+
+    final val all // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.all|{}all[0]
+        final fun <get-all>(): kotlin.collections/Set<kotlin/String> // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes.all.<get-all>|<get-all>(){}[0]
 }
 
 final object tv.nomercy.player.music/MusicEvents { // tv.nomercy.player.music/MusicEvents|null[0]

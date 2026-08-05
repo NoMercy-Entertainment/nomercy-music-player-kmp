@@ -323,6 +323,13 @@ public final class tv/nomercy/player/music/item/MusicPlaylistItem$DefaultImpls {
 	public static fun getImage (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
 }
 
+public final class tv/nomercy/player/music/lyrics/LyricsErrorCodes {
+	public static final field FETCH_FAILED Ljava/lang/String;
+	public static final field INSTANCE Ltv/nomercy/player/music/lyrics/LyricsErrorCodes;
+	public static final field NO_PARSER Ljava/lang/String;
+	public final fun getAll ()Ljava/util/Set;
+}
+
 public final class tv/nomercy/player/music/lyrics/LyricsEvents {
 	public static final field INSTANCE Ltv/nomercy/player/music/lyrics/LyricsEvents;
 	public final fun getCleared ()Ltv/nomercy/player/core/events/EventKey;
@@ -548,6 +555,13 @@ public final class tv/nomercy/player/music/scrobble/ScrobbleContext {
 	public final fun getStartedAt ()J
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/scrobble/ScrobbleErrorCodes {
+	public static final field INSTANCE Ltv/nomercy/player/music/scrobble/ScrobbleErrorCodes;
+	public static final field NOW_PLAYING_FAILED Ljava/lang/String;
+	public static final field SCROBBLE_FAILED Ljava/lang/String;
+	public final fun getAll ()Ljava/util/Set;
 }
 
 public class tv/nomercy/player/music/scrobble/ScrobblePlugin : tv/nomercy/player/core/plugin/Plugin {

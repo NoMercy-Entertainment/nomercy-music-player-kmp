@@ -8,6 +8,7 @@
 
 package tv.nomercy.player.music.scrobble
 
+import kotlinx.coroutines.CancellationException
 import tv.nomercy.player.core.events.CoreEvents
 import tv.nomercy.player.core.events.EventKey
 import tv.nomercy.player.core.events.ItemChange
@@ -94,7 +95,25 @@ public open class ScrobblePlugin(
         // thousands of years out.
         startedAt = clock.now() / MILLIS_PER_SECOND
         launch {
-            scrobbler.nowPlaying(id)
+            try {
+                scrobbler.nowPlaying(id)
+            }
+            catch (cause: CancellationException) {
+                throw cause
+            }
+            catch (@Suppress("TooGenericExceptionCaught") cause: Throwable) {
+                // A scrobbler that throws used to take the coroutine with it and
+                // tell nobody. The service being down is not a reason for the
+                // music to stop reporting.
+                report(
+                    ScrobbleErrorCodes.NOW_PLAYING_FAILED,
+                    "Scrobbler backend rejected the nowPlaying() call.",
+                    cause = cause,
+                    context = mapOf("itemId" to id),
+                )
+                return@launch
+            }
+
             // After the backend answered, matching the reference: the event
             // means "the service has been told", and firing it before the call
             // would make a listener's badge appear for a service that refused.
@@ -110,16 +129,35 @@ public open class ScrobblePlugin(
         val heard: Double = tracker.listenedSeconds()
 
         launch {
-            scrobbler.scrobble(
-                id,
-                ScrobbleContext(
-                    startedAt = startedAt,
-                    listenedSeconds = heard,
-                    durationSeconds = durationSeconds,
-                ),
-            )
+            try {
+                scrobbler.scrobble(
+                    id,
+                    ScrobbleContext(
+                        startedAt = startedAt,
+                        listenedSeconds = heard,
+                        durationSeconds = durationSeconds,
+                    ),
+                )
+            }
+            catch (cause: CancellationException) {
+                throw cause
+            }
+            catch (@Suppress("TooGenericExceptionCaught") cause: Throwable) {
+                report(
+                    ScrobbleErrorCodes.SCROBBLE_FAILED,
+                    "Scrobbler backend rejected the scrobble() call.",
+                    cause = cause,
+                    context = mapOf("itemId" to id),
+                )
+                return@launch
+            }
+
+            // Inside the launch and after the call, for the same reason
+            // nowPlaying is: this was emitted the moment the coroutine was
+            // started, so a listener saw "scrobbled" for a submission the
+            // service went on to refuse.
+            emit(Scrobbled, ScrobbleReport(id, heard))
         }
-        emit(Scrobbled, ScrobbleReport(id, heard))
     }
 }
 
