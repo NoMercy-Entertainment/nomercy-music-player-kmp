@@ -1,5 +1,5 @@
 {
-  "contractVersion": "2.0.3",
+  "contractVersion": "2.0.4",
   "scenarios": [
     {
       "id": "transport/play",

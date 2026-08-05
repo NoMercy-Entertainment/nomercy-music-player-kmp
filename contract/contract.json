@@ -1,8 +1,8 @@
 {
-  "version": "2.0.3",
+  "version": "2.0.4",
   "provenance": {
-    "version": "2.0.3",
-    "commit": "555e07f",
+    "version": "2.0.4",
+    "commit": "acfece6",
     "commitsAheadOfTag": 0,
     "dirty": false
   },
@@ -892,1447 +892,2025 @@
     {
       "name": "activityTracking",
       "signature": "{\n\t\t(): boolean;\n\t\t(enabled: boolean): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/activity",
+      "kind": "accessor"
     },
     {
       "name": "addClasses",
       "signature": "IPlayer<MusicEventMap>['addClasses']",
-      "player": "music"
+      "player": "music",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "addPlugin",
       "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P), opts?: P['opts']) => this",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "addTranslations",
       "signature": "(bundle: Translations) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "announce",
       "signature": "(text: string, level?: AriaLiveLevel) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "audioContext",
       "signature": "() => AudioContext | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/base-url-audio-context",
+      "kind": "method"
     },
     {
       "name": "audioOutput",
       "signature": "{\n\t\t(): Promise<string | null>;\n\t\t(deviceId: string): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/audio-output",
+      "kind": "accessor"
     },
     {
       "name": "audioOutputs",
       "signature": "() => Promise<MediaDeviceInfo[]>",
-      "player": "music"
+      "player": "music",
+      "group": "core/audio-output",
+      "kind": "method"
     },
     {
       "name": "audioTrack",
       "signature": "{\n\t\t(): CurrentAudioTrackSelection | null;\n\t\t(idx: number): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "audioTrackMode",
       "signature": "{\n\t\t(): AudioTrackState;\n\t\t(idx: number): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "accessor"
     },
     {
       "name": "audioTracks",
       "signature": "() => AudioTrack[]",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "auth",
       "signature": "{\n\t\t(): Readonly<AuthConfig> | undefined;\n\t\t(config: AuthConfig): void;\n\t\t(partial: Partial<AuthConfig>): void;\n\t\t(clear: null): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/auth",
+      "kind": "accessor"
     },
     {
       "name": "backend",
       "signature": "(kind?: AudioBackendKind) => IAudioBackend | Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "method"
     },
     {
       "name": "backlog",
       "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[]): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "backlogAppend",
       "signature": "(item: T | T[]) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "backlogClear",
       "signature": "() => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "backlogRemove",
       "signature": "(id: string | number) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "bandwidth",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/abr",
+      "kind": "method"
     },
     {
       "name": "bandwidthEstimator",
       "signature": "{\n\t\t(): (() => number) | undefined;\n\t\t(fn: () => number): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/abr",
+      "kind": "accessor"
     },
     {
       "name": "baseUrl",
       "signature": "{\n\t\t(): string | undefined;\n\t\t(url: string): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/base-url-audio-context",
+      "kind": "accessor"
     },
     {
       "name": "bufferState",
       "signature": "() => BufferState",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "buffered",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "bufferedRanges",
       "signature": "() => TimeRanges",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "bumpActivity",
       "signature": "() => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/activity",
+      "kind": "method"
     },
     {
       "name": "canPlay",
       "signature": "(profile: { contentType: string; width?: number; height?: number; bitrate?: number; framerate?: number }) => Promise<CanPlayResult>",
-      "player": "music"
+      "player": "music",
+      "group": "core/abr",
+      "kind": "method"
     },
     {
       "name": "castState",
       "signature": "() => CastState",
-      "player": "music"
+      "player": "music",
+      "group": "core/cast",
+      "kind": "method"
     },
     {
       "name": "chapter",
       "signature": "{\n\t\t(): Chapter | null;\n\t\t(idx: number): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "chapters",
       "signature": "() => Chapter[]",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "container",
       "signature": "HTMLElement",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "property"
     },
     {
       "name": "createButton",
       "signature": "IPlayer<MusicEventMap>['createButton']",
-      "player": "music"
+      "player": "music",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "createElement",
       "signature": "IPlayer<MusicEventMap>['createElement']",
-      "player": "music"
+      "player": "music",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "createSVG",
       "signature": "IPlayer<MusicEventMap>['createSVG']",
-      "player": "music"
+      "player": "music",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "crossfadeTo",
       "signature": "(item: T, opts?: CrossfadeOptions & ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "method"
     },
     {
       "name": "device",
       "signature": "() => DeviceCapabilities",
-      "player": "music"
+      "player": "music",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "dispatching",
       "signature": "() => ReadonlyArray<string>",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "dispose",
       "signature": "() => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "duration",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "enabledPlugins",
       "signature": "() => ReadonlyArray<Plugin>",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "experimental",
       "signature": "PlayerExperimental",
-      "player": "music"
+      "player": "music",
+      "group": "core/experimental",
+      "kind": "property"
     },
     {
       "name": "forward",
       "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "getPlugin",
       "signature": "<P extends object>(PluginClass: PluginCtorWithId & (new () => P)) => P | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "getPluginById",
       "signature": "<P extends object = object>(id: string) => P | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "getStreamFactory",
       "signature": "(id: string) => IStreamFactory | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "index",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "isDesktop",
       "signature": "() => boolean",
-      "player": "music"
+      "player": "music",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "isMobile",
       "signature": "() => boolean",
-      "player": "music"
+      "player": "music",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "isTransitioning",
       "signature": "() => boolean",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "method"
     },
     {
       "name": "isTv",
       "signature": "() => boolean",
-      "player": "music"
+      "player": "music",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "item",
       "signature": "{\n\t\t(): T | undefined;\n\t\t(target: T | string | number, opts?: LoadOptions): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "language",
       "signature": "{\n\t\t(): string;\n\t\t(lang: string): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/i18n",
+      "kind": "accessor"
     },
     {
       "name": "load",
       "signature": "(item: T, opts?: LoadOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/loading",
+      "kind": "method"
     },
     {
       "name": "loadQueue",
       "signature": "(url: string, parser?: (raw: string) => T[]) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/loading",
+      "kind": "method"
     },
     {
       "name": "metrics",
       "signature": "() => PlaybackMetrics",
-      "player": "music"
+      "player": "music",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "mute",
       "signature": "() => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "networkState",
       "signature": "() => NetworkState",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "next",
       "signature": "(opts?: LoadOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "nextChapter",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "now",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "options",
       "signature": "MusicPlayerConfig<T>",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "property"
     },
     {
       "name": "pause",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "peekNext",
       "signature": "() => T | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "peekPrevious",
       "signature": "() => T | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "phase",
       "signature": "() => PlayerPhase",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "platform",
       "signature": "() => IPlatform",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "play",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "playItem",
       "signature": "(\n\t\ttarget: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/play-queue",
+      "kind": "method"
     },
     {
       "name": "playNow",
       "signature": "(\n\t\titems: BasePlaylistItem[],\n\t\tstart?: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/play-queue",
+      "kind": "method"
     },
     {
       "name": "playState",
       "signature": "() => PlayState",
-      "player": "music"
+      "player": "music",
+      "group": "core/state-mutators",
+      "kind": "method"
     },
     {
       "name": "playbackRate",
       "signature": "{\n\t\t(): number;\n\t\t(rate: number): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "accessor"
     },
     {
       "name": "playbackRates",
       "signature": "() => number[]",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "playerId",
       "signature": "string",
-      "player": "music"
+      "player": "music",
+      "group": "music/player",
+      "kind": "property"
     },
     {
       "name": "plugins",
       "signature": "() => ReadonlyArray<Plugin>",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "preloadStrategy",
       "signature": "() => IPreloadStrategy",
-      "player": "music"
+      "player": "music",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "previous",
       "signature": "(opts?: LoadOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "previousChapter",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "quality",
       "signature": "{\n\t\t(): CurrentQualitySelection | 'auto';\n\t\t(idx: number | 'auto'): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "qualityLevels",
       "signature": "{\n\t\t(): QualityLevel[];\n\t\t(opts: { includeUnsupported: true }): QualityLevel[];\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "qualityMode",
       "signature": "{\n\t\t(): QualityState;\n\t\t(target: number | 'auto'): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "accessor"
     },
     {
       "name": "queue",
       "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[], opts?: ActionOptions): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "queueAppend",
       "signature": "(item: T | T[], opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueClear",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueIndexOf",
       "signature": "(id: string | number) => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueInsert",
       "signature": "(item: T | T[], index: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueLength",
       "signature": "() => number",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueMove",
       "signature": "(from: number, to: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queuePrepend",
       "signature": "(item: T | T[], opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueRemove",
       "signature": "(id: string | number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueRemoveAt",
       "signature": "(index: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueShuffle",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueSort",
       "signature": "(compare: (itemA: T, itemB: T) => number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "ready",
       "signature": "() => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "recordMetric",
       "signature": "(name: string, value: number) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "refreshAuth",
       "signature": "() => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/auth",
+      "kind": "method"
     },
     {
       "name": "registerCueParser",
       "signature": "(parser: ICueParser, prepend?: boolean) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "registerStream",
       "signature": "(factory: IStreamFactory, prepend?: boolean) => this",
-      "player": "music"
+      "player": "music",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "registerTitleTokens",
       "signature": "(tokens: Record<string, string>) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "removeClasses",
       "signature": "IPlayer<MusicEventMap>['removeClasses']",
-      "player": "music"
+      "player": "music",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "removePlugin",
       "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P)) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "removePluginById",
       "signature": "(id: string) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "removeTranslations",
       "signature": "(prefix: string, lang?: string) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "repeatState",
       "signature": "{\n\t\t(): RepeatState;\n\t\t(state: RepeatState): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/state-mutators",
+      "kind": "accessor"
     },
     {
       "name": "resolveCueParser",
       "signature": "(url: string) => ICueParser | undefined",
-      "player": "music"
+      "player": "music",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "resolveUrl",
       "signature": "(url: string, category?: UrlCategory) => Promise<ResolvedUrl>",
-      "player": "music"
+      "player": "music",
+      "group": "core/auth",
+      "kind": "method"
     },
     {
       "name": "restart",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "rewind",
       "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "seekByPercentage",
       "signature": "(pct: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "seekToChapter",
       "signature": "(idx: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "seekToIndex",
       "signature": "(position: number, opts?: ActionOptions) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "seekable",
       "signature": "() => TimeRanges",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "selectAudioOutput",
       "signature": "() => Promise<MediaDeviceInfo | null>",
-      "player": "music"
+      "player": "music",
+      "group": "core/audio-output",
+      "kind": "method"
     },
     {
       "name": "setPreloadStrategy",
       "signature": "(strategy: IPreloadStrategy) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "setTransitionStrategy",
       "signature": "(strategy: ITransitionStrategy) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "setup",
       "signature": "(config: MusicPlayerConfig<T>) => this",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "setupState",
       "signature": "() => SetupState",
-      "player": "music"
+      "player": "music",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "shuffleState",
       "signature": "{\n\t\t(): ShuffleState;\n\t\t(state: ShuffleState | boolean): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/state-mutators",
+      "kind": "accessor"
     },
     {
       "name": "stop",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "streamState",
       "signature": "() => string",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "streams",
       "signature": "() => ReadonlyArray<string>",
-      "player": "music"
+      "player": "music",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "t",
       "signature": "{\n\t\t(key: string, vars?: Record<string, string>): string;\n\t\t(PluginClass: PluginCtorWithId, key: string, vars?: Record<string, string>): string;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "time",
       "signature": "{\n\t\t(): number;\n\t\t(seconds: number, opts?: ActionOptions): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "accessor"
     },
     {
       "name": "timeData",
       "signature": "() => KitTimeState",
-      "player": "music"
+      "player": "music",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "toggleMute",
       "signature": "() => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "togglePlayback",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "transferTo",
       "signature": "(target: CastTarget) => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/cast",
+      "kind": "method"
     },
     {
       "name": "transitionStrategy",
       "signature": "() => ITransitionStrategy",
-      "player": "music"
+      "player": "music",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "translation",
       "signature": "{\n\t\t(lang: string, key: string): string | undefined;\n\t\t(lang: string, key: string, value: string): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "unmute",
       "signature": "() => Promise<void>",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "unregisterCueParser",
       "signature": "(id: string) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "unregisterStream",
       "signature": "(id: string) => this",
-      "player": "music"
+      "player": "music",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "urlResolver",
       "signature": "{\n\t\t(): IUrlResolver | undefined;\n\t\t(resolver: IUrlResolver | undefined): void;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/auth",
+      "kind": "accessor"
     },
     {
       "name": "visibilityState",
       "signature": "() => VisibilityState",
-      "player": "music"
+      "player": "music",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "volume",
       "signature": "{\n\t\t(): number;\n\t\t(level: number): Promise<void>;\n\t}",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "accessor"
     },
     {
       "name": "volumeDown",
       "signature": "(step?: number) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "volumeState",
       "signature": "() => VolumeState",
-      "player": "music"
+      "player": "music",
+      "group": "core/state-mutators",
+      "kind": "method"
     },
     {
       "name": "volumeUp",
       "signature": "(step?: number) => void",
-      "player": "music"
+      "player": "music",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "activityTracking",
       "signature": "{\n\t\t(): boolean;\n\t\t(enabled: boolean): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/activity",
+      "kind": "accessor"
     },
     {
       "name": "addClasses",
       "signature": "IPlayer<VideoEventMap>['addClasses']",
-      "player": "video"
+      "player": "video",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "addPlugin",
       "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P), opts?: P['opts']) => this",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "addSubtitleTrack",
       "signature": "(track: SidecarSubtitleInput, opts?: ActionOptions) => SubtitleTrack",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "addTranslations",
       "signature": "(bundle: Translations) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "announce",
       "signature": "(text: string, level?: AriaLiveLevel) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "aspectRatio",
       "signature": "(value?: Stretching) => Stretching | void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "audioContext",
       "signature": "() => AudioContext | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/base-url-audio-context",
+      "kind": "method"
     },
     {
       "name": "audioOutput",
       "signature": "{\n\t\t(): Promise<string | null>;\n\t\t(deviceId: string): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/audio-output",
+      "kind": "accessor"
     },
     {
       "name": "audioOutputs",
       "signature": "() => Promise<MediaDeviceInfo[]>",
-      "player": "video"
+      "player": "video",
+      "group": "core/audio-output",
+      "kind": "method"
     },
     {
       "name": "audioTrack",
       "signature": "{\n\t\t(): CurrentAudioTrackSelection | null;\n\t\t(idx: number): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "audioTrackMode",
       "signature": "{\n\t\t(): AudioTrackState;\n\t\t(idx: number): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "accessor"
     },
     {
       "name": "audioTracks",
       "signature": "() => AudioTrack[]",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "auth",
       "signature": "{\n\t\t(): Readonly<AuthConfig> | undefined;\n\t\t(config: AuthConfig): void;\n\t\t(partial: Partial<AuthConfig>): void;\n\t\t(clear: null): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/auth",
+      "kind": "accessor"
     },
     {
       "name": "backend",
       "signature": "(kind?: VideoBackendKind) => IVideoBackend | Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "backlog",
       "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[]): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "backlogAppend",
       "signature": "(item: T | T[]) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "backlogClear",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "backlogRemove",
       "signature": "(id: string | number) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "bandwidth",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/abr",
+      "kind": "method"
     },
     {
       "name": "bandwidthEstimator",
       "signature": "{\n\t\t(): (() => number) | undefined;\n\t\t(fn: () => number): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/abr",
+      "kind": "accessor"
     },
     {
       "name": "baseUrl",
       "signature": "{\n\t\t(): string | undefined;\n\t\t(url: string): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/base-url-audio-context",
+      "kind": "accessor"
     },
     {
       "name": "bufferState",
       "signature": "() => BufferState",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "buffered",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "bufferedRanges",
       "signature": "() => TimeRanges",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "bumpActivity",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/activity",
+      "kind": "method"
     },
     {
       "name": "canPlay",
       "signature": "(profile: { contentType: string; width?: number; height?: number; bitrate?: number; framerate?: number }) => Promise<CanPlayResult>",
-      "player": "video"
+      "player": "video",
+      "group": "core/abr",
+      "kind": "method"
     },
     {
       "name": "castState",
       "signature": "() => CastState",
-      "player": "video"
+      "player": "video",
+      "group": "core/cast",
+      "kind": "method"
     },
     {
       "name": "chapter",
       "signature": "{\n\t\t(): Chapter | null;\n\t\t(idx: number): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "chapters",
       "signature": "() => Chapter[]",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "clearSegment",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "container",
       "signature": "HTMLElement",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "property"
     },
     {
       "name": "createButton",
       "signature": "IPlayer<VideoEventMap>['createButton']",
-      "player": "video"
+      "player": "video",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "createElement",
       "signature": "IPlayer<VideoEventMap>['createElement']",
-      "player": "video"
+      "player": "video",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "createSVG",
       "signature": "IPlayer<VideoEventMap>['createSVG']",
-      "player": "video"
+      "player": "video",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "cycleAspectRatio",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "cycleAudioTracks",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "cycleSubtitles",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "device",
       "signature": "() => DeviceCapabilities",
-      "player": "video"
+      "player": "video",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "dispatching",
       "signature": "() => ReadonlyArray<string>",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "dispose",
       "signature": "() => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "duration",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "enabledPlugins",
       "signature": "() => ReadonlyArray<Plugin>",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "experimental",
       "signature": "PlayerExperimental",
-      "player": "video"
+      "player": "video",
+      "group": "core/experimental",
+      "kind": "property"
     },
     {
       "name": "forward",
       "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "fullscreen",
       "signature": "(state?: FullscreenState | boolean) => FullscreenState | void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "getPlugin",
       "signature": "<P extends object>(PluginClass: PluginCtorWithId & (new () => P)) => P | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "getPluginById",
       "signature": "<P extends object = object>(id: string) => P | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "getStreamFactory",
       "signature": "(id: string) => IStreamFactory | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "index",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "isDesktop",
       "signature": "() => boolean",
-      "player": "video"
+      "player": "video",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "isMobile",
       "signature": "() => boolean",
-      "player": "video"
+      "player": "video",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "isTv",
       "signature": "() => boolean",
-      "player": "video"
+      "player": "video",
+      "group": "core/device",
+      "kind": "method"
     },
     {
       "name": "item",
       "signature": "{\n\t\t(): T | undefined;\n\t\t(target: T | string | number, opts?: LoadOptions): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "language",
       "signature": "{\n\t\t(): string;\n\t\t(lang: string): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/i18n",
+      "kind": "accessor"
     },
     {
       "name": "load",
       "signature": "(item: T, opts?: LoadOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/loading",
+      "kind": "method"
     },
     {
       "name": "loadQueue",
       "signature": "(url: string, parser?: (raw: string) => T[]) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/loading",
+      "kind": "method"
     },
     {
       "name": "metrics",
       "signature": "() => PlaybackMetrics",
-      "player": "video"
+      "player": "video",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "mute",
       "signature": "() => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "networkState",
       "signature": "() => NetworkState",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "next",
       "signature": "(opts?: LoadOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "nextChapter",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "normalizePlaylistItem",
       "signature": "(item: BasePlaylistItem) => BasePlaylistItem",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "now",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "options",
       "signature": "VideoPlayerConfig<T>",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "property"
     },
     {
       "name": "pause",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "peekNext",
       "signature": "() => T | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "peekPrevious",
       "signature": "() => T | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "phase",
       "signature": "() => PlayerPhase",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "pip",
       "signature": "(state?: PipState | boolean) => PipState | void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "platform",
       "signature": "() => IPlatform",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "play",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "playItem",
       "signature": "(\n\t\ttarget: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/play-queue",
+      "kind": "method"
     },
     {
       "name": "playNow",
       "signature": "(\n\t\titems: BasePlaylistItem[],\n\t\tstart?: BasePlaylistItem | string | number | ((item: BasePlaylistItem) => boolean),\n\t\topts?: LoadOptions,\n\t) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/play-queue",
+      "kind": "method"
     },
     {
       "name": "playSegment",
       "signature": "(opts: SegmentOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "playState",
       "signature": "() => PlayState",
-      "player": "video"
+      "player": "video",
+      "group": "core/state-mutators",
+      "kind": "method"
     },
     {
       "name": "playbackRate",
       "signature": "{\n\t\t(): number;\n\t\t(rate: number): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "accessor"
     },
     {
       "name": "playbackRates",
       "signature": "() => number[]",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "playerId",
       "signature": "string",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "property"
     },
     {
       "name": "plugins",
       "signature": "() => ReadonlyArray<Plugin>",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "preloadStrategy",
       "signature": "() => IPreloadStrategy",
-      "player": "video"
+      "player": "video",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "previous",
       "signature": "(opts?: LoadOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "previousChapter",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "quality",
       "signature": "{\n\t\t(): CurrentQualitySelection | 'auto';\n\t\t(idx: number | 'auto'): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "qualityLevels",
       "signature": "{\n\t\t(): QualityLevel[];\n\t\t(opts: { includeUnsupported: true }): QualityLevel[];\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "qualityMode",
       "signature": "{\n\t\t(): QualityState;\n\t\t(target: number | 'auto'): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "accessor"
     },
     {
       "name": "queue",
       "signature": "{\n\t\t(): ReadonlyArray<T>;\n\t\t(items: T[], opts?: ActionOptions): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "accessor"
     },
     {
       "name": "queueAppend",
       "signature": "(item: T | T[], opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueClear",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueIndexOf",
       "signature": "(id: string | number) => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueInsert",
       "signature": "(item: T | T[], index: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueLength",
       "signature": "() => number",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueMove",
       "signature": "(from: number, to: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queuePrepend",
       "signature": "(item: T | T[], opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueRemove",
       "signature": "(id: string | number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueRemoveAt",
       "signature": "(index: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueShuffle",
       "signature": "(opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "queueSort",
       "signature": "(compare: (itemA: T, itemB: T) => number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "ready",
       "signature": "() => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "recordMetric",
       "signature": "(name: string, value: number) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/metrics",
+      "kind": "method"
     },
     {
       "name": "refreshAuth",
       "signature": "() => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/auth",
+      "kind": "method"
     },
     {
       "name": "registerCueParser",
       "signature": "(parser: ICueParser, prepend?: boolean) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "registerStream",
       "signature": "(factory: IStreamFactory, prepend?: boolean) => this",
-      "player": "video"
+      "player": "video",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "registerTitleTokens",
       "signature": "(tokens: Record<string, string>) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "removeClasses",
       "signature": "IPlayer<VideoEventMap>['removeClasses']",
-      "player": "video"
+      "player": "video",
+      "group": "core/dom",
+      "kind": "property"
     },
     {
       "name": "removePlugin",
       "signature": "<P extends Plugin<any, any, any>>(PluginClass: PluginCtorWithId & (new () => P)) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "removePluginById",
       "signature": "(id: string) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/plugin-registration",
+      "kind": "method"
     },
     {
       "name": "removeSubtitleTrack",
       "signature": "(id: string, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "removeTranslations",
       "signature": "(prefix: string, lang?: string) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "repeatState",
       "signature": "{\n\t\t(): RepeatState;\n\t\t(state: RepeatState): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/state-mutators",
+      "kind": "accessor"
     },
     {
       "name": "resolveCueParser",
       "signature": "(url: string) => ICueParser | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "resolveUrl",
       "signature": "(url: string, category?: UrlCategory) => Promise<ResolvedUrl>",
-      "player": "video"
+      "player": "video",
+      "group": "core/auth",
+      "kind": "method"
     },
     {
       "name": "restart",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "rewind",
       "signature": "(seconds?: number, opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "seekByPercentage",
       "signature": "(pct: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "seekToChapter",
       "signature": "(idx: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "seekToIndex",
       "signature": "(position: number, opts?: ActionOptions) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/queue",
+      "kind": "method"
     },
     {
       "name": "seekable",
       "signature": "() => TimeRanges",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "selectAudioOutput",
       "signature": "() => Promise<MediaDeviceInfo | null>",
-      "player": "video"
+      "player": "video",
+      "group": "core/audio-output",
+      "kind": "method"
     },
     {
       "name": "setPreloadStrategy",
       "signature": "(strategy: IPreloadStrategy) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "setTransitionStrategy",
       "signature": "(strategy: ITransitionStrategy) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "setup",
       "signature": "(config: VideoPlayerConfig<T>) => this",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "setupState",
       "signature": "() => SetupState",
-      "player": "video"
+      "player": "video",
+      "group": "core/lifecycle",
+      "kind": "method"
     },
     {
       "name": "shuffleState",
       "signature": "{\n\t\t(): ShuffleState;\n\t\t(state: ShuffleState | boolean): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/state-mutators",
+      "kind": "accessor"
     },
     {
       "name": "stop",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "streamState",
       "signature": "() => string",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "streams",
       "signature": "() => ReadonlyArray<string>",
-      "player": "video"
+      "player": "video",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "subtitle",
       "signature": "{\n\t\t(): CurrentSubtitleSelection | null;\n\t\t(idx: number | null): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "subtitleState",
       "signature": "() => SubtitleState",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "subtitleStyle",
       "signature": "{\n\t\t(): SubtitleStyle;\n\t\t(patch: Partial<SubtitleStyle>): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "accessor"
     },
     {
       "name": "subtitles",
       "signature": "() => SubtitleTrack[]",
-      "player": "video"
+      "player": "video",
+      "group": "core/media-tracks",
+      "kind": "method"
     },
     {
       "name": "t",
       "signature": "{\n\t\t(key: string, vars?: Record<string, string>): string;\n\t\t(PluginClass: PluginCtorWithId, key: string, vars?: Record<string, string>): string;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "theater",
       "signature": "(state?: TheaterState | boolean) => TheaterState | void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "time",
       "signature": "{\n\t\t(): number;\n\t\t(seconds: number, opts?: ActionOptions): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "accessor"
     },
     {
       "name": "timeData",
       "signature": "() => KitTimeState",
-      "player": "video"
+      "player": "video",
+      "group": "core/time",
+      "kind": "method"
     },
     {
       "name": "toggleFullscreen",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "toggleMute",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "togglePip",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "togglePlayback",
       "signature": "(opts?: ActionOptions) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/transport",
+      "kind": "method"
     },
     {
       "name": "toggleTheater",
       "signature": "() => void",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "transferTo",
       "signature": "(target: CastTarget) => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/cast",
+      "kind": "method"
     },
     {
       "name": "transitionStrategy",
       "signature": "() => ITransitionStrategy",
-      "player": "video"
+      "player": "video",
+      "group": "core/preload-strategy",
+      "kind": "method"
     },
     {
       "name": "translation",
       "signature": "{\n\t\t(lang: string, key: string): string | undefined;\n\t\t(lang: string, key: string, value: string): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/i18n",
+      "kind": "method"
     },
     {
       "name": "unmute",
       "signature": "() => Promise<void>",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "unregisterCueParser",
       "signature": "(id: string) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/cue-parser",
+      "kind": "method"
     },
     {
       "name": "unregisterStream",
       "signature": "(id: string) => this",
-      "player": "video"
+      "player": "video",
+      "group": "core/stream-registration",
+      "kind": "method"
     },
     {
       "name": "urlResolver",
       "signature": "{\n\t\t(): IUrlResolver | undefined;\n\t\t(resolver: IUrlResolver | undefined): void;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/auth",
+      "kind": "accessor"
     },
     {
       "name": "videoElement",
       "signature": "HTMLVideoElement | undefined",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "property"
     },
     {
       "name": "videoRect",
       "signature": "() => VideoRect | null",
-      "player": "video"
+      "player": "video",
+      "group": "video/player",
+      "kind": "method"
     },
     {
       "name": "visibilityState",
       "signature": "() => VisibilityState",
-      "player": "video"
+      "player": "video",
+      "group": "core/player-state",
+      "kind": "method"
     },
     {
       "name": "volume",
       "signature": "{\n\t\t(): number;\n\t\t(level: number): Promise<void>;\n\t}",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "accessor"
     },
     {
       "name": "volumeDown",
       "signature": "(step?: number) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "method"
     },
     {
       "name": "volumeState",
       "signature": "() => VolumeState",
-      "player": "video"
+      "player": "video",
+      "group": "core/state-mutators",
+      "kind": "method"
     },
     {
       "name": "volumeUp",
       "signature": "(step?: number) => void",
-      "player": "video"
+      "player": "video",
+      "group": "core/volume",
+      "kind": "method"
     }
   ],
   "errors": [
