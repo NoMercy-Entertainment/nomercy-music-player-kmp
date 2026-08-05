@@ -32,6 +32,7 @@ private val WEB_ONLY_METHODS = setOf(
     // The Web Audio graph handle. There is no AudioContext off the web; the
     // equivalent here is the audio backend, which the player already exposes.
     "audioContext",
+    "selectAudioOutput",
     // A runtime method-override table. The web needs one because a
     // mixin-composed player cannot be subclassed; every member here is already
     // open, so a consumer replacing one behaviour overrides one method.
