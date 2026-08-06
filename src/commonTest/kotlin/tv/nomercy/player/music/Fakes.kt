@@ -87,9 +87,20 @@ internal open class SilentBackend : MediaBackend {
     override fun stop() {
         stopCount += 1
     }
-    override fun currentTime(): Double = 0.0
+    // Honours its own seeks.
+    //
+    // It used to record a seek and keep reporting 0.0, which is an engine that
+    // says it is somewhere it has never been. The clock in core converges on
+    // what the engine reports, so a test that seeked to 12 and then asked where
+    // the player was got an answer being steered back to zero — and the drift
+    // rule under test compared a real position against a fictional one.
+    private var positionSeconds: Double = 0.0
+
+    override fun currentTime(): Double = positionSeconds
+
     override fun currentTime(seconds: Double) {
         seekedTo += seconds
+        positionSeconds = seconds
     }
     override fun duration(): Double = 0.0
     override fun volume(): Float = 1.0f
