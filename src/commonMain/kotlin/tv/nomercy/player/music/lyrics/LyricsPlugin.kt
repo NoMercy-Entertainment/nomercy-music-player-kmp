@@ -98,10 +98,14 @@ public open class LyricsPlugin(
     private val tracker = CueTracker<TextPayload>()
 
     /** Every line of the current track, in order. Empty when there are none. */
-    public fun lines(): List<Cue<TextPayload>> = tracker.cues()
+    // `all` and `current`, because those are the reference's names for these.
+    // They shipped as lines()/line(), which is the same pair renamed, so a
+    // consumer written against the documented API called all() and found
+    // nothing.
+    public fun all(): List<Cue<TextPayload>> = tracker.cues()
 
     /** The line at the current position, or null between lines. */
-    public fun line(): Cue<TextPayload>? = tracker.line
+    public fun current(): Cue<TextPayload>? = tracker.line
 
     override fun use() {
         on(CoreEvents.Item) { change: ItemChange ->
@@ -139,8 +143,27 @@ public open class LyricsPlugin(
      * For a host that turns [LyricsOptions.autoFetch] off because it resolves
      * lyrics some other way — a cache, a bundled file, a user-supplied one.
      */
-    public suspend fun load(url: String) {
+    public suspend fun fetchLyrics(url: String) {
         fetchInto(url)
+    }
+
+    /**
+     * Drop the cues without disposing the plugin.
+     *
+     * The reference separates these deliberately: clear() ends the current
+     * track's lyrics and leaves the plugin listening for the next one, and
+     * dispose() ends both. Only dispose existed here, so a host wanting to
+     * blank the view between tracks had to tear the plugin down and register
+     * it again.
+     */
+    public fun clear() {
+        tracker.load(emptyList())
+        emit(LyricsEvents.Cleared, Unit)
+    }
+
+    override fun dispose() {
+        clear()
+        super.dispose()
     }
 
     /** Attach cues that are already parsed. */

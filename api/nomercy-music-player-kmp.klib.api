@@ -614,10 +614,12 @@ open class tv.nomercy.player.music.lyrics/LyricsPlugin : tv.nomercy.player.core.
     open val options // tv.nomercy.player.music.lyrics/LyricsPlugin.options|{}options[0]
         open fun <get-options>(): tv.nomercy.player.music.lyrics/LyricsOptions // tv.nomercy.player.music.lyrics/LyricsPlugin.options.<get-options>|<get-options>(){}[0]
 
+    final fun all(): kotlin.collections/List<tv.nomercy.player.core.cues/Cue<tv.nomercy.player.core.cues/TextPayload>> // tv.nomercy.player.music.lyrics/LyricsPlugin.all|all(){}[0]
     final fun attach(kotlin.collections/List<tv.nomercy.player.core.cues/Cue<tv.nomercy.player.core.cues/TextPayload>>) // tv.nomercy.player.music.lyrics/LyricsPlugin.attach|attach(kotlin.collections.List<tv.nomercy.player.core.cues.Cue<tv.nomercy.player.core.cues.TextPayload>>){}[0]
-    final fun line(): tv.nomercy.player.core.cues/Cue<tv.nomercy.player.core.cues/TextPayload>? // tv.nomercy.player.music.lyrics/LyricsPlugin.line|line(){}[0]
-    final fun lines(): kotlin.collections/List<tv.nomercy.player.core.cues/Cue<tv.nomercy.player.core.cues/TextPayload>> // tv.nomercy.player.music.lyrics/LyricsPlugin.lines|lines(){}[0]
-    final suspend fun load(kotlin/String) // tv.nomercy.player.music.lyrics/LyricsPlugin.load|load(kotlin.String){}[0]
+    final fun clear() // tv.nomercy.player.music.lyrics/LyricsPlugin.clear|clear(){}[0]
+    final fun current(): tv.nomercy.player.core.cues/Cue<tv.nomercy.player.core.cues/TextPayload>? // tv.nomercy.player.music.lyrics/LyricsPlugin.current|current(){}[0]
+    final suspend fun fetchLyrics(kotlin/String) // tv.nomercy.player.music.lyrics/LyricsPlugin.fetchLyrics|fetchLyrics(kotlin.String){}[0]
+    open fun dispose() // tv.nomercy.player.music.lyrics/LyricsPlugin.dispose|dispose(){}[0]
     open fun use() // tv.nomercy.player.music.lyrics/LyricsPlugin.use|use(){}[0]
 
     final object Manifest : tv.nomercy.player.core.plugin/PluginManifest { // tv.nomercy.player.music.lyrics/LyricsPlugin.Manifest|null[0]

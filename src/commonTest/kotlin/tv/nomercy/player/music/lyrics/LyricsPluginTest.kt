@@ -73,7 +73,7 @@ class LyricsPluginTest {
             advanceUntilIdle()
 
             assertEquals("https://example.test/song.lrc", source.asked)
-            assertEquals(listOf("first", "second"), subject.lines().map { it.payload.text })
+            assertEquals(listOf("first", "second"), subject.all().map { it.payload.text })
         }
     }
 
@@ -90,7 +90,7 @@ class LyricsPluginTest {
             player.emit(CoreEvents.Item, itemChange("song"))
             advanceUntilIdle()
 
-            assertEquals(listOf("first"), subject.lines().map { it.payload.text })
+            assertEquals(listOf("first"), subject.all().map { it.payload.text })
         }
     }
 
@@ -103,13 +103,13 @@ class LyricsPluginTest {
             advanceUntilIdle()
 
             player.emit(CoreEvents.Time, timeUpdate(0.5))
-            assertEquals("first", subject.line()?.payload?.text)
+            assertEquals("first", subject.current()?.payload?.text)
 
             player.emit(CoreEvents.Time, timeUpdate(2.5))
-            assertEquals("second", subject.line()?.payload?.text)
+            assertEquals("second", subject.current()?.payload?.text)
 
             player.emit(CoreEvents.Time, timeUpdate(9.0))
-            assertNull(subject.line())
+            assertNull(subject.current())
         }
     }
 
@@ -124,7 +124,7 @@ class LyricsPluginTest {
 
             player.emit(CoreEvents.Item, itemChange("next"))
 
-            assertTrue(subject.lines().isEmpty(), "expected no lines, got ${subject.lines()}")
+            assertTrue(subject.all().isEmpty(), "expected no lines, got ${subject.all()}")
         }
     }
 
@@ -179,7 +179,7 @@ class LyricsPluginTest {
             player.emit(CoreEvents.Item, itemChange("song"))
             advanceUntilIdle()
 
-            val lrc = subject.lines().single().payload as LrcPayload
+            val lrc = subject.all().single().payload as LrcPayload
             assertEquals(listOf("Never", "gonna", "give"), lrc.words.map { it.text })
         }
     }
@@ -209,7 +209,7 @@ class LyricsPluginTest {
             player.emit(CoreEvents.Item, itemChange("song"))
             advanceUntilIdle()
 
-            assertEquals("from the host's own parser", subject.lines().single().payload.text)
+            assertEquals("from the host's own parser", subject.all().single().payload.text)
         }
     }
 }
