@@ -162,6 +162,11 @@ tasks.withType<Test>().configureEach {
     )
         .withPropertyName("conformanceFixtures")
         .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // What this library IS, so a test can compare it to the core it RESOLVED.
+    // The two are hand-written in different files and drifted for a whole
+    // renumber without anything noticing — see CoreVersionPinTest.
+    systemProperty("nomercy.library.version", providers.gradleProperty("VERSION_NAME").get())
 }
 
 
