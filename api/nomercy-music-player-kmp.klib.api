@@ -638,9 +638,13 @@ open class tv.nomercy.player.music.queue/AutoAdvancePlugin : tv.nomercy.player.c
     open val options // tv.nomercy.player.music.queue/AutoAdvancePlugin.options|{}options[0]
         open fun <get-options>(): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvancePlugin.options.<get-options>|<get-options>(){}[0]
 
+    final fun addCrossfadeHandler(kotlin.coroutines/SuspendFunction2<tv.nomercy.player.core.media/PlaylistItem?, kotlin/Double, kotlin/Unit>) // tv.nomercy.player.music.queue/AutoAdvancePlugin.addCrossfadeHandler|addCrossfadeHandler(kotlin.coroutines.SuspendFunction2<tv.nomercy.player.core.media.PlaylistItem?,kotlin.Double,kotlin.Unit>){}[0]
+    final fun addEndedHandler(kotlin.coroutines/SuspendFunction0<kotlin/Unit>) // tv.nomercy.player.music.queue/AutoAdvancePlugin.addEndedHandler|addEndedHandler(kotlin.coroutines.SuspendFunction0<kotlin.Unit>){}[0]
+    final fun addPreloadHandler(kotlin.coroutines/SuspendFunction1<tv.nomercy.player.core.media/PlaylistItem?, kotlin/Unit>) // tv.nomercy.player.music.queue/AutoAdvancePlugin.addPreloadHandler|addPreloadHandler(kotlin.coroutines.SuspendFunction1<tv.nomercy.player.core.media.PlaylistItem?,kotlin.Unit>){}[0]
     final fun peekNext(): kotlin/Int? // tv.nomercy.player.music.queue/AutoAdvancePlugin.peekNext|peekNext(){}[0]
     final suspend fun advance() // tv.nomercy.player.music.queue/AutoAdvancePlugin.advance|advance(){}[0]
     final suspend fun onItemEndingSoon() // tv.nomercy.player.music.queue/AutoAdvancePlugin.onItemEndingSoon|onItemEndingSoon(){}[0]
+    final suspend fun preloadNext() // tv.nomercy.player.music.queue/AutoAdvancePlugin.preloadNext|preloadNext(){}[0]
     open fun use() // tv.nomercy.player.music.queue/AutoAdvancePlugin.use|use(){}[0]
 
     final object Manifest : tv.nomercy.player.core.plugin/PluginManifest { // tv.nomercy.player.music.queue/AutoAdvancePlugin.Manifest|null[0]

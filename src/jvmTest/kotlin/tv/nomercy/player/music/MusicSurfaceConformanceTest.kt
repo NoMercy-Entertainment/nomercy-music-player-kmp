@@ -150,6 +150,11 @@ class MusicSurfaceConformanceTest {
         // What native has that the web needs no name for: the controllers the
         // core player is composed of, and the Kotlin-shaped state surface.
         val NATIVE_ONLY = setOf(
+            // Core's seam for AutoAdvancePlugin.preloadNext, which IS on the
+            // contract. LoadOptions carries no slot here because the engines
+            // expose a real secondary rather than a cache to warm, so the
+            // capability had to be reachable another way. See core's own list.
+            "preloadNow",
             "context", "transport", "volume", "time", "state", "lifecycle", "bridge", "activity",
             "cueParsers", "streamFactories", "metrics", "bandwidth", "plugins", "queue",
             "stateFlow", "rootLogger", "rootStorage", "emit", "on", "onAll", "once", "off",

@@ -83,6 +83,57 @@ public open class AutoAdvancePlugin(
      * Public for the same reason [advance] is: a chrome that shows an "up next"
      * card wants the same preparation the timer would have done.
      */
+    /**
+     * Load the coming track into the next slot.
+     *
+     * Safe to call at any time and a no-op when the queue has nothing after
+     * this. The reference exposes it so a host can warm the next track on its
+     * own schedule — a radio UI priming as soon as the listener picks a
+     * station, rather than waiting for the ending-soon threshold — and without
+     * it the only way to preload was to sit and wait for the plugin to decide.
+     *
+     * Failures are swallowed, as they are there: a preload that did not land
+     * costs a gapless transition, not the track that is currently playing.
+     */
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    public suspend fun preloadNext() {
+        val next: PlaylistItem = resolveNext() ?: return
+
+        try {
+            player.preloadNow(next)
+        } catch (failure: Throwable) {
+            // Swallowed as the reference swallows it: a preload that did not
+            // land costs a gapless transition, not the track now playing.
+        }
+    }
+
+    /**
+     * Extra work to run when an item ends, after the built-in advance.
+     *
+     * The three handler lists are how the reference lets a host add behaviour
+     * without subclassing — an analytics ping on every advance, a scrobble, a
+     * queue refill. None of them existed here, so the only way to react was to
+     * listen for the event separately and re-derive what the plugin had
+     * already worked out.
+     */
+    public fun addEndedHandler(handler: suspend () -> Unit) {
+        endedHandlers += handler
+    }
+
+    /** Extra work to run when the item is ending soon, given what is next. */
+    public fun addPreloadHandler(handler: suspend (PlaylistItem?) -> Unit) {
+        preloadHandlers += handler
+    }
+
+    /** Extra work to run alongside a crossfade, given what is next and how long. */
+    public fun addCrossfadeHandler(handler: suspend (PlaylistItem?, Double) -> Unit) {
+        crossfadeHandlers += handler
+    }
+
+    private val endedHandlers: MutableList<suspend () -> Unit> = mutableListOf()
+    private val preloadHandlers: MutableList<suspend (PlaylistItem?) -> Unit> = mutableListOf()
+    private val crossfadeHandlers: MutableList<suspend (PlaylistItem?, Double) -> Unit> = mutableListOf()
+
     public suspend fun onItemEndingSoon() {
         if (!opts.crossfade) return
 

@@ -423,12 +423,16 @@ public class tv/nomercy/player/music/queue/AutoAdvancePlugin : tv/nomercy/player
 	public static final field Manifest Ltv/nomercy/player/music/queue/AutoAdvancePlugin$Manifest;
 	public fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/queue/AutoAdvanceOptions;)V
 	public synthetic fun <init> (Ltv/nomercy/player/core/controllers/ComposedPlayer;Ltv/nomercy/player/music/queue/AutoAdvanceOptions;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun addCrossfadeHandler (Lkotlin/jvm/functions/Function3;)V
+	public final fun addEndedHandler (Lkotlin/jvm/functions/Function1;)V
+	public final fun addPreloadHandler (Lkotlin/jvm/functions/Function2;)V
 	public final fun advance (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun getManifest ()Ltv/nomercy/player/core/plugin/PluginManifest;
 	public synthetic fun getOptions ()Ljava/lang/Object;
 	public fun getOptions ()Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
 	public final fun onItemEndingSoon (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun peekNext ()Ljava/lang/Integer;
+	public final fun preloadNext (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun use ()V
 }
 
