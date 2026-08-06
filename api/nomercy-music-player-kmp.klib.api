@@ -761,9 +761,9 @@ final object tv.nomercy.player.music.lyrics/NoLyricsSource : tv.nomercy.player.m
     final suspend fun fetch(kotlin/String): kotlin/String? // tv.nomercy.player.music.lyrics/NoLyricsSource.fetch|fetch(kotlin.String){}[0]
 }
 
-final object tv.nomercy.player.music.scrobble/NoScrobbler : tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/NoScrobbler|null[0]
-    final suspend fun nowPlaying(kotlin/String) // tv.nomercy.player.music.scrobble/NoScrobbler.nowPlaying|nowPlaying(kotlin.String){}[0]
-    final suspend fun scrobble(kotlin/String, tv.nomercy.player.music.scrobble/ScrobbleContext) // tv.nomercy.player.music.scrobble/NoScrobbler.scrobble|scrobble(kotlin.String;tv.nomercy.player.music.scrobble.ScrobbleContext){}[0]
+final object tv.nomercy.player.music.scrobble/NoopScrobbler : tv.nomercy.player.music.scrobble/Scrobbler { // tv.nomercy.player.music.scrobble/NoopScrobbler|null[0]
+    final suspend fun nowPlaying(kotlin/String) // tv.nomercy.player.music.scrobble/NoopScrobbler.nowPlaying|nowPlaying(kotlin.String){}[0]
+    final suspend fun scrobble(kotlin/String, tv.nomercy.player.music.scrobble/ScrobbleContext) // tv.nomercy.player.music.scrobble/NoopScrobbler.scrobble|scrobble(kotlin.String;tv.nomercy.player.music.scrobble.ScrobbleContext){}[0]
 }
 
 final object tv.nomercy.player.music.scrobble/ScrobbleErrorCodes { // tv.nomercy.player.music.scrobble/ScrobbleErrorCodes|null[0]

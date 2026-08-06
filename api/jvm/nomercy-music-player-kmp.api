@@ -528,8 +528,8 @@ public final class tv/nomercy/player/music/queue/TaggedMusicItem$DefaultImpls {
 	public static fun getGenres (Ltv/nomercy/player/music/queue/TaggedMusicItem;)Ljava/util/List;
 }
 
-public final class tv/nomercy/player/music/scrobble/NoScrobbler : tv/nomercy/player/music/scrobble/Scrobbler {
-	public static final field INSTANCE Ltv/nomercy/player/music/scrobble/NoScrobbler;
+public final class tv/nomercy/player/music/scrobble/NoopScrobbler : tv/nomercy/player/music/scrobble/Scrobbler {
+	public static final field INSTANCE Ltv/nomercy/player/music/scrobble/NoopScrobbler;
 	public fun nowPlaying (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun scrobble (Ljava/lang/String;Ltv/nomercy/player/music/scrobble/ScrobbleContext;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }

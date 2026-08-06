@@ -35,7 +35,7 @@ import tv.nomercy.player.core.ports.defaultClock
  * history to a service nobody configured.
  */
 public open class ScrobblePlugin(
-    private val scrobbler: Scrobbler = NoScrobbler,
+    private val scrobbler: Scrobbler = NoopScrobbler,
     private val rules: ScrobbleRules = ScrobbleRules(),
     // Stamps the moment a track started. Injected so a test decides what time it
     // is, and so a fleet sharing one clock stamps the same instant.
@@ -201,7 +201,10 @@ public interface Scrobbler {
  * that would make the default do work.
  */
 @Suppress("EmptyFunctionBlock")
-public object NoScrobbler : Scrobbler {
+// The reference calls this NoopScrobbler. It shipped here as NoopScrobbler,
+// which is the same object renamed, so a consumer following the documented
+// API imported a name that did not exist.
+public object NoopScrobbler : Scrobbler {
     override suspend fun nowPlaying(trackId: String) {}
 
     override suspend fun scrobble(trackId: String, context: ScrobbleContext) {}
