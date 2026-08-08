@@ -51,8 +51,19 @@ private class RecordingMusicCommands(
 // keys.
 class MusicKeyHandlerPluginTest {
 
+    /**
+     * A clock that moves, because the binding table has a cooldown.
+     *
+     * It was `{ 0L }`, which froze time inside [KeyBindingTable]'s 300ms
+     * key-repeat cooldown: the second press of the SAME key was swallowed as a
+     * held key, so `r` pressed twice cycled repeat once and the two cases that
+     * press a key twice failed. The cooldown is right — it is what stops a held
+     * key running the queue off the end — and a listener pressing r twice does
+     * it seconds apart, not in the same millisecond.
+     */
     private fun handler(commands: MusicCommands): MusicKeyHandlerPlugin {
-        val plugin = MusicKeyHandlerPlugin(commands, nowMs = { 0L })
+        var now = 0L
+        val plugin = MusicKeyHandlerPlugin(commands, nowMs = { now += BETWEEN_PRESSES_MS; now })
         plugin.use()
         return plugin
     }
@@ -113,5 +124,10 @@ class MusicKeyHandlerPluginTest {
     @Test
     fun theIdIsTheWebsSoConsumerCodeCarriesOver() {
         assertEquals("key-handler", MusicKeyHandlerPlugin.Manifest.id)
+    }
+
+    private companion object {
+        // Past the binding table's 300ms cooldown, so each press is a press.
+        const val BETWEEN_PRESSES_MS = 500L
     }
 }
