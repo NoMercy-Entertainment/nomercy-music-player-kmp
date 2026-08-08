@@ -94,27 +94,7 @@ public open class NMMusicPlayer(
         // a second request is about a track that is no longer the one coming up.
         if (transitioning) return refuse(ALREADY_TRANSITIONING)
 
-        // Two of the ways this can decline are not declines at all — they are
-        // programming errors the web raises, and folding them into "false with
-        // a reason" left a caller to discover from an event that the track it
-        // handed over had no url. The other refusals stay refusals.
-        if (next.url.isBlank()) {
-            throw mediaFormatError(
-                CoreErrorCodes.MISSING_URL,
-                "crossfadeTo(item) requires item.url to be present.",
-                mapOf("id" to next.id),
-            )
-        }
-
-        transitions?.let { engine ->
-            if (!engine.supportsCrossfade()) {
-                throw stateError(
-                    CoreErrorCodes.CROSSFADE_UNSUPPORTED,
-                    "crossfadeTo() requires a backend with dual-playback support — " +
-                        "the active backend returned supportsCrossfade() == false.",
-                )
-            }
-        }
+        rejectWhatCannotBeCrossfaded(next)
 
         val outcome = dispatchBefore(
             MusicEvents.BeforeCrossfade,
@@ -153,6 +133,33 @@ public open class NMMusicPlayer(
 
         emit(MusicEvents.CrossfadeComplete, CrossfadeComplete(resolved.to))
         return true
+    }
+
+    /**
+     * The two ways this is not a refusal at all.
+     *
+     * They are programming errors the web raises, and folding them into "false
+     * with a reason" left a caller to discover from an event that the track it
+     * handed over had no url. Every other way a crossfade declines stays a
+     * refusal.
+     */
+    private fun rejectWhatCannotBeCrossfaded(next: PlaylistItem) {
+        if (next.url.isBlank()) {
+            throw mediaFormatError(
+                CoreErrorCodes.MISSING_URL,
+                "crossfadeTo(item) requires item.url to be present.",
+                mapOf("id" to next.id),
+            )
+        }
+
+        val engine: TransitionBackend = transitions ?: return
+        if (!engine.supportsCrossfade()) {
+            throw stateError(
+                CoreErrorCodes.CROSSFADE_UNSUPPORTED,
+                "crossfadeTo() requires a backend with dual-playback support — " +
+                    "the active backend returned supportsCrossfade() == false.",
+            )
+        }
     }
 
     private fun refuse(reason: String?): Boolean {

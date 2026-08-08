@@ -95,29 +95,16 @@ public open class ScrobblePlugin(
         // thousands of years out.
         startedAt = clock.now() / MILLIS_PER_SECOND
         launch {
-            try {
-                scrobbler.nowPlaying(id)
-            }
-            catch (cause: CancellationException) {
-                throw cause
-            }
-            catch (@Suppress("TooGenericExceptionCaught") cause: Throwable) {
-                // A scrobbler that throws used to take the coroutine with it and
-                // tell nobody. The service being down is not a reason for the
-                // music to stop reporting.
-                report(
-                    ScrobbleErrorCodes.NOW_PLAYING_FAILED,
-                    "Scrobbler backend rejected the nowPlaying() call.",
-                    cause = cause,
-                    context = mapOf("itemId" to id),
-                )
-                return@launch
-            }
-
             // After the backend answered, matching the reference: the event
             // means "the service has been told", and firing it before the call
             // would make a listener's badge appear for a service that refused.
-            emit(NowPlaying, NowPlayingReport(id))
+            val told: Boolean = delivered(
+                code = ScrobbleErrorCodes.NOW_PLAYING_FAILED,
+                message = "Scrobbler backend rejected the nowPlaying() call.",
+                itemId = id,
+            ) { scrobbler.nowPlaying(id) }
+
+            if (told) emit(NowPlaying, NowPlayingReport(id))
         }
     }
 
@@ -129,7 +116,15 @@ public open class ScrobblePlugin(
         val heard: Double = tracker.listenedSeconds()
 
         launch {
-            try {
+            // Inside the launch and after the call, for the same reason
+            // nowPlaying is: this was emitted the moment the coroutine was
+            // started, so a listener saw "scrobbled" for a submission the
+            // service went on to refuse.
+            val submitted: Boolean = delivered(
+                code = ScrobbleErrorCodes.SCROBBLE_FAILED,
+                message = "Scrobbler backend rejected the scrobble() call.",
+                itemId = id,
+            ) {
                 scrobbler.scrobble(
                     id,
                     ScrobbleContext(
@@ -139,25 +134,34 @@ public open class ScrobblePlugin(
                     ),
                 )
             }
-            catch (cause: CancellationException) {
-                throw cause
-            }
-            catch (@Suppress("TooGenericExceptionCaught") cause: Throwable) {
-                report(
-                    ScrobbleErrorCodes.SCROBBLE_FAILED,
-                    "Scrobbler backend rejected the scrobble() call.",
-                    cause = cause,
-                    context = mapOf("itemId" to id),
-                )
-                return@launch
-            }
-
-            // Inside the launch and after the call, for the same reason
-            // nowPlaying is: this was emitted the moment the coroutine was
-            // started, so a listener saw "scrobbled" for a submission the
-            // service went on to refuse.
-            emit(Scrobbled, ScrobbleReport(id, heard))
+            if (submitted) emit(Scrobbled, ScrobbleReport(id, heard))
         }
+    }
+
+    /**
+     * One call to the service, and whether it landed.
+     *
+     * A scrobbler that throws used to take the coroutine with it and tell
+     * nobody; the service being down is not a reason for the music to stop
+     * reporting. Answering true or false rather than returning out of the
+     * coroutine keeps the "tell the listener" decision at the call site, beside
+     * the call it reports on.
+     */
+    private suspend fun delivered(
+        code: String,
+        message: String,
+        itemId: String,
+        call: suspend () -> Unit,
+    ): Boolean = try {
+        call()
+        true
+    }
+    catch (cause: CancellationException) {
+        throw cause
+    }
+    catch (@Suppress("TooGenericExceptionCaught") cause: Throwable) {
+        report(code, message, cause = cause, context = mapOf("itemId" to itemId))
+        false
     }
 }
 
