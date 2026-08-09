@@ -156,6 +156,22 @@ mavenPublishing {
 //
 // Found by editing one on purpose and watching nothing happen.
 tasks.withType<Test>().configureEach {
+    // A temp directory inside the build, not the machine's.
+    //
+    // Conscrypt extracts a native .so to `java.io.tmpdir` and loads it, and the
+    // self-hosted runner executes jobs in a container whose /tmp will not take
+    // one: every Android host test failed with
+    // `UnsatisfiedLinkError: Failed creating temp file
+    // (/tmp/libconscrypt_openjdk_jni-linux-x86_64....so)`. The same suite is
+    // green on a GitHub-hosted image, so the tests were never the thing that
+    // changed.
+    //
+    // Set here rather than in the workflow because it is a property of running
+    // these tests anywhere, not of one runner.
+    val temporary: java.io.File = layout.buildDirectory.dir("tmp/test-jvm").get().asFile
+    systemProperty("java.io.tmpdir", temporary.absolutePath)
+    doFirst { temporary.mkdirs() }
+
     inputs.files(
         fileTree("contract") { include("*.json") },
         fileTree("scenarios") { include("*.json") },
