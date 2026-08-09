@@ -87,6 +87,8 @@ internal open class SilentBackend : MediaBackend {
     override fun stop() {
         stopCount += 1
     }
+
+    override fun release(): Unit = stop()
     // Honours its own seeks.
     //
     // It used to record a seek and keep reporting 0.0, which is an engine that
