@@ -76,6 +76,22 @@ kotlin {
 // test task that sits there until the job's timeout, with the last line of the
 // log being the task that started.
 tasks.withType<Test>().configureEach {
+    // A temp directory inside the build, not the machine's.
+    //
+    // Conscrypt extracts a native .so to `java.io.tmpdir` and loads it, and
+    // the self-hosted runner executes jobs in a container whose /tmp will not
+    // take one: every Android host test failed with
+    // `UnsatisfiedLinkError: Failed creating temp file
+    // (/tmp/libconscrypt_openjdk_jni-linux-x86_64....so)`.
+    //
+    // Set HERE as well as at the root, because a root `tasks.withType<Test>()`
+    // configures the root project's tasks and this module's are its own — the
+    // root-only fix reported green once on a build whose tests were UP-TO-DATE
+    // from the runner's persistent cache, then failed the moment they ran.
+    val temporary: java.io.File = layout.buildDirectory.dir("tmp/test-jvm").get().asFile
+    systemProperty("java.io.tmpdir", temporary.absolutePath)
+    doFirst { temporary.mkdirs() }
+
     systemProperty("skiko.renderApi", "SOFTWARE")
     systemProperty("java.awt.headless", "true")
 
