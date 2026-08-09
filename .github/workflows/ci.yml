@@ -63,9 +63,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reports-music
+          # Rooted at the WORKSPACE, not at the working directory the build step
+          # used: the repo is checked out into a subdirectory here, and an
+          # unrooted path uploads an empty artifact while reporting success.
           path: |
-            build/reports/
-            build/test-results/
-            ui-compose/build/reports/
-            ui-compose/build/test-results/
+            packages-native/nomercy-music-player-kmp/build/reports/
+            packages-native/nomercy-music-player-kmp/build/test-results/
+            packages-native/nomercy-music-player-kmp/ui-compose/build/reports/
+            packages-native/nomercy-music-player-kmp/ui-compose/build/test-results/
           retention-days: 7
