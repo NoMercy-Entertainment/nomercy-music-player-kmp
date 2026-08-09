@@ -52,3 +52,20 @@ jobs:
       - name: Build
         working-directory: packages-native/nomercy-music-player-kmp
         run: ./gradlew build --stacktrace
+
+      # The reports, always, because a failing test's cause does not survive the
+      # console. Gradle prints the exception TYPE and the line it was thrown at
+      # and stops there, so `UnsatisfiedLinkError at NativeLibraryLoader.java:205`
+      # was the whole of what a red run said — a message that names a class and
+      # not a reason, on a machine nobody can attach to. The XML carries the
+      # message and the stack.
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-music
+          path: |
+            build/reports/
+            build/test-results/
+            ui-compose/build/reports/
+            ui-compose/build/test-results/
+          retention-days: 7
