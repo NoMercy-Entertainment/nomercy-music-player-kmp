@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, beast-unit]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,6 +30,16 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      # The Android SDK, which a GitHub-hosted ubuntu image carried and a
+      # self-hosted runner does not. Without it every Android target fails to
+      # configure, and the message names a licence rather than a missing SDK.
+      - uses: android-actions/setup-android@v3
+
+      # The Gradle user home, kept between runs. On a persistent machine this
+      # matters less than it did on a fresh VM, and it still keeps two repos'
+      # builds from fighting over one unmanaged cache directory.
+      - uses: gradle/actions/setup-gradle@v4
 
       # First, and on its own, because drift from the ecosystem contract is the
       # one failure whose cause is not in this repo's diff. Named, so a red run
