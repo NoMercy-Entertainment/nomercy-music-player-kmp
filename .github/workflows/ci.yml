@@ -10,6 +10,16 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# The payload download needs a token.
+#
+# Core's payloads come from release assets, and one of them -- libass -- lives
+# in a private repository, so `gh release download` is an authenticated call.
+# Only publish.yml ever set this, so the moment these jobs left GitHub's own
+# runners they failed with gh's own advice: "set the GH_TOKEN environment
+# variable".
+env:
+  GH_TOKEN: ${{ github.token }}
+
 jobs:
   build:
     runs-on: [self-hosted, Linux, X64, beast-unit]
