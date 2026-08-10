@@ -163,6 +163,12 @@ class MusicSurfaceConformanceTest {
             // Music-specific and native-shaped: announceBackend tells listeners
             // which engine took over, which the web infers from the DOM.
             "announceBackend", "crossfadeEnabled", "configureCrossfade",
+            // The reference reaches AirPlay through transferTo(AIRPLAY) — see
+            // core's MethodSurfaceConformanceTest for the full reasoning. An
+            // AirPlay route has no item or position to hand over and must not
+            // pause first, where a CastSender transfer must, so it cannot
+            // share transferTo's guard.
+            "transferToExternal",
         )
     }
 }
