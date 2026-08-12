@@ -44,4 +44,22 @@ public interface MusicPlaylistItem : PlaylistItem {
      * it: hosts already populate it, and reading both costs one elvis.
      */
     public val cover: String? get() = null
+
+    /**
+     * Whether the host's own server considers this track a favorite.
+     *
+     * Read-only here — toggling it is a server call this library has no
+     * business making (see [PlaylistItem]'s own narrow-seam reasoning). A
+     * host that has the concept supplies it; one that does not leaves the
+     * default, and no favorite button is drawn for it.
+     */
+    public val favorite: Boolean get() = false
+
+    /**
+     * The server-relative link a host POSTs a favorite toggle to, or null
+     * for a track with nothing to toggle (a plugin's synthetic item, a
+     * bare stream). Distinct from [PlaylistItem.url] — that is the media
+     * source, this is the API resource.
+     */
+    public val link: String? get() = null
 }
