@@ -391,7 +391,15 @@ public open class MusicConnectPlugin(
     private fun guardSeek(event: BeforeEvent<SeekPosition>) {
         if (isEcho(event.data.source)) return
 
-        if (!isActiveDevice) event.preventDefault()
+        // PASSIVE — a real Connect frame named another device active — blocks.
+        // NONE does not: it means no frame has ever arrived (never connected,
+        // still negotiating, or the socket is down), and treating "unknown"
+        // the same as "refused by another device" locked local playback out
+        // permanently on any client that hadn't yet completed its first
+        // Connect handshake (confirmed live, real TV, 2026-08-12 — playback
+        // never advanced past TransportController's BeforePlay gate even
+        // though nothing else was actually claiming the device).
+        if (role == DeviceRole.PASSIVE) event.preventDefault()
         val seconds: Double = event.data.time
         scope.launch { channel.playbackCommand(ConnectCommand.SEEK, seconds) }
     }
@@ -401,7 +409,8 @@ public open class MusicConnectPlugin(
 
         if (isActiveDevice && command in ADVANCING_COMMANDS) advanceShield = armed()
 
-        if (!isActiveDevice) {
+        // See guardSeek's comment: only a confirmed PASSIVE role blocks.
+        if (role == DeviceRole.PASSIVE) {
             showIntentBeforeTheServerAnswers(command)
             event.preventDefault()
         }
