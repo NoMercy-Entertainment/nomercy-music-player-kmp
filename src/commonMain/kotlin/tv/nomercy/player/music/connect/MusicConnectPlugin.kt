@@ -407,6 +407,19 @@ public open class MusicConnectPlugin(
     private fun guard(event: BeforeEvent<ActionOptions>, command: String) {
         if (isEcho(event.data.source)) return
 
+        // A genuine local PLAY with no device yet named active claims this one —
+        // the old MusicPlayerStore.claimActiveForLocalPlaybackStart() equivalent.
+        // Without this, a device that only ever started LOCAL playback (never
+        // named by a server frame) stays DeviceRole.NONE forever: isActiveDevice
+        // reads false while it is genuinely playing, which made
+        // NoMercyApplication.onStop() disconnect the music hub on backgrounding
+        // mid-playback, and left it exposed to applyServerFrame's session-end
+        // branch on the next frame — confirmed live, real device, 2026-08-12
+        // (radio and regular music both stopped silently while backgrounded).
+        if (command == ConnectCommand.PLAY && role == DeviceRole.NONE) {
+            claimActiveForLocalPlaybackStart()
+        }
+
         if (isActiveDevice && command in ADVANCING_COMMANDS) advanceShield = armed()
 
         // See guardSeek's comment: only a confirmed PASSIVE role blocks.
@@ -415,6 +428,17 @@ public open class MusicConnectPlugin(
             event.preventDefault()
         }
         scope.launch { channel.playbackCommand(command) }
+    }
+
+    // Optimistic, ahead of the round trip — the same reasoning as the deleted
+    // MusicPlayerStore's own version: flipping activeDeviceId here keeps every
+    // observer keyed off role/isActiveDevice correct immediately, even if the
+    // server's ChangeDevice broadcast is delayed. A later frame naming another
+    // device still demotes normally through applyServerFrame; this only sets
+    // the optimistic starting point, never bypasses that.
+    private fun claimActiveForLocalPlaybackStart() {
+        activeDeviceId = channel.deviceId
+        scope.launch { channel.changeDevice(channel.deviceId) }
     }
 
     private fun armed() = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
