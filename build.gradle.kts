@@ -24,6 +24,16 @@ kotlin {
 
         withHostTestBuilder {}.configure {}
 
+        // AndroidKeepAliveTone opens a real AudioTrack against the real
+        // audio HAL — a host test proves nothing about the odd-OEM audio
+        // configurations (cheap Android TV boxes, soundbars) it exists for,
+        // the exact device class F7's crash guard was written against.
+        withDeviceTestBuilder {
+            sourceSetTreeName = "test"
+        }.configure {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
+
         compilations.configureEach {
             compileTaskProvider.configure {
                 compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
@@ -93,6 +103,9 @@ kotlin {
             // a megabyte every consumer carries so a test could ask a question at
             // build time.
             implementation(kotlin("reflect"))
+        }
+        getByName("androidDeviceTest").dependencies {
+            implementation(libs.androidx.test.runner)
         }
     }
 }
