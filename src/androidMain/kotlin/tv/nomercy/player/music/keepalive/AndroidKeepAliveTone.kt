@@ -62,12 +62,8 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
             .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
             .build()
 
-        // Guarded: AudioTrack.Builder().build() is documented to throw
-        // UnsupportedOperationException on an incompatible parameter
-        // combination, and does so in practice on odd OEM audio-HAL setups —
-        // exactly the low-end Android TV / soundbar device class this
-        // feature exists for. Caught and folded into the existing
-        // not-initialized path below rather than left to crash the process.
+        // build() can throw UnsupportedOperationException on odd OEM HALs —
+        // folded into the not-initialized path below.
         val newTrack = runCatching {
             AudioTrack.Builder()
                 .setAudioAttributes(audioAttributes)
@@ -110,11 +106,7 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
         while (running && !Thread.currentThread().isInterrupted) {
             val t = track ?: break
             val toWrite = minOf(WRITE_CHUNK, toneBuffer.size - bufPos)
-            // Guarded the same way as the Builder above: this runs on a raw
-            // Thread, not a coroutine, and an uncaught exception here crashes
-            // the whole process by default. Folded into the same negative-
-            // return "give up on this write" path the HAL's own error codes
-            // already take.
+            // Runs on a raw Thread, not a coroutine — guarded the same way.
             val wrote = runCatching { t.write(toneBuffer, bufPos, toWrite) }.getOrDefault(-1)
             if (wrote < 0) break
             bufPos += wrote

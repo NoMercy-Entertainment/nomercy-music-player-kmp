@@ -74,14 +74,9 @@ public open class MusicConnectPlugin(
     // settling, which is the state it spends nearly all its life in.
     private var settlingUntilMs: Long = 0
 
-    // Until when this device ignores an incoming isPlaying=true. Armed by a
-    // local Pause/Stop, the opposite direction from settlingUntilMs above:
-    // that field protects a fresh promotion's right to START playing from a
-    // stale frame saying to stop, this one protects a deliberate local STOP
-    // from a stale frame — already in flight when the command was sent, on a
-    // hub that broadcasts several times a second — saying to resume. The two
-    // cannot share a field: gating the play direction on settlingUntilMs too
-    // would also block a freshly promoted device's own first play.
+    // Mirror of settlingUntilMs for the opposite direction: armed by a local
+    // Pause/Stop, ignores an incoming stale isPlaying=true. Can't share a
+    // field with settlingUntilMs — that one must let a fresh promotion play.
     private var pauseIntentUntilMs: Long = 0
 
     // The track a local crossfade has already swapped the audio to, while the
@@ -367,10 +362,7 @@ public open class MusicConnectPlugin(
         // promotion it crossed with.
         val pauseIsWanted: Boolean = !frame.isPlaying && nowMs() >= settlingUntilMs
 
-        // A resume this device is willing to hear. See pauseIntentUntilMs's own
-        // doc: without this gate, a stale isPlaying=true frame already in
-        // flight when a local Pause/Stop was sent lands after the local
-        // command took effect and resumes playback the viewer just stopped.
+        // A resume this device is willing to hear — see pauseIntentUntilMs.
         val playIsWanted: Boolean = frame.isPlaying && nowMs() >= pauseIntentUntilMs
 
         if (playIsWanted && !playing) player.play(remote)
@@ -447,11 +439,8 @@ public open class MusicConnectPlugin(
             claimActiveForLocalPlaybackStart()
         }
 
-        // See pauseIntentUntilMs's own doc: a heartbeat frame already in
-        // flight when this command was sent can still say isPlaying=true and
-        // arrive after the local stop takes effect. Armed on Pause and Stop
-        // specifically — the two commands that leave this device not
-        // playing, which is exactly the state a stale resume would corrupt.
+        // See pauseIntentUntilMs: guards against a stale isPlaying=true frame
+        // resuming what this Pause/Stop just stopped.
         if (command == ConnectCommand.PAUSE || command == ConnectCommand.STOP) {
             pauseIntentUntilMs = nowMs() + SETTLEMENT_MS
         }
@@ -474,12 +463,8 @@ public open class MusicConnectPlugin(
     // the optimistic starting point, never bypasses that.
     //
     // Also arms settlingUntilMs, same as applyActiveFrame does for a
-    // server-driven promotion. Without it, this device's confirming frame
-    // reads its own wasActive off the pre-claim value (this flip happened
-    // client-side, ahead of that frame), so applyActiveFrame's own
-    // justBecameActive check evaluates false on the one frame this path is
-    // about to receive — the settlement window that exists specifically to
-    // protect a fresh promotion never arms on this path at all.
+    // server-driven promotion — without it the confirming frame's own
+    // justBecameActive check reads false, since this flip already happened.
     private fun claimActiveForLocalPlaybackStart() {
         settlingUntilMs = nowMs() + SETTLEMENT_MS
         activeDeviceId = channel.deviceId

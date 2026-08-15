@@ -76,12 +76,8 @@ public open class AutoAdvancePlugin(
             if (opts.enabled) launch { onItemEndingSoon() }
         }
 
-        // Whatever moved the playing item — this plugin's own advance(),
-        // a host's skip button, a remote command — the resolution cached
-        // below belongs to the transition it was drawn for and no other.
-        // Left uncleared, a track changed by anything other than this
-        // plugin's own advance() would leave a stale pick sitting there for
-        // the NEXT transition to wrongly reuse.
+        // Invalidates the cache below on any item change, not just this
+        // plugin's own advance().
         on(CoreEvents.Item) { pendingNext = null }
     }
 
@@ -171,20 +167,10 @@ public open class AutoAdvancePlugin(
         return queue.getOrNull(target)
     }
 
-    // The item [resolveNext] decided for the CURRENT track's upcoming
-    // transition, cached rather than re-derived on every call — a configured
-    // generator is not required to be a pure function of (queue, index):
-    // SmartShuffleGenerator draws a random pick and appends to its own play
-    // history on every [PlaylistGenerator.next] call, so asking twice inside
-    // one transition can draw two DIFFERENT tracks. Without this cache,
-    // onItemEndingSoon's preload/crossfade warmed one track and the eventual
-    // advance() on Ended played a different one — the exact case
-    // [resolveNext]'s own comment above says cannot happen.
-    //
-    // Invalidated by the CoreEvents.Item listener in [use] the moment the
-    // playing item actually changes, for any reason — not cleared here on
-    // consumption, so a caller that reads it more than once before that
-    // still sees the one answer this transition drew.
+    // [resolveNext]'s answer for the current transition, cached rather than
+    // re-derived: SmartShuffleGenerator draws random and mutates its own
+    // history on every call, so asking twice can draw two different tracks.
+    // Cleared by the CoreEvents.Item listener in [use].
     private var pendingNext: PlaylistItem? = null
 
     private fun resolveNextCached(): PlaylistItem? {
@@ -210,11 +196,8 @@ public open class AutoAdvancePlugin(
         // player's own next() here would make a generator that said "stop"
         // advance anyway, and a radio that ended would loop instead.
         //
-        // Through the same cache onItemEndingSoon's preload/crossfade already
-        // drew from — see resolveNextCached's own doc — so this plays the
-        // track that was actually warmed, not a second, independently-drawn
-        // pick from a generator that is not required to answer the same way
-        // twice.
+        // Through the same cache as preload/crossfade, so this plays the
+        // track that was actually warmed.
         val next: PlaylistItem = resolveNextCached() ?: return
         player.item(next.id)
     }
