@@ -401,6 +401,17 @@ public open class MusicConnectPlugin(
         // though nothing else was actually claiming the device).
         if (role == DeviceRole.PASSIVE) event.preventDefault()
         val seconds: Double = event.data.time
+
+        // Same settlement window applyActiveFrame arms for justBecameActive —
+        // a seek just told the server where this device now is, and the
+        // server's own broadcast of that hasn't landed yet. A frame already
+        // in flight (describing wherever this device was BEFORE the seek)
+        // can still arrive in the gap and, unprotected, its isPlaying read
+        // matchPlaybackTo() as a real pause request — a genuinely playing
+        // local seek left paused by its own stale echo. Confirmed live, real
+        // device, 2026-08-12: FAST_FORWARD advanced the position correctly
+        // and the transport still ended up PAUSED.
+        settlingUntilMs = nowMs() + SETTLEMENT_MS
         scope.launch { channel.playbackCommand(ConnectCommand.SEEK, seconds) }
     }
 
