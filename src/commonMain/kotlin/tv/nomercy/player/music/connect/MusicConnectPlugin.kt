@@ -90,6 +90,15 @@ public open class MusicConnectPlugin(
     // is a question about when the server sent it, not about which track it is.
     private var advanceShield: OptimisticShield? = null
 
+    // Until when this device's own start is protected from a session end.
+    //
+    // Deliberately not settlingUntilMs, which a SERVER-driven promotion also
+    // arms: a device the server promoted was promoted with a track, so a frame
+    // with no item after it is a real session end and has to stop. This window
+    // is armed only by a start that began here, where the server has not been
+    // told what is playing yet and its own answer carries no item.
+    private var localStartUntilMs: Long = 0
+
     // What a passive device draws. Empty on the active one, which renders from
     // its own player because it is the thing actually playing.
     public val mirror: StateFlow<ConnectMirror> get() = ticker.mirror
@@ -205,12 +214,37 @@ public open class MusicConnectPlugin(
         // the device that just stopped being active would take the passive
         // branch and start following a session that no longer exists.
         val item: PlaylistItem = frame.item ?: run {
+            // Unless the server produced it before it heard this device start.
+            // Then it is not the session ending, it is the state from before the
+            // session began, and adopting it stops the track the viewer just
+            // pressed play on — measured on an SM-A137F as the decoder going
+            // RUNNING and RELEASED within eight milliseconds, no audio, no
+            // error. An unstamped frame is held too: a server too old to stamp
+            // cannot be placed either side of the press, and silently killing
+            // playback is the worse of the two ways to be wrong.
+            // Unless this device just started playing and the server is only
+            // now acknowledging it.
+            //
+            // Measured on an SM-A137F: the frame that killed playback arrived
+            // thirty milliseconds AFTER the press, named this very device, and
+            // carried no item — the server had processed the device claim and
+            // not yet the track. Answering that with a stop tore down the audio
+            // the viewer had just started, decoder RUNNING to RELEASED in eight
+            // milliseconds with no error anywhere. A null item means the session
+            // is over everywhere EXCEPT in the gap this device opened itself.
+            if (frame.deviceId == channel.deviceId && nowMs() < localStartUntilMs) return
+
             activeDeviceId = null
             cancelLoadContinuation()
             ticker.clear()
             scope.launch { player.stop(remote) }
             return
         }
+
+        // A frame carrying an item is the server caught up, whatever its clock
+        // says — the window has done its job and holding it open longer would
+        // only delay a real session end.
+        localStartUntilMs = 0
 
         val wasActive: Boolean = role == DeviceRole.ACTIVE
         activeDeviceId = frame.deviceId
@@ -467,6 +501,9 @@ public open class MusicConnectPlugin(
     // justBecameActive check reads false, since this flip already happened.
     private fun claimActiveForLocalPlaybackStart() {
         settlingUntilMs = nowMs() + SETTLEMENT_MS
+        // A round trip's worth, the same budget the optimistic shield uses, and
+        // for the same reason: it has to survive a bad connection.
+        localStartUntilMs = nowMs() + OPTIMISTIC_SHIELD_MS
         activeDeviceId = channel.deviceId
         scope.launch { channel.changeDevice(channel.deviceId) }
     }
