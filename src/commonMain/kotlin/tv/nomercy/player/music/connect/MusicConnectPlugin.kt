@@ -450,7 +450,20 @@ public open class MusicConnectPlugin(
         // means the current source is reset faster than it can start. That is
         // playback that never begins, with no duration, which a chrome draws as
         // live.
-        if (player.queue().map { it.id } != upcoming.map { it.id }) {
+        val held: List<String> = player.queue().map { it.id }
+        val offered: List<String> = upcoming.map { it.id }
+
+        // The server sends a WINDOW, not the queue: CloneForBroadcast caps the
+        // playlist at a hundred upcoming tracks. Overwriting with it threw away
+        // the rest of a long list on the device that started it — a five hundred
+        // track genre became a hundred and one, and the tracks after that could
+        // not be chosen any more. A window this device already contains tells it
+        // nothing it does not know, so it is dropped rather than applied.
+        val alreadyContained: Boolean = offered.isNotEmpty() &&
+            held.size > offered.size &&
+            held.containsAll(offered)
+
+        if (held != offered && !alreadyContained) {
             player.queue(upcoming)
         }
         player.repeatState(frame.repeatState, remote)
