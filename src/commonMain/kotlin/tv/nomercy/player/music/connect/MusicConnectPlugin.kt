@@ -443,7 +443,16 @@ public open class MusicConnectPlugin(
     protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
-        player.queue(upcoming)
+        // Only when it actually changed. This runs on EVERY frame, and a frame
+        // arrives several times a second: rewriting the queue tears down and
+        // rebuilds what the engine is playing from, which for a small album is
+        // survivable and for a genre — the server sends a hundred-entry window —
+        // means the current source is reset faster than it can start. That is
+        // playback that never begins, with no duration, which a chrome draws as
+        // live.
+        if (player.queue().map { it.id } != upcoming.map { it.id }) {
+            player.queue(upcoming)
+        }
         player.repeatState(frame.repeatState, remote)
         player.shuffleState(
             if (frame.shuffleState) ShuffleState.ON else ShuffleState.OFF,
