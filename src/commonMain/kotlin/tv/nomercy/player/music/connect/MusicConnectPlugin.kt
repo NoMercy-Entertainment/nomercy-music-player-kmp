@@ -254,6 +254,14 @@ public open class MusicConnectPlugin(
         val wasActive: Boolean = role == DeviceRole.ACTIVE
         activeDeviceId = frame.deviceId
 
+        // This device's own level, applied before the staleness gate below.
+        // Living in applyUniversalSettings meant a frame dropped as stale — one
+        // naming a track this device had already moved past — took the volume
+        // change with it, so a level sent to a device that was mid-advance was
+        // silently discarded (measured on the living-room TV: the phone
+        // addressed SetDeviceVolumeCommand correctly and nothing moved).
+        ownVolumeIn(frame, channel.deviceId)?.let { own -> scope.launch { player.volume(own, remote) } }
+
         // One coroutine for the whole frame, in order. Two would race: the queue
         // is written by the settings and read by the load, and a load that
         // arrived first would look for a track the player has not been given.
@@ -423,8 +431,6 @@ public open class MusicConnectPlugin(
     // looking at the wrong list, and it becomes the wrong list to play from the
     // moment they take over.
     protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
-        ownVolumeIn(frame, channel.deviceId)?.let { own -> player.volume(own, remote) }
-
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
         player.queue(upcoming)
