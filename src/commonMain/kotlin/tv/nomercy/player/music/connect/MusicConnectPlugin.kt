@@ -530,7 +530,15 @@ public open class MusicConnectPlugin(
             pauseIntentUntilMs = nowMs() + SETTLEMENT_MS
         }
 
-        if (isActiveDevice && command in ADVANCING_COMMANDS) advanceShield = armed()
+        if (isActiveDevice && command in ADVANCING_COMMANDS) {
+            advanceShield = armed()
+            // And the same window a promotion gets. The frame the server built
+            // before it heard this advance says the session is not playing, and
+            // obeying it pauses audio that just started: auto-advance reached the
+            // next track and stopped there, with the session still claiming to
+            // play. A pause is only wanted once the server has caught up.
+            settlingUntilMs = nowMs() + SETTLEMENT_MS
+        }
 
         // See guardSeek's comment: only a confirmed PASSIVE role blocks.
         if (role == DeviceRole.PASSIVE) {
