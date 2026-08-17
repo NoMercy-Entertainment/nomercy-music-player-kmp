@@ -369,6 +369,16 @@ public open class MusicConnectPlugin(
             // is inside this call — a continuation armed afterwards would wait
             // for a signal that had already gone past.
             armLoadContinuation(frame, target)
+            // item(id) plays a track the QUEUE already holds. A device the
+            // server just promoted may never have been given one — it was
+            // mirroring, not playing — so the id resolved to nothing and the
+            // promotion produced silence. The frame carries the track and the
+            // playlist it belongs to; seed the queue from that first, exactly
+            // as master builds its source from the mirrored song rather than
+            // hoping a local queue already has it.
+            if (player.queue().none { it.id == item.id }) {
+                player.queue(if (frame.playlist.isNotEmpty()) frame.playlist else listOf(item))
+            }
             player.item(item.id)
             return
         }
