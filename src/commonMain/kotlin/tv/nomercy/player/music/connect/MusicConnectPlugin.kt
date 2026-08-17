@@ -536,6 +536,11 @@ public open class MusicConnectPlugin(
      * item-changed event.
      */
     public fun startPlayback(type: String, listId: String, trackId: String) {
+        // The server answers the claim before it has processed the start, and
+        // that answer still names the PREVIOUS track. Applied, it loads and
+        // plays the song the viewer just moved away from. This is the same
+        // shield a local track change already uses, armed for the same reason.
+        advanceShield = armed()
         claimActiveForLocalPlaybackStart()
         scope.launch { channel.startPlayback(type, listId, trackId) }
     }
