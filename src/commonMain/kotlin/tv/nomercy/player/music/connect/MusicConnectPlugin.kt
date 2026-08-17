@@ -294,6 +294,14 @@ public open class MusicConnectPlugin(
         val held: Boolean = playingShield.holds(frame.serverTimeMs, nowMs())
         if (!held) playingShield = null
 
+        // The cursor moves, the engine is asked for nothing — the same verb the
+        // crossfade path uses. Without it a passive device kept the track it
+        // held when it went passive: its notification, lock screen and every
+        // reader of player.item() named the wrong song for the rest of the
+        // session.
+        val index: Int = player.queue().indexOfFirst { it.id == item.id }
+        if (index >= 0) player.seekToIndex(index + 1)
+
         ticker.show(
             ConnectMirror(
                 item = item,
