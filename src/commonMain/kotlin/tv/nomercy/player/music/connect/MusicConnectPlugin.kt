@@ -276,7 +276,17 @@ public open class MusicConnectPlugin(
             // dropped whole rather than partly applied. Letting it through to
             // the settings would rewrite the queue around the song that just
             // ended, and the next frame would rewrite it back.
-            val overtaken: Boolean = heldItemId != item.id && item.id != crossfadeTargetId
+            // Only a device that actually HELD a different track can have been
+            // overtaken by one. A device holding nothing — every mirroring
+            // device, by design, and every device the server is about to
+            // promote — has no track to be overtaken from, and comparing null
+            // against the frame's id made EVERY frame look overtaken. Whenever
+            // the shield window covered it the whole frame was dropped: no
+            // queue, no promotion, no mirror. That is a handoff that produces
+            // silence and a track drawn as live, and a passive device whose
+            // current item never updates.
+            val overtaken: Boolean =
+                heldItemId != null && heldItemId != item.id && item.id != crossfadeTargetId
             val stale: Boolean = overtaken && advanceShield.precedes(frame.serverTimeMs, nowMs())
 
             if (!stale) {
@@ -369,16 +379,6 @@ public open class MusicConnectPlugin(
             // is inside this call — a continuation armed afterwards would wait
             // for a signal that had already gone past.
             armLoadContinuation(frame, target)
-            // item(id) plays a track the QUEUE already holds. A device the
-            // server just promoted may never have been given one — it was
-            // mirroring, not playing — so the id resolved to nothing and the
-            // promotion produced silence. The frame carries the track and the
-            // playlist it belongs to; seed the queue from that first, exactly
-            // as master builds its source from the mirrored song rather than
-            // hoping a local queue already has it.
-            if (player.queue().none { it.id == item.id }) {
-                player.queue(if (frame.playlist.isNotEmpty()) frame.playlist else listOf(item))
-            }
             player.item(item.id)
             return
         }
