@@ -180,4 +180,22 @@ class MusicConnectLocalStartTest {
 
         assertEquals(1, rig.backend.stopCount, "the window outlived the server catching up")
     }
+
+    @Test
+    fun aLocalStartTellsTheServerWhatIsPlayingAndNotOnlyWhoIsPlayingIt() = runTest {
+        // The server builds its session from this command. Claiming the device
+        // without it leaves the session itemless, and an itemless session is
+        // broadcast as an ended one — so the claim alone silences the device
+        // that just started.
+        val rig: Rig = rig()
+
+        rig.plugin.startPlayback("album", "list-1", "track-1")
+        testScheduler.runCurrent()
+
+        assertEquals(
+            listOf("changeDevice:dev-a", "startPlayback:album:list-1:track-1"),
+            rig.channel.sent,
+            "the server was told who is playing but never what",
+        )
+    }
 }

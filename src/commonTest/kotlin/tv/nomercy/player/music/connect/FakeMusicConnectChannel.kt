@@ -53,6 +53,10 @@ class FakeMusicConnectChannel(
         sent += "changeDevice:$targetDeviceId"
     }
 
+    override suspend fun startPlayback(type: String, listId: String, trackId: String) {
+        sent += "startPlayback:$type:$listId:$trackId"
+    }
+
     override suspend fun reportPosition(positionMs: Long) {
         reported += positionMs
     }

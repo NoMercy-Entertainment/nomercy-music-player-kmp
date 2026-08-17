@@ -137,6 +137,7 @@ public abstract interface class tv/nomercy/player/music/connect/MusicConnectChan
 	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public abstract fun reportPosition (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun serverTimeMs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun startPlayback (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
 public final class tv/nomercy/player/music/connect/MusicConnectChannel$DefaultImpls {
@@ -164,6 +165,7 @@ public class tv/nomercy/player/music/connect/MusicConnectPlugin : tv/nomercy/pla
 	public fun isActiveDevice ()Z
 	protected fun nowMs ()J
 	protected fun serverNowMs ()J
+	public final fun startPlayback (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 	public final fun syncClock (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public fun use ()V
 }

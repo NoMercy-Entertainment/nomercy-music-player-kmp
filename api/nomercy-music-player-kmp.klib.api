@@ -48,6 +48,7 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
     abstract suspend fun playbackCommand(kotlin/String, kotlin/Double? = ...) // tv.nomercy.player.music.connect/MusicConnectChannel.playbackCommand|playbackCommand(kotlin.String;kotlin.Double?){}[0]
     abstract suspend fun reportPosition(kotlin/Long) // tv.nomercy.player.music.connect/MusicConnectChannel.reportPosition|reportPosition(kotlin.Long){}[0]
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
+    abstract suspend fun startPlayback(kotlin/String, kotlin/String, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.startPlayback|startPlayback(kotlin.String;kotlin.String;kotlin.String){}[0]
 }
 
 abstract interface tv.nomercy.player.music.input/MusicCommands { // tv.nomercy.player.music.input/MusicCommands|null[0]
@@ -600,6 +601,7 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
     final var lastAppliedSeq // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq|{}lastAppliedSeq[0]
         final fun <get-lastAppliedSeq>(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq.<get-lastAppliedSeq>|<get-lastAppliedSeq>(){}[0]
 
+    final fun startPlayback(kotlin/String, kotlin/String, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectPlugin.startPlayback|startPlayback(kotlin.String;kotlin.String;kotlin.String){}[0]
     final suspend fun syncClock() // tv.nomercy.player.music.connect/MusicConnectPlugin.syncClock|syncClock(){}[0]
     open fun applyServerFrame(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyServerFrame|applyServerFrame(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
     open fun dispose() // tv.nomercy.player.music.connect/MusicConnectPlugin.dispose|dispose(){}[0]

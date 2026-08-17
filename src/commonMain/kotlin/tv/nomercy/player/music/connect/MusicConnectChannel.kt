@@ -38,6 +38,14 @@ public interface MusicConnectChannel {
     // Hand playback to another device.
     public suspend fun changeDevice(targetDeviceId: String)
 
+    // Tell the server what this device just started playing, so its session has
+    // a track at all. Every other command reconciles against that session: with
+    // no item in it the server broadcasts an empty state, which every client
+    // reads as "session over" — the device playing stops itself on its own next
+    // frame and a handoff hands over nothing. Type is the hub's singular
+    // vocabulary (track/playlist/album/artist/genre), not the REST route.
+    public suspend fun startPlayback(type: String, listId: String, trackId: String)
+
     // Where this device has actually got to, in milliseconds. Only the active
     // device reports; a passive one reporting would be telling the server about
     // a position it inferred from the server.

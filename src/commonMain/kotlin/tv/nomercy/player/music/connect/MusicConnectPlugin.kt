@@ -508,6 +508,25 @@ public open class MusicConnectPlugin(
         scope.launch { channel.changeDevice(channel.deviceId) }
     }
 
+    /**
+     * A genuine user-initiated start of a list on THIS device: claim the
+     * session, then tell the server what is playing.
+     *
+     * Without the second half the server's session has no item, and an itemless
+     * session is broadcast as an ended one — the device that started the music
+     * stopped itself on the very next frame (play, seek, or the ~5s cadence),
+     * and a handoff moved an empty session to a device that then had nothing to
+     * play. Measured on two phones, 2026-08-17.
+     *
+     * Only a real tap calls this. A passive device mirroring the active one's
+     * auto-advance must never claim, which is why this is not driven off the
+     * item-changed event.
+     */
+    public fun startPlayback(type: String, listId: String, trackId: String) {
+        claimActiveForLocalPlaybackStart()
+        scope.launch { channel.startPlayback(type, listId, trackId) }
+    }
+
     private fun armed() = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
 
     // A press on a device that is not the one playing still has to look like it
