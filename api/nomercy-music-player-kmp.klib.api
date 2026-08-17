@@ -46,7 +46,7 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
 
     abstract suspend fun changeDevice(kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.changeDevice|changeDevice(kotlin.String){}[0]
     abstract suspend fun playbackCommand(kotlin/String, kotlin/Double? = ...) // tv.nomercy.player.music.connect/MusicConnectChannel.playbackCommand|playbackCommand(kotlin.String;kotlin.Double?){}[0]
-    abstract suspend fun reportPosition(kotlin/Long) // tv.nomercy.player.music.connect/MusicConnectChannel.reportPosition|reportPosition(kotlin.Long){}[0]
+    abstract suspend fun reportPosition(kotlin/Double, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.reportPosition|reportPosition(kotlin.Double;kotlin.String){}[0]
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
     abstract suspend fun startPlayback(kotlin/String, kotlin/String, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.startPlayback|startPlayback(kotlin.String;kotlin.String;kotlin.String){}[0]
 }

@@ -129,3 +129,12 @@ internal const val CLOCK_SAMPLES = 5
 // Half a minute. Clocks drift slowly, and a device that has been asleep gets a
 // fresh answer from the reconnect rather than from this.
 internal const val CLOCK_SYNC_PERIOD_MS = 30_000L
+
+// The active device's proof of life, and the same period the web reports on.
+// The server ends a session whose active device has not reported for fifteen
+// seconds and broadcasts the cleared state, which every device reads as the
+// session ending — so a client that never reports plays for fifteen seconds and
+// is then silenced by its own server (measured on an SM-A137F, 2026-08-17: the
+// gap between the last frame carrying the track and the frame carrying nothing
+// was 15,070ms).
+internal const val POSITION_REPORT_PERIOD_MS = 5_000L

@@ -198,4 +198,41 @@ class MusicConnectLocalStartTest {
             "the server was told who is playing but never what",
         )
     }
+
+    @Test
+    fun theActiveDeviceKeepsReportingWhereItIs() = runTest {
+        // The server ends a session whose active device has been silent for
+        // fifteen seconds and broadcasts the cleared state — so a device that
+        // never reports plays until the watchdog notices and is then stopped by
+        // its own server. Twenty seconds of playing must carry reports.
+        val rig: Rig = rig()
+
+        rig.plugin.startPlayback("album", "list-1", "a")
+        rig.player.play()
+        testScheduler.runCurrent()
+
+        rig.plugin.reportPositionNow()
+        testScheduler.runCurrent()
+
+        assertEquals(
+            listOf(0.0 to "a"),
+            rig.channel.reported,
+            "nothing told the server this device was still alive",
+        )
+    }
+
+    @Test
+    fun aDeviceThatIsNotPlayingReportsNothing() = runTest {
+        // The server does not treat a paused device as stale, and a report from
+        // one would keep the watchdog off a session nobody is listening to.
+        val rig: Rig = rig()
+
+        rig.plugin.startPlayback("album", "list-1", "a")
+        testScheduler.runCurrent()
+
+        rig.plugin.reportPositionNow()
+        testScheduler.runCurrent()
+
+        assertEquals(emptyList(), rig.channel.reported, "a passive device reported its position")
+    }
 }

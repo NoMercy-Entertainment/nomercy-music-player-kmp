@@ -63,7 +63,7 @@ class ConnectHandoffAcceptanceTest {
             sent += "startPlayback:$type:$listId:$trackId"
         }
 
-        override suspend fun reportPosition(positionMs: Long) = Unit
+        override suspend fun reportPosition(positionSeconds: Double, itemId: String) = Unit
 
         override suspend fun serverTimeMs(): Long? = null
     }

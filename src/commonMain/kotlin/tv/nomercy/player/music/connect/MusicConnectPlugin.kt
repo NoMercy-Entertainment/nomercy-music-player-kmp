@@ -64,6 +64,8 @@ public open class MusicConnectPlugin(
 
     private var clockSync: Job? = null
 
+    private var positionReports: Job? = null
+
     private val ticker = ConnectMirrorTicker(scope)
 
     private var loadContinuation: List<Subscription> = emptyList()
@@ -192,6 +194,7 @@ public open class MusicConnectPlugin(
         // with a different answer than it went in with.
         scope.launch { syncClock() }
         clockSync = interval(CLOCK_SYNC_PERIOD_MS) { scope.launch { syncClock() } }
+        positionReports = interval(POSITION_REPORT_PERIOD_MS) { reportPositionNow() }
     }
 
     override fun dispose() {
@@ -199,6 +202,8 @@ public open class MusicConnectPlugin(
         subscription = null
         clockSync?.cancel()
         clockSync = null
+        positionReports?.cancel()
+        positionReports = null
         cancelLoadContinuation()
         ticker.dispose()
     }
@@ -525,6 +530,16 @@ public open class MusicConnectPlugin(
     public fun startPlayback(type: String, listId: String, trackId: String) {
         claimActiveForLocalPlaybackStart()
         scope.launch { channel.startPlayback(type, listId, trackId) }
+    }
+
+    // Only the device the server considers active, and only while it is really
+    // playing: a paused device is not stale, and a passive one reporting would
+    // be telling the server about a position it got FROM the server.
+    internal fun reportPositionNow() {
+        if (!isActiveDevice) return
+        if (player.playState() != PlayState.PLAYING) return
+        val itemId: String = player.item()?.id ?: return
+        scope.launch { channel.reportPosition(player.time(), itemId) }
     }
 
     private fun armed() = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())

@@ -44,14 +44,14 @@ class MusicConnectChannelTest {
     }
 
     @Test
-    fun onlyPositionsInMillisecondsAreReported() = runTest {
-        // The server counts in milliseconds even though the player does not, and
-        // this is the one place the two meet.
+    fun aReportedPositionCarriesTheItemItIsAPositionIn() = runTest {
+        // Seconds, the player's own unit, and tagged: a report that lands after
+        // a track change must be recognisable as belonging to the old one.
         val channel = FakeMusicConnectChannel()
 
-        channel.reportPosition(90_000)
+        channel.reportPosition(90.0, "track-a")
 
-        assertEquals(listOf(90_000L), channel.reported)
+        assertEquals(listOf(90.0 to "track-a"), channel.reported)
     }
 
     @Test

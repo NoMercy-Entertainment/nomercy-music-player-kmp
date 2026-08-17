@@ -135,7 +135,7 @@ public abstract interface class tv/nomercy/player/music/connect/MusicConnectChan
 	public abstract fun getFrames ()Lkotlinx/coroutines/flow/Flow;
 	public abstract fun playbackCommand (Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun playbackCommand$default (Ltv/nomercy/player/music/connect/MusicConnectChannel;Ljava/lang/String;Ljava/lang/Double;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public abstract fun reportPosition (JLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun reportPosition (DLjava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun serverTimeMs (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public abstract fun startPlayback (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
