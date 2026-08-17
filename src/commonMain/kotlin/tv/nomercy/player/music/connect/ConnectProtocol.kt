@@ -59,7 +59,15 @@ internal fun adjustedPositionMs(frame: MusicPlayerState, serverNowMs: Long): Lon
         else -> 0
     }
 
-    val moved: Long = frame.progressMs + elapsedMs
+    // Bounded by the reporting period. The compensation exists to cover the trip
+    // from capture to arrival, and the device that is playing reports where it is
+    // every POSITION_REPORT_PERIOD_MS — so nothing honest can be older than that.
+    // An unbounded add pairs a fresh progress with a stale capture stamp and
+    // double-counts: measured on a freshly launched phone mirroring a television,
+    // the first frame landed 7.8 SECONDS ahead of the device actually decoding,
+    // then converged. That is a bar that jumps on load and again when playback
+    // takes over.
+    val moved: Long = frame.progressMs + elapsedMs.coerceAtMost(POSITION_REPORT_PERIOD_MS)
     return if (frame.durationMs > 0) moved.coerceAtMost(frame.durationMs) else moved
 }
 
