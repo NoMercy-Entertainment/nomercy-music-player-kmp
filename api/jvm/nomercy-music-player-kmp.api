@@ -443,19 +443,21 @@ public final class tv/nomercy/player/music/lyrics/NoLyricsSource : tv/nomercy/pl
 
 public final class tv/nomercy/player/music/queue/AutoAdvanceOptions {
 	public fun <init> ()V
-	public fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZD)V
-	public synthetic fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDZ)V
+	public synthetic fun <init> (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Z
 	public final fun component2 ()Ltv/nomercy/player/music/queue/PlaylistGenerator;
 	public final fun component3 ()Z
 	public final fun component4 ()D
-	public final fun copy (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZD)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
-	public static synthetic fun copy$default (Ltv/nomercy/player/music/queue/AutoAdvanceOptions;ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDILjava/lang/Object;)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
+	public final fun component5 ()Z
+	public final fun copy (ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDZ)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
+	public static synthetic fun copy$default (Ltv/nomercy/player/music/queue/AutoAdvanceOptions;ZLtv/nomercy/player/music/queue/PlaylistGenerator;ZDZILjava/lang/Object;)Ltv/nomercy/player/music/queue/AutoAdvanceOptions;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCrossfade ()Z
 	public final fun getCrossfadeDuration ()D
 	public final fun getEnabled ()Z
 	public final fun getGenerator ()Ltv/nomercy/player/music/queue/PlaylistGenerator;
+	public final fun getPreloadNextOnEnding ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

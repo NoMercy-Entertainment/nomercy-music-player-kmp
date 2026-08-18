@@ -27,6 +27,13 @@ public data class AutoAdvanceOptions(
     val crossfade: Boolean = false,
     /** Crossfade duration in seconds. Default `0` — a hard cut. */
     val crossfadeDuration: Double = 0.0,
+    /**
+     * On `itemEndingSoon`, warm the coming track through [NMMusicPlayer.preloadNow]
+     * when [crossfade] is off. Crossfading already primes the engine's own
+     * secondary slot — see [onItemEndingSoon] — so this only fires the
+     * separate warm when there is no crossfade doing it already.
+     */
+    val preloadNextOnEnding: Boolean = false,
 )
 
 /**
@@ -139,7 +146,15 @@ public open class AutoAdvancePlugin(
     private val crossfadeHandlers: MutableList<suspend (PlaylistItem?, Double) -> Unit> = mutableListOf()
 
     public suspend fun onItemEndingSoon() {
-        if (!opts.crossfade) return
+        if (!opts.crossfade) {
+            // The crossfade branch below already primes the coming track by
+            // loading it into the engine's own secondary slot — a second warm
+            // here would be redundant work on the same track. Without a
+            // crossfade there is no such priming, so this is the only warm
+            // the coming track gets before advance() plays it.
+            if (opts.preloadNextOnEnding) preloadNext()
+            return
+        }
 
         // Only a music player can crossfade — the method is not on the core
         // composition — so a plugin registered on a video player skips it
@@ -150,7 +165,8 @@ public open class AutoAdvancePlugin(
         // The crossfade IS the head start: it loads the coming track into the
         // engine's secondary slot and primes it before the fade begins. The
         // reference's separate preloadNextOnEnding exists because a browser has
-        // no such slot and warms the HTTP cache instead.
+        // no such slot and warms the HTTP cache instead; here it only fires
+        // when crossfade is off, above.
         music.crossfadeTo(next, opts.crossfadeDuration)
     }
 

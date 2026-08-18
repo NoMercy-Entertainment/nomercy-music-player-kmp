@@ -369,7 +369,7 @@ final class tv.nomercy.player.music.lyrics/LyricsOptions { // tv.nomercy.player.
 }
 
 final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.player.music.queue/AutoAdvanceOptions|null[0]
-    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
+    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ..., kotlin/Boolean = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double;kotlin.Boolean){}[0]
 
     final val crossfade // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade|{}crossfade[0]
         final fun <get-crossfade>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade.<get-crossfade>|<get-crossfade>(){}[0]
@@ -379,12 +379,15 @@ final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.pla
         final fun <get-enabled>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.enabled.<get-enabled>|<get-enabled>(){}[0]
     final val generator // tv.nomercy.player.music.queue/AutoAdvanceOptions.generator|{}generator[0]
         final fun <get-generator>(): tv.nomercy.player.music.queue/PlaylistGenerator? // tv.nomercy.player.music.queue/AutoAdvanceOptions.generator.<get-generator>|<get-generator>(){}[0]
+    final val preloadNextOnEnding // tv.nomercy.player.music.queue/AutoAdvanceOptions.preloadNextOnEnding|{}preloadNextOnEnding[0]
+        final fun <get-preloadNextOnEnding>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.preloadNextOnEnding.<get-preloadNextOnEnding>|<get-preloadNextOnEnding>(){}[0]
 
     final fun component1(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component1|component1(){}[0]
     final fun component2(): tv.nomercy.player.music.queue/PlaylistGenerator? // tv.nomercy.player.music.queue/AutoAdvanceOptions.component2|component2(){}[0]
     final fun component3(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component3|component3(){}[0]
     final fun component4(): kotlin/Double // tv.nomercy.player.music.queue/AutoAdvanceOptions.component4|component4(){}[0]
-    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
+    final fun component5(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component5|component5(){}[0]
+    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ..., kotlin/Boolean = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double;kotlin.Boolean){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.queue/AutoAdvanceOptions.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.queue/AutoAdvanceOptions.toString|toString(){}[0]
