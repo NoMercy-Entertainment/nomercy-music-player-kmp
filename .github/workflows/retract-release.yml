@@ -1,0 +1,70 @@
+name: Retract Release
+
+# Maven Central is append-only. A published coordinate can never be removed,
+# deprecated, or re-pointed, so there is no technical unwind for this surface:
+# the only real retraction is shipping a fixed version and making the bad one
+# unmistakable everywhere a human looks. This workflow does that half, and says
+# out loud that the artifact itself stays resolvable forever.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version being retracted (e.g. 0.3.1)'
+        required: true
+      rollback_to:
+        description: 'Known-good version consumers should pin instead'
+        required: true
+      reason:
+        description: 'Why this release is being retracted. Shown to users.'
+        required: true
+      dry_run:
+        description: 'Report what would change without touching anything'
+        type: boolean
+        default: true
+
+concurrency:
+  group: retract-release
+  cancel-in-progress: false
+
+jobs:
+  retract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      VERSION: ${{ inputs.version }}
+      ROLLBACK_TO: ${{ inputs.rollback_to }}
+    steps:
+      - name: Mark the GitHub release as retracted
+        run: |
+          tag="v${VERSION}"
+          gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1 || tag="${VERSION}"
+          if ! gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "::warning::no GitHub release for ${VERSION} — skipping release notes update"
+            exit 0
+          fi
+          notice=$(printf '> [!CAUTION]\n> **RETRACTED.** %s\n>\n> Pin %s instead. This version stays resolvable on Maven Central — Central is append-only and cannot be unpublished.\n\n' \
+            "${{ inputs.reason }}" "$ROLLBACK_TO")
+          body=$(gh release view "$tag" --repo "${{ github.repository }}" --json body --jq .body)
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "dry run: would prepend"
+            echo "$notice"
+          else
+            printf '%s%s' "$notice" "$body" > /tmp/body.md
+            gh release edit "$tag" --repo "${{ github.repository }}" --prerelease --notes-file /tmp/body.md
+          fi
+
+      - name: Summarise
+        run: |
+          {
+            echo "## Retracted ${VERSION}"
+            echo
+            echo "- Reason: ${{ inputs.reason }}"
+            echo "- Consumers should pin **${ROLLBACK_TO}**"
+            echo
+            echo "> Maven Central still serves \`${VERSION}\` and always will."
+            echo "> Ship a fixed version and bump every consumer — that is the only"
+            echo "> retraction this surface has."
+          } >> "$GITHUB_STEP_SUMMARY"
