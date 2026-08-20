@@ -39,6 +39,7 @@ import kotlin.math.abs
 // stopping it to wait for a round trip would put a gap in the audio for the
 // person holding it. A passive device tells the server and stops: it is not the
 // one playing, and letting it start would be the second stream.
+@Suppress("TooManyFunctions")
 public open class MusicConnectPlugin(
     private val player: ComposedPlayer,
     private val channel: MusicConnectChannel,

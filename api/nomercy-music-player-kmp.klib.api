@@ -68,8 +68,20 @@ abstract interface tv.nomercy.player.music.item/MusicPlaylistItem : tv.nomercy.p
         open fun <get-artist>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.artist.<get-artist>|<get-artist>(){}[0]
     open val cover // tv.nomercy.player.music.item/MusicPlaylistItem.cover|{}cover[0]
         open fun <get-cover>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.cover.<get-cover>|<get-cover>(){}[0]
+    open val favorite // tv.nomercy.player.music.item/MusicPlaylistItem.favorite|{}favorite[0]
+        open fun <get-favorite>(): kotlin/Boolean // tv.nomercy.player.music.item/MusicPlaylistItem.favorite.<get-favorite>|<get-favorite>(){}[0]
     open val image // tv.nomercy.player.music.item/MusicPlaylistItem.image|{}image[0]
         open fun <get-image>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.image.<get-image>|<get-image>(){}[0]
+    open val link // tv.nomercy.player.music.item/MusicPlaylistItem.link|{}link[0]
+        open fun <get-link>(): kotlin/String? // tv.nomercy.player.music.item/MusicPlaylistItem.link.<get-link>|<get-link>(){}[0]
+}
+
+abstract interface tv.nomercy.player.music.keepalive/KeepAliveTone { // tv.nomercy.player.music.keepalive/KeepAliveTone|null[0]
+    abstract val isRunning // tv.nomercy.player.music.keepalive/KeepAliveTone.isRunning|{}isRunning[0]
+        abstract fun <get-isRunning>(): kotlin/Boolean // tv.nomercy.player.music.keepalive/KeepAliveTone.isRunning.<get-isRunning>|<get-isRunning>(){}[0]
+
+    abstract fun start() // tv.nomercy.player.music.keepalive/KeepAliveTone.start|start(){}[0]
+    abstract fun stop() // tv.nomercy.player.music.keepalive/KeepAliveTone.stop|stop(){}[0]
 }
 
 abstract interface tv.nomercy.player.music.lyrics/LyricsSource { // tv.nomercy.player.music.lyrics/LyricsSource|null[0]
@@ -319,6 +331,24 @@ final class tv.nomercy.player.music.item/MusicItem : tv.nomercy.player.music.ite
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.item/MusicItem.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.item/MusicItem.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.item/MusicItem.toString|toString(){}[0]
+}
+
+final class tv.nomercy.player.music.keepalive/KeepAliveGate { // tv.nomercy.player.music.keepalive/KeepAliveGate|null[0]
+    constructor <init>(tv.nomercy.player.music.keepalive/KeepAliveTone, kotlinx.coroutines/CoroutineDispatcher = ...) // tv.nomercy.player.music.keepalive/KeepAliveGate.<init>|<init>(tv.nomercy.player.music.keepalive.KeepAliveTone;kotlinx.coroutines.CoroutineDispatcher){}[0]
+
+    final val active // tv.nomercy.player.music.keepalive/KeepAliveGate.active|{}active[0]
+        final fun <get-active>(): kotlinx.coroutines.flow/StateFlow<kotlin/Boolean> // tv.nomercy.player.music.keepalive/KeepAliveGate.active.<get-active>|<get-active>(){}[0]
+
+    final fun attachPlayback(kotlinx.coroutines.flow/StateFlow<kotlin/Boolean>, kotlinx.coroutines.flow/StateFlow<kotlin/Boolean>) // tv.nomercy.player.music.keepalive/KeepAliveGate.attachPlayback|attachPlayback(kotlinx.coroutines.flow.StateFlow<kotlin.Boolean>;kotlinx.coroutines.flow.StateFlow<kotlin.Boolean>){}[0]
+    final fun dispose() // tv.nomercy.player.music.keepalive/KeepAliveGate.dispose|dispose(){}[0]
+    final fun setForegrounded(kotlin/Boolean) // tv.nomercy.player.music.keepalive/KeepAliveGate.setForegrounded|setForegrounded(kotlin.Boolean){}[0]
+    final fun setUserEnabled(kotlin/Boolean) // tv.nomercy.player.music.keepalive/KeepAliveGate.setUserEnabled|setUserEnabled(kotlin.Boolean){}[0]
+    final fun setVideoPlaying(kotlin/Boolean) // tv.nomercy.player.music.keepalive/KeepAliveGate.setVideoPlaying|setVideoPlaying(kotlin.Boolean){}[0]
+
+    final object Companion { // tv.nomercy.player.music.keepalive/KeepAliveGate.Companion|null[0]
+        final const val IDLE_THRESHOLD_MS // tv.nomercy.player.music.keepalive/KeepAliveGate.Companion.IDLE_THRESHOLD_MS|{}IDLE_THRESHOLD_MS[0]
+            final fun <get-IDLE_THRESHOLD_MS>(): kotlin/Long // tv.nomercy.player.music.keepalive/KeepAliveGate.Companion.IDLE_THRESHOLD_MS.<get-IDLE_THRESHOLD_MS>|<get-IDLE_THRESHOLD_MS>(){}[0]
+    }
 }
 
 final class tv.nomercy.player.music.lyrics/LyricsOptions { // tv.nomercy.player.music.lyrics/LyricsOptions|null[0]
@@ -716,6 +746,14 @@ final object tv.nomercy.player.music.connect/ConnectCommand { // tv.nomercy.play
         final fun <get-STOP>(): kotlin/String // tv.nomercy.player.music.connect/ConnectCommand.STOP.<get-STOP>|<get-STOP>(){}[0]
 }
 
+final object tv.nomercy.player.music.keepalive/NoKeepAliveTone : tv.nomercy.player.music.keepalive/KeepAliveTone { // tv.nomercy.player.music.keepalive/NoKeepAliveTone|null[0]
+    final val isRunning // tv.nomercy.player.music.keepalive/NoKeepAliveTone.isRunning|{}isRunning[0]
+        final fun <get-isRunning>(): kotlin/Boolean // tv.nomercy.player.music.keepalive/NoKeepAliveTone.isRunning.<get-isRunning>|<get-isRunning>(){}[0]
+
+    final fun start() // tv.nomercy.player.music.keepalive/NoKeepAliveTone.start|start(){}[0]
+    final fun stop() // tv.nomercy.player.music.keepalive/NoKeepAliveTone.stop|stop(){}[0]
+}
+
 final object tv.nomercy.player.music.lyrics/LyricsErrorCodes { // tv.nomercy.player.music.lyrics/LyricsErrorCodes|null[0]
     final const val FETCH_FAILED // tv.nomercy.player.music.lyrics/LyricsErrorCodes.FETCH_FAILED|{}FETCH_FAILED[0]
         final fun <get-FETCH_FAILED>(): kotlin/String // tv.nomercy.player.music.lyrics/LyricsErrorCodes.FETCH_FAILED.<get-FETCH_FAILED>|<get-FETCH_FAILED>(){}[0]
@@ -812,6 +850,7 @@ final val tv.nomercy.player.music.scrobble/Scrobbled // tv.nomercy.player.music.
 final fun tv.nomercy.player.music.input/musicCommandsOf(tv.nomercy.player.music/NMMusicPlayer, kotlinx.coroutines/CoroutineScope): tv.nomercy.player.music.input/MusicCommands // tv.nomercy.player.music.input/musicCommandsOf|musicCommandsOf(tv.nomercy.player.music.NMMusicPlayer;kotlinx.coroutines.CoroutineScope){}[0]
 final fun tv.nomercy.player.music.input/nextRepeatState(tv.nomercy.player.core.player/RepeatState): tv.nomercy.player.core.player/RepeatState // tv.nomercy.player.music.input/nextRepeatState|nextRepeatState(tv.nomercy.player.core.player.RepeatState){}[0]
 final fun tv.nomercy.player.music.input/nextShuffleState(tv.nomercy.player.core.player/ShuffleState): tv.nomercy.player.core.player/ShuffleState // tv.nomercy.player.music.input/nextShuffleState|nextShuffleState(tv.nomercy.player.core.player.ShuffleState){}[0]
+final fun tv.nomercy.player.music.keepalive/defaultKeepAliveTone(): tv.nomercy.player.music.keepalive/KeepAliveTone // tv.nomercy.player.music.keepalive/defaultKeepAliveTone|defaultKeepAliveTone(){}[0]
 final fun tv.nomercy.player.music/defaultAudioBackend(): tv.nomercy.player.core.ports/AudioBackend // tv.nomercy.player.music/defaultAudioBackend|defaultAudioBackend(){}[0]
 final fun tv.nomercy.player.music/nmMusicPlayer(kotlin/String = ..., tv.nomercy.player.core.ports/AudioBackend? = ...): tv.nomercy.player.music/NMMusicPlayer // tv.nomercy.player.music/nmMusicPlayer|nmMusicPlayer(kotlin.String;tv.nomercy.player.core.ports.AudioBackend?){}[0]
 final suspend fun tv.nomercy.player.music.connect/connectMusic(tv.nomercy.player.core.controllers/ComposedPlayer, tv.nomercy.player.music.connect/MusicConnectChannel, kotlinx.coroutines/CoroutineScope, kotlin/Boolean = ...): tv.nomercy.player.music.connect/MusicConnectPlugin // tv.nomercy.player.music.connect/connectMusic|connectMusic(tv.nomercy.player.core.controllers.ComposedPlayer;tv.nomercy.player.music.connect.MusicConnectChannel;kotlinx.coroutines.CoroutineScope;kotlin.Boolean){}[0]

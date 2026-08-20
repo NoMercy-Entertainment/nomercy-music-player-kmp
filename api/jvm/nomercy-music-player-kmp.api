@@ -299,8 +299,10 @@ public final class tv/nomercy/player/music/item/MusicItem : tv/nomercy/player/mu
 	public fun getAlbum ()Ljava/lang/String;
 	public fun getArtist ()Ljava/lang/String;
 	public fun getCover ()Ljava/lang/String;
+	public fun getFavorite ()Z
 	public fun getId ()Ljava/lang/String;
 	public fun getImage ()Ljava/lang/String;
+	public fun getLink ()Ljava/lang/String;
 	public fun getName ()Ljava/lang/String;
 	public fun getTitle ()Ljava/lang/String;
 	public fun getUrl ()Ljava/lang/String;
@@ -312,7 +314,9 @@ public abstract interface class tv/nomercy/player/music/item/MusicPlaylistItem :
 	public fun getAlbum ()Ljava/lang/String;
 	public fun getArtist ()Ljava/lang/String;
 	public fun getCover ()Ljava/lang/String;
+	public fun getFavorite ()Z
 	public fun getImage ()Ljava/lang/String;
+	public fun getLink ()Ljava/lang/String;
 	public abstract fun getName ()Ljava/lang/String;
 }
 
@@ -320,7 +324,42 @@ public final class tv/nomercy/player/music/item/MusicPlaylistItem$DefaultImpls {
 	public static fun getAlbum (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
 	public static fun getArtist (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
 	public static fun getCover (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+	public static fun getFavorite (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Z
 	public static fun getImage (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+	public static fun getLink (Ltv/nomercy/player/music/item/MusicPlaylistItem;)Ljava/lang/String;
+}
+
+public final class tv/nomercy/player/music/keepalive/KeepAliveGate {
+	public static final field Companion Ltv/nomercy/player/music/keepalive/KeepAliveGate$Companion;
+	public static final field IDLE_THRESHOLD_MS J
+	public fun <init> (Ltv/nomercy/player/music/keepalive/KeepAliveTone;Lkotlinx/coroutines/CoroutineDispatcher;)V
+	public synthetic fun <init> (Ltv/nomercy/player/music/keepalive/KeepAliveTone;Lkotlinx/coroutines/CoroutineDispatcher;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun attachPlayback (Lkotlinx/coroutines/flow/StateFlow;Lkotlinx/coroutines/flow/StateFlow;)V
+	public final fun dispose ()V
+	public final fun getActive ()Lkotlinx/coroutines/flow/StateFlow;
+	public final fun setForegrounded (Z)V
+	public final fun setUserEnabled (Z)V
+	public final fun setVideoPlaying (Z)V
+}
+
+public final class tv/nomercy/player/music/keepalive/KeepAliveGate$Companion {
+}
+
+public final class tv/nomercy/player/music/keepalive/KeepAlivePlatform_jvmKt {
+	public static final fun defaultKeepAliveTone ()Ltv/nomercy/player/music/keepalive/KeepAliveTone;
+}
+
+public abstract interface class tv/nomercy/player/music/keepalive/KeepAliveTone {
+	public abstract fun isRunning ()Z
+	public abstract fun start ()V
+	public abstract fun stop ()V
+}
+
+public final class tv/nomercy/player/music/keepalive/NoKeepAliveTone : tv/nomercy/player/music/keepalive/KeepAliveTone {
+	public static final field INSTANCE Ltv/nomercy/player/music/keepalive/NoKeepAliveTone;
+	public fun isRunning ()Z
+	public fun start ()V
+	public fun stop ()V
 }
 
 public final class tv/nomercy/player/music/lyrics/LyricsErrorCodes {
