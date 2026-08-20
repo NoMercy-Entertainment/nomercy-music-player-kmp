@@ -133,15 +133,16 @@ class MusicConnectOutboundTest {
     }
 
     @Test
-    fun withNoActiveDeviceAnywhereThisOneStillDoesNotAssumeItIsPlaying() = runTest {
-        // Nothing is playing. This device is not active, so it reports and waits
-        // to be told — a device that assumed would be the second authority.
+    fun withNoActiveDeviceAnywhereAGenuineLocalPlayClaimsThisOne() = runTest {
+        // Nothing is playing anywhere. A genuine local PLAY — not an echo, not
+        // already claimed by another device — claims this one optimistically,
+        // ahead of the round trip (see MusicConnectPlugin.claimActiveForLocalPlaybackStart).
         val rig: Rig = rig(activeDeviceId = null)
 
         rig.player.play()
 
-        assertEquals(0, rig.backend.playCount)
-        assertEquals(listOf("play"), rig.channel.sent)
+        assertTrue(rig.backend.playCount > 0, "a genuine local play did not start playback")
+        assertEquals(listOf("changeDevice:dev-a", "play"), rig.channel.sent)
     }
 
     @Test
