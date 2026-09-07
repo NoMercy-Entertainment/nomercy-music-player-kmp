@@ -19,6 +19,8 @@ import tv.nomercy.player.core.ports.NowPlaying
 import tv.nomercy.player.core.ports.SystemTransport
 import tv.nomercy.player.core.ports.TransportActions
 import tv.nomercy.player.core.ports.TransportPlaybackState
+import tv.nomercy.player.music.NMMusicPlayer
+import tv.nomercy.player.music.SilentBackend
 import tv.nomercy.player.music.item.MusicPlaylistItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -110,5 +112,37 @@ class MusicMediaSessionPluginTest {
         assertNull(playing?.artist)
         assertNull(playing?.album)
         assertNull(playing?.artworkUrl)
+    }
+
+    // Reproduces the exact call pattern MusicPlayerFacade.playTrack makes:
+    // queue(listOf(item)) then item(id, autoplay = true) — a fresh single-item
+    // queue on every tap, not queue-then-move-cursor within a stable list. A
+    // real device (Samsung SM-A137F, 2026-09-07) showed a second track playing
+    // — correct art, correct title in the app's own UI — while
+    // dumpsys media_session still reported the FIRST track's metadata,
+    // unchanged, minutes later: Android Auto and the lock screen both read
+    // that stale platform session, not the app's UI state.
+    @Test
+    fun aSecondTrackPlayedTheSameWayTheAppPlaysOneUpdatesTheSession() = runTest {
+        val transport = CapturingTransport()
+        val backend = SilentBackend()
+        val player = NMMusicPlayer(backend)
+        player.setup()
+        player.addPlugin(MusicMediaSessionPlugin(SilentCommands()) { transport })
+
+        val first = Track(id = "kogong", name = "Kogong", artist = "Mark Forster")
+        player.queue(listOf(first))
+        player.item(first.id, autoplay = true)
+        assertEquals("Kogong", transport.lastNowPlaying?.title, "the first track never reached the session")
+
+        val second = Track(id = "strip-my-mind", name = "Strip My Mind", artist = "Red Hot Chili Peppers")
+        player.queue(listOf(second))
+        player.item(second.id, autoplay = true)
+
+        assertEquals(
+            "Strip My Mind",
+            transport.lastNowPlaying?.title,
+            "the session kept showing the first track after a second one started playing",
+        )
     }
 }
