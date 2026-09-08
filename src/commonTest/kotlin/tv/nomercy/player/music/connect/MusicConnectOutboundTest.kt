@@ -120,6 +120,35 @@ class MusicConnectOutboundTest {
     }
 
     @Test
+    fun aSystemTransportButtonReachesTheServerEvenWhilePassive() = runTest {
+        // PlayerTransportCommands (the notification, lock screen, car, or
+        // Bluetooth remote) tags its calls PLUGIN, not REMOTE — REMOTE is
+        // reserved for this plugin's own echo of a server frame, one test
+        // above. A passive device's system-transport button press has to
+        // reach the server the same way a genuine on-screen tap does, or
+        // pressing pause while mirroring another device's session does
+        // nothing to the real session at all (confirmed live, real phone,
+        // 2026-09-09 — see PlayerTransportCommands.kt's own comment).
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.pause(ActionOptions(source = ActionSource.PLUGIN))
+
+        assertEquals(listOf("pause"), rig.channel.sent, "a system-transport button was swallowed as an echo")
+    }
+
+    @Test
+    fun aSeekFromSystemTransportReachesTheServerEvenWhilePassive() = runTest {
+        // guardSeek is its own function with its own isEcho check — separate
+        // from guard()'s, proven above only for pause. A fix to one is not
+        // proof of the other; this is the seek half.
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.time(42.0, ActionOptions(source = ActionSource.PLUGIN))
+
+        assertEquals(listOf("seek:42.0"), rig.channel.sent, "a system-transport seek was swallowed as an echo")
+    }
+
+    @Test
     fun anEchoedActionStillHappensLocally() = runTest {
         // The other half of the same rule. Not echoing it back must not mean
         // ignoring it — the server said pause, so this device pauses.
