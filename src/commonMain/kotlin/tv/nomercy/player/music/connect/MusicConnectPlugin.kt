@@ -72,6 +72,10 @@ public open class MusicConnectPlugin(
 
     private var loadContinuation: List<Subscription> = emptyList()
 
+    // Separate from loadContinuation on purpose — see armLoadContinuation's
+    // own comment on why the two can no longer share one dispose-together list.
+    private var readySubscription: Subscription? = null
+
     private var playingShield: OptimisticShield? = null
 
     // Until when a freshly promoted device ignores a pause. Zero means it is not
@@ -417,31 +421,54 @@ public open class MusicConnectPlugin(
 
     // What happens once the engine has the track.
     //
-    // Both arms end the continuation, including the failure one: a load that
-    // errored is never going to report ready, and leaving the subscription armed
-    // means the NEXT track's readiness runs this frame's stale seek.
+    // The ready arm ends only itself, not the failure arms beside it. MediaReady
+    // says the engine holds a source, never that the bytes behind it arrived —
+    // load() on the real backend (ExoPlayerVideoBackend.load) returns as soon as
+    // prepare() is called and reports a bad response later, off its own loading
+    // thread, once the fetch it started actually completes. Measured live, real
+    // phone, 2026-09-08: a track's MediaReady fired at once and its real 404
+    // surfaced roughly a minute later — so a version of this that let "ready"
+    // retire the failure listeners was deaf to the one failure shape production
+    // hits, and recovery from a genuine stream error never ran at all, first
+    // failure or fifth. The failure arms stay live for the rest of this load's
+    // life and are only replaced by the next armLoadContinuation/
+    // recoverFromLoadFailure call, or torn down deliberately by
+    // cancelLoadContinuation.
     private fun armLoadContinuation(frame: MusicPlayerState, seekSeconds: Double) {
         cancelLoadContinuation()
 
-        val ready: Subscription = on(CoreEvents.MediaReady) {
-            cancelLoadContinuation()
+        readySubscription = on(CoreEvents.MediaReady) {
+            readySubscription?.dispose()
+            readySubscription = null
             scope.launch {
                 player.time(seekSeconds, remote)
                 matchPlaybackTo(frame)
             }
         }
-        // Both failure surfaces. A stream that would not open reports one, a
-        // playlist that would not resolve reports the other, and either of them
-        // means the readiness this is waiting for is never coming — and this
-        // device already told the server, or the server already believes, that
-        // it is playing something it now holds no source for.
+        armFailureRecovery()
+    }
+
+    // Both failure surfaces. A stream that would not open reports one, a
+    // playlist that would not resolve reports the other, and either of them
+    // means the readiness this load was waiting for is never coming — and this
+    // device already told the server, or the server already believes, that it
+    // is playing something it now holds no source for.
+    //
+    // Called both from armLoadContinuation, before its own load, and from
+    // recoverFromLoadFailure, before the next() call that load reaches for —
+    // armed before the load in both places, not after: against a fast engine
+    // the load's own failure can land inside that same call, and a listener
+    // attached afterwards would wait for a signal that already went past.
+    private fun armFailureRecovery() {
         val streamFailed: Subscription = on(CoreEvents.StreamError) { recoverFromLoadFailure() }
         val failed: Subscription = on(CoreEvents.Error) { recoverFromLoadFailure() }
 
-        loadContinuation = listOf(ready, streamFailed, failed)
+        loadContinuation = listOf(streamFailed, failed)
     }
 
     private fun cancelLoadContinuation() {
+        readySubscription?.dispose()
+        readySubscription = null
         loadContinuation.forEach { it.dispose() }
         loadContinuation = emptyList()
     }
@@ -466,8 +493,22 @@ public open class MusicConnectPlugin(
     // Only once NEXT itself has nowhere to go (CoreEvents.QueueExhausted,
     // the same signal a chrome would read) does this fall back to stopping
     // outright — the honest answer once nothing is left to try.
+    //
+    // Re-arms its own failure listeners before calling next(), rather than
+    // trusting the server's next frame to do it through applyActiveFrame.
+    // next() moves the queue cursor and loads the new track synchronously
+    // (TransportController.next -> advanceTo -> ctx.load), before the
+    // server's frame confirming that move ever arrives — so by the time it
+    // does, applyActiveFrame's heldItemId (read from player.item() at the top
+    // of that frame) already equals the frame's own item, isTrackChange reads
+    // false, and armLoadContinuation is never called for the track this
+    // recovery just moved to. A second, unrelated failure on that track would
+    // then have nothing listening for it. Measured live, real phone,
+    // 2026-09-08: recovery skipped the first failed track correctly and then
+    // froze forever on the second one, in the same session, immediately after.
     private fun recoverFromLoadFailure() {
         cancelLoadContinuation()
+        armFailureRecovery()
 
         scope.launch {
             var exhausted = false
@@ -475,7 +516,10 @@ public open class MusicConnectPlugin(
             player.next(ownInitiative)
             watch.dispose()
 
-            if (exhausted) player.stop(ownInitiative)
+            if (exhausted) {
+                cancelLoadContinuation()
+                player.stop(ownInitiative)
+            }
         }
     }
 

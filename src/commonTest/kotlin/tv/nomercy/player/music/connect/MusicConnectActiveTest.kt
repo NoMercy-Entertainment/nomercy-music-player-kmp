@@ -193,6 +193,57 @@ class MusicConnectActiveTest {
     }
 
     @Test
+    fun aStreamErrorArrivingAfterMediaReadyStillRecovers() = runTest {
+        // MediaReady says the engine holds a source, not that the bytes behind
+        // it will ever arrive. The real backend's load() (ExoPlayerVideoBackend)
+        // returns as soon as prepare() is called and reports a bad response
+        // later, off its own loading thread — measured live, real phone,
+        // 2026-09-08: MediaReady fired at once and the real 404 surfaced
+        // roughly a minute afterward. This fake's default load() reports ready
+        // synchronously (no holdTheNextLoad needed), so the STREAM_ERROR below
+        // models exactly that late, out-of-band failure. A continuation that
+        // let "ready" retire the failure listeners would be deaf to it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("b", rig.player.item()?.id, "a failure that arrived after MediaReady was never heard")
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.NEXT),
+            "the server was never told this device skipped: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
+    fun twoConsecutiveLoadFailuresBothRecoverInsteadOfFreezingOnTheSecond() = runTest {
+        // Traced live, real phone, 2026-09-08: recovery skipped the first
+        // failed track correctly and then froze forever on the second one, in
+        // the same session, immediately after. next() moves the queue cursor
+        // and loads the new track synchronously, before the server's own frame
+        // confirming that move arrives — so applyActiveFrame's isTrackChange
+        // reads false against it and never re-arms. Recovery has to arm its
+        // own retry rather than depend on that frame ever doing it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"), Track("c"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+        assertEquals("b", rig.player.item()?.id, "the first failure never skipped forward")
+
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("c", rig.player.item()?.id, "the second failure in a row was never heard")
+        assertEquals(
+            2,
+            rig.channel.sent.count { it == ConnectCommand.NEXT },
+            "the server was told about only one of the two skips: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
     fun aSmallDriftIsLeftAlone() = runTest {
         // Correcting every frame would make each one a seek, and a seek on a
         // music engine is an audible gap. The tolerance exists to keep the
