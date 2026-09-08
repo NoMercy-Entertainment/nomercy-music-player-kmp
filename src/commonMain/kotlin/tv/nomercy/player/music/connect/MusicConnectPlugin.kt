@@ -379,7 +379,11 @@ public open class MusicConnectPlugin(
             // is inside this call — a continuation armed afterwards would wait
             // for a signal that had already gone past.
             armLoadContinuation(frame, target)
-            player.item(item.id)
+            // Not the library's own autoplay default: whether this plays is
+            // matchPlaybackTo's call once MediaReady fires, not the load's — a
+            // paused session handed over would otherwise start audibly, if
+            // only for the instant before that correction lands.
+            player.item(item.id, autoplay = false)
             return
         }
 
