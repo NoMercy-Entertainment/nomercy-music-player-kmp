@@ -182,6 +182,31 @@ class MusicConnectPassiveTest {
     }
 
     @Test
+    fun aPassiveDeviceLearnsTheActiveDevicesVolumeFromTheFrame() = runTest {
+        // Not this device's own remembered level — the level the device
+        // ACTUALLY playing is at right now, which is what a passive device has
+        // to know before it computes a step meant to change it.
+        val rig: Rig = rig()
+
+        send(rig, playingElsewhere().copy(volumePercentage = 64))
+
+        assertEquals(64, rig.plugin.remoteVolume.value)
+    }
+
+    @Test
+    fun theRemoteVolumeMovesAgainOnTheNextFrameWithoutAPress() = runTest {
+        // The whole bug: someone else changes the TV's volume — its own
+        // remote, HDMI-CEC, another client — and the phone that never touched
+        // anything still has to end up knowing the new figure.
+        val rig: Rig = rig()
+        send(rig, playingElsewhere(seq = 1).copy(volumePercentage = 80))
+
+        send(rig, playingElsewhere(seq = 2).copy(volumePercentage = 55))
+
+        assertEquals(55, rig.plugin.remoteVolume.value, "a change nobody here made was not picked up")
+    }
+
+    @Test
     fun aDisposedPluginStopsMovingTheBar() = runTest {
         // A ticker outliving its plugin is a coroutine per player ever opened,
         // each of them waking four times a second forever.

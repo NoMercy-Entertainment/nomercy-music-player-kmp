@@ -10,7 +10,9 @@ package tv.nomercy.player.music.connect
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.events.BeforeEvent
@@ -104,6 +106,21 @@ public open class MusicConnectPlugin(
     // What a passive device draws. Empty on the active one, which renders from
     // its own player because it is the thing actually playing.
     public val mirror: StateFlow<ConnectMirror> get() = ticker.mirror
+
+    // Not this device's own remembered level (ownVolumeIn/applyOwnVolume,
+    // deliberately a different knob) and not the engine's gain. This is what
+    // the server last said the ACTIVE device is at, kept for every role so a
+    // device that is currently passive still knows what it would be nudging.
+    //
+    // Without it, a phone computing a volume-down step from its own stale idea
+    // of the television's level sent that stale number back up before stepping
+    // down from it — the television got LOUDER on a press meant to lower it.
+    // Stoney: "my phone is holding the original volume causing the volume down
+    // action on my phone to reset to the higher value before then lowering one
+    // step every press."
+    private val _remoteVolume = MutableStateFlow(DEFAULT_VOLUME_PERCENT)
+
+    public val remoteVolume: StateFlow<Int> get() = _remoteVolume.asStateFlow()
 
     public open val role: DeviceRole get() = resolveRole(activeDeviceId, channel.deviceId)
 
@@ -213,6 +230,13 @@ public open class MusicConnectPlugin(
         val nextSeq: Long = nextAppliedSeqOrNull(frame.seq, lastAppliedSeq) ?: return
         lastAppliedSeq = nextSeq
 
+        // Every frame that gets this far, whatever it says about the session —
+        // regardless of this device's own role, and regardless of whether it
+        // carries an item at all. The value is read by whichever device is
+        // about to step a volume it does not own, and it has to be current the
+        // instant that press happens, not only while a track is loaded.
+        _remoteVolume.value = frame.volumePercentage
+
         // No item is the session ending, and it ends everywhere at once. The
         // device that was playing stops and every other one stops mirroring,
         // which is why this happens before the role is reconciled — after it,
@@ -260,7 +284,7 @@ public open class MusicConnectPlugin(
         // change with it, so a level sent to a device that was mid-advance was
         // silently discarded (measured on the living-room TV: the phone
         // addressed SetDeviceVolumeCommand correctly and nothing moved).
-        ownVolumeIn(frame, channel.deviceId)?.let { own -> scope.launch { player.volume(own, remote) } }
+        ownVolumeIn(frame, channel.deviceId)?.let { own -> scope.launch { applyOwnVolume(own) } }
 
         // One coroutine for the whole frame, in order. Two would race: the queue
         // is written by the settings and read by the load, and a load that
@@ -480,6 +504,24 @@ public open class MusicConnectPlugin(
     // Marked as the server's doing, which is what stops every one of these
     // becoming an outbound command. The guards read the source and the applier
     // is the only thing that sets it.
+    /**
+     * The level the server says THIS device should be at.
+     *
+     * Separate from every other volume call in this library because it is a
+     * different thing: a slider moves the player's own gain, while this is a
+     * remote telling an appliance how loud to be. On a television those are not
+     * the same knob — turning the engine's gain down leaves the set exactly as
+     * loud as it was, so the phone's volume key appeared to do nothing (Stoney:
+     * "it changes the exoplayer volume instead of the hardware volume on tv").
+     *
+     * The default keeps the old behaviour, because gain is the only volume a
+     * library can portably touch — a browser cannot set OS volume at all. A host
+     * that CAN move the device overrides this and does.
+     */
+    protected open suspend fun applyOwnVolume(percent: Int) {
+        player.volume(percent, remote)
+    }
+
     private val remote = ActionOptions(source = ActionSource.REMOTE)
 
     // Its own function rather than a labelled return inside the subscription,
@@ -625,3 +667,8 @@ public open class MusicConnectPlugin(
 
 // The two that move this device off the track the server last named.
 private val ADVANCING_COMMANDS = setOf(ConnectCommand.NEXT, ConnectCommand.PREVIOUS)
+
+// Only a starting point before the first frame ever lands — matches
+// MusicPlayerState.volumePercentage's own default, so a device that has not
+// heard from the server yet assumes full rather than silent.
+private const val DEFAULT_VOLUME_PERCENT = 100

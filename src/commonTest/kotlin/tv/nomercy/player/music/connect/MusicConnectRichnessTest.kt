@@ -82,6 +82,56 @@ class MusicConnectRichnessTest {
         serverTimeMs = serverTimeMs,
     )
 
+    /**
+     * A host that owns a real device volume gets the level instead of the engine.
+     *
+     * The server's per-device figure is an instruction to an appliance — "the
+     * television should be at 73" — and on Android that has to reach the system
+     * volume, not ExoPlayer's gain, or the set stays exactly as loud as it was
+     * while the decoder goes quiet.
+     *
+     * Both halves are asserted, because either alone passes while the bug is
+     * present: that the host was handed the level, AND that the engine gain was
+     * left alone. A test that only checked the first would still pass if the
+     * library set both, which is the double-attenuation this seam exists to
+     * avoid.
+     */
+    @Test
+    fun aHostThatOwnsTheDeviceVolumeGetsTheLevelInsteadOfTheEngine() = runTest {
+        val taken = mutableListOf<Int>()
+        val backend = TwoTrackBackend()
+        val channel = FakeMusicConnectChannel(deviceId = "dev-a")
+        val player = NMMusicPlayer(backend, backend)
+        val plugin = object : MusicConnectPlugin(player, channel, eager()) {
+            override suspend fun applyOwnVolume(percent: Int) {
+                taken += percent
+            }
+        }
+        player.setup()
+        player.addPlugin(plugin)
+        testScheduler.runCurrent()
+
+        val engineLevelBefore: Int = player.volume()
+
+        channel.broadcast(
+            MusicPlayerState(
+                deviceId = "dev-b",
+                seq = 1,
+                item = Track("a"),
+                volumePercentage = 20,
+                deviceVolumes = mapOf("dev-a" to 73),
+            ),
+        )
+        testScheduler.runCurrent()
+
+        assertEquals(listOf(73), taken)
+        assertEquals(
+            engineLevelBefore,
+            player.volume(),
+            "the engine gain moved as well, so the device would be attenuated twice",
+        )
+    }
+
     @Test
     fun aDeviceAppliesItsOwnRememberedLevelRatherThanTheSessionsFigure() = runTest {
         // A phone at thirty and a television at eighty are both correct. The

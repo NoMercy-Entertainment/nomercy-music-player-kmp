@@ -231,4 +231,17 @@ class MusicConnectActiveTest {
 
         assertEquals(plays, rig.backend.playCount)
     }
+
+    @Test
+    fun theActiveDeviceAlsoLearnsItsOwnBroadcastVolumeAsTheRemoteFigure() = runTest {
+        // remoteVolume is "what the active device is at", tracked for every
+        // role rather than only while passive — this device happens to BE the
+        // active one here, and the server's own echo of that fact is still the
+        // right source, not a special case that skips it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1).copy(volumePercentage = 37))
+
+        assertEquals(37, rig.plugin.remoteVolume.value)
+    }
 }
