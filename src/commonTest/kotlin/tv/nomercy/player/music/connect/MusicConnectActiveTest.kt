@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.ports.CanonicalBackendEvent
 import tv.nomercy.player.music.ConnectBackend
 import tv.nomercy.player.music.NMMusicPlayer
@@ -138,6 +139,56 @@ class MusicConnectActiveTest {
         assertTrue(
             rig.backend.seekedTo.none { it == 90.0 },
             "a cancelled continuation still seeked: ${rig.backend.seekedTo}",
+        )
+    }
+
+    @Test
+    fun aFailedLoadWithNothingQueuedStopsRatherThanStayingSilentlyPlaying() = runTest {
+        // Traced live, real phone, 2026-09-07: a track 404'd on handoff and the
+        // session was left claiming isPlaying=true forever, frozen at the
+        // position the failure happened at. Nothing corrected it because
+        // nothing told the server. This is the case with no other track to
+        // fall back to — the plugin has to say so, out loud, to the server.
+        val rig: Rig = rig()
+        rig.backend.holdTheNextLoad()
+
+        send(rig, playingHere(seq = 1, progressMs = 33_000))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals(1, rig.backend.stopCount, "a load that never opened left the engine claiming to play")
+        assertEquals(PlayState.STOPPED, rig.player.playState())
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.STOP),
+            "the server was never told this device gave up: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
+    fun aFailedLoadWithATrackQueuedSkipsToItInsteadOfFreezing() = runTest {
+        // The same failure, but the server's own window still names a track
+        // after the one that would not open — the case a real "next" press
+        // already handles correctly. Recovering should look exactly like that
+        // press: move to the next one and tell the server NEXT happened,
+        // never falling back to stopping when there was somewhere to go.
+        //
+        // The engine is left holding its load (never finished) so the failed
+        // continuation is still armed when STREAM_ERROR fires; the assertion
+        // reads the queue cursor rather than a completed load; the fake
+        // engine's own outstanding first load has no cancellation and would
+        // still land on a finish this test never calls.
+        val rig: Rig = rig()
+        rig.backend.holdTheNextLoad()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("b", rig.player.item()?.id, "recovery never advanced past the track that would not open")
+        assertEquals(0, rig.backend.stopCount, "there was a track to fall back to and it stopped anyway")
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.NEXT),
+            "the server was never told this device skipped: ${rig.channel.sent}",
         )
     }
 

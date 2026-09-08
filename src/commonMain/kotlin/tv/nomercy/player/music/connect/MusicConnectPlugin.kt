@@ -432,9 +432,11 @@ public open class MusicConnectPlugin(
         }
         // Both failure surfaces. A stream that would not open reports one, a
         // playlist that would not resolve reports the other, and either of them
-        // means the readiness this is waiting for is never coming.
-        val streamFailed: Subscription = on(CoreEvents.StreamError) { cancelLoadContinuation() }
-        val failed: Subscription = on(CoreEvents.Error) { cancelLoadContinuation() }
+        // means the readiness this is waiting for is never coming — and this
+        // device already told the server, or the server already believes, that
+        // it is playing something it now holds no source for.
+        val streamFailed: Subscription = on(CoreEvents.StreamError) { recoverFromLoadFailure() }
+        val failed: Subscription = on(CoreEvents.Error) { recoverFromLoadFailure() }
 
         loadContinuation = listOf(ready, streamFailed, failed)
     }
@@ -442,6 +444,39 @@ public open class MusicConnectPlugin(
     private fun cancelLoadContinuation() {
         loadContinuation.forEach { it.dispose() }
         loadContinuation = emptyList()
+    }
+
+    // What a load failure resolves to. Left alone, the claim this device made
+    // to the server never corrects itself: the server's own frame keeps
+    // broadcasting isPlaying=true against a position that stopped moving the
+    // moment the engine gave up, and every passive device mirrors that
+    // forever — measured live, real phone, 2026-09-07 (a 404 thirty seconds
+    // into a handoff froze the bar at ~33s for the rest of the session, and
+    // "next song" was the only thing that ever moved it again).
+    //
+    // Recovering has to reach the server, not just the local engine, so it
+    // goes through the same public transport calls a real button press
+    // uses — next() first, matching what a real next press already does
+    // against this same queue — rather than a bare local reset. Those calls
+    // are the ones whose own guard() carries the outbound command; tagging
+    // them `remote` the way every other call in this file is tagged would
+    // silence exactly the send this correction depends on, since the server
+    // does not already know this device failed.
+    //
+    // Only once NEXT itself has nowhere to go (CoreEvents.QueueExhausted,
+    // the same signal a chrome would read) does this fall back to stopping
+    // outright — the honest answer once nothing is left to try.
+    private fun recoverFromLoadFailure() {
+        cancelLoadContinuation()
+
+        scope.launch {
+            var exhausted = false
+            val watch: Subscription = on(CoreEvents.QueueExhausted) { exhausted = true }
+            player.next(ownInitiative)
+            watch.dispose()
+
+            if (exhausted) player.stop(ownInitiative)
+        }
     }
 
     // Only when it differs. Playing a player that is already playing is an event
@@ -523,6 +558,13 @@ public open class MusicConnectPlugin(
     }
 
     private val remote = ActionOptions(source = ActionSource.REMOTE)
+
+    // Tags a transport call this plugin makes on its own initiative — recovering
+    // from a load failure the server was never told about — rather than an echo
+    // of a server frame. Deliberately not `remote`: that source is what silences
+    // guard()'s own outbound send, and reaching the server is the whole point of
+    // this one.
+    private val ownInitiative = ActionOptions(source = ActionSource.PLUGIN)
 
     // Its own function rather than a labelled return inside the subscription,
     // which reads as a jump out of a lambda and is one more thing to hold while
