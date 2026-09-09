@@ -676,6 +676,28 @@ public open class MusicConnectPlugin(
         if (role == DeviceRole.PASSIVE) {
             showIntentBeforeTheServerAnswers(command)
             event.preventDefault()
+
+            // A passive device forwarding a command it did not act on locally
+            // is a deliberate feature — the widget's own transport controls
+            // are meant to reach whichever device is actually playing (see
+            // media-notification.md), and a genuine tap's source is USER,
+            // PLUGIN, or unset (ActionOptions defaults source to null) — this
+            // must stay allow-by-default, not an allowlist, or an unset
+            // source on a real tap silently stops forwarding it. What has to
+            // be denied is the small, closed set of sources that mean "this
+            // device's own engine reacted to something local," which a
+            // passive mirror has no business relaying as a remote command:
+            // PLATFORM/AUDIO_FOCUS/BACKEND_SETTLE. Confirmed live, real
+            // device, 2026-09-09: starting local video on a phone passively
+            // mirroring another device's music stopped that OTHER device's
+            // playback account-wide, with nothing the viewer did on either
+            // device asking for that.
+            if (event.data.source == ActionSource.PLATFORM ||
+                event.data.source == ActionSource.AUDIO_FOCUS ||
+                event.data.source == ActionSource.BACKEND_SETTLE
+            ) {
+                return
+            }
         }
         scope.launch { channel.playbackCommand(command) }
     }

@@ -137,6 +137,25 @@ class MusicConnectOutboundTest {
     }
 
     @Test
+    fun aLocalEngineReactionDoesNotReachTheServerWhilePassive() = runTest {
+        // Unlike PLUGIN (a real system-transport button, tested above), these
+        // three sources mean this device's own engine reacted to something
+        // that happened only on this device — another local app taking audio
+        // focus, a transient backend settle blip, the library pausing itself.
+        // A passive mirror has no real audio of its own to lose, so relaying
+        // one of these as a command stopped another device's genuine, live
+        // playback because of a local video starting on a phone that was only
+        // ever watching. Confirmed live, real device, 2026-09-09.
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.pause(ActionOptions(source = ActionSource.AUDIO_FOCUS))
+        rig.player.pause(ActionOptions(source = ActionSource.PLATFORM))
+        rig.player.pause(ActionOptions(source = ActionSource.BACKEND_SETTLE))
+
+        assertEquals(emptyList(), rig.channel.sent, "a local-only engine reaction reached the server while passive")
+    }
+
+    @Test
     fun aSeekFromSystemTransportReachesTheServerEvenWhilePassive() = runTest {
         // guardSeek is its own function with its own isEcho check — separate
         // from guard()'s, proven above only for pause. A fix to one is not
