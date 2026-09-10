@@ -54,7 +54,7 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
         val minBuf = AudioTrack.getMinBufferSize(
             SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT,
         )
-        val bufSize = maxOf(minBuf * 4, WRITE_CHUNK * Short.SIZE_BYTES * 2)
+        val bufSize = maxOf(minBuf * MIN_BUFFER_MULTIPLIER, WRITE_CHUNK * Short.SIZE_BYTES * WRITE_CHUNK_MULTIPLIER)
 
         val audioFormat = AudioFormat.Builder()
             .setSampleRate(SAMPLE_RATE)
@@ -104,15 +104,24 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
     private fun writeLoop() {
         var bufPos = 0
         while (running && !Thread.currentThread().isInterrupted) {
-            val t = track ?: break
-            val toWrite = minOf(WRITE_CHUNK, toneBuffer.size - bufPos)
-            // Runs on a raw Thread, not a coroutine — guarded the same way.
-            val wrote = runCatching { t.write(toneBuffer, bufPos, toWrite) }.getOrDefault(-1)
-            if (wrote < 0) break
-            bufPos += wrote
-            if (bufPos >= toneBuffer.size) bufPos = 0
+            bufPos = writeChunk(bufPos) ?: return
         }
     }
+
+    // One chunk written, or null when the track is gone or the write itself
+    // failed — either end is the same "stop the loop" outcome to the caller,
+    // collapsed here so the loop body carries a single jump statement.
+    // write() runs on a raw Thread here, not a coroutine, and throws on some
+    // OEM HALs — guarded for the same reason build() is.
+    private fun writeChunk(bufPos: Int): Int? {
+        val t = track ?: return null
+        val toWrite = minOf(WRITE_CHUNK, toneBuffer.size - bufPos)
+        val wrote = runCatching { t.write(toneBuffer, bufPos, toWrite) }.getOrDefault(-1)
+        if (wrote < 0) return null
+        val next = bufPos + wrote
+        return if (next >= toneBuffer.size) 0 else next
+    }
+
 
     // What output route the tone is actually reaching — expected HDMI/ARC or
     // a Bluetooth A2DP device on a television; `TYPE_BUILTIN_SPEAKER` means
@@ -150,5 +159,7 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
         const val TONE_FREQ_HZ = 19_000.0
         const val TONE_AMPLITUDE = 0.05 // ~-26 dB — non-zero to hardware, inaudible to humans
         const val WRITE_CHUNK = 2048
+        const val MIN_BUFFER_MULTIPLIER = 4
+        const val WRITE_CHUNK_MULTIPLIER = 2
     }
 }
