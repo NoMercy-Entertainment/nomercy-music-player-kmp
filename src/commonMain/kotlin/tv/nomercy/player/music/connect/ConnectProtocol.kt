@@ -59,7 +59,15 @@ internal fun adjustedPositionMs(frame: MusicPlayerState, serverNowMs: Long): Lon
         else -> 0
     }
 
-    val moved: Long = frame.progressMs + elapsedMs
+    // Bounded by the reporting period. The compensation exists to cover the trip
+    // from capture to arrival, and the device that is playing reports where it is
+    // every POSITION_REPORT_PERIOD_MS — so nothing honest can be older than that.
+    // An unbounded add pairs a fresh progress with a stale capture stamp and
+    // double-counts: measured on a freshly launched phone mirroring a television,
+    // the first frame landed 7.8 SECONDS ahead of the device actually decoding,
+    // then converged. That is a bar that jumps on load and again when playback
+    // takes over.
+    val moved: Long = frame.progressMs + elapsedMs.coerceAtMost(POSITION_REPORT_PERIOD_MS)
     return if (frame.durationMs > 0) moved.coerceAtMost(frame.durationMs) else moved
 }
 
@@ -129,3 +137,12 @@ internal const val CLOCK_SAMPLES = 5
 // Half a minute. Clocks drift slowly, and a device that has been asleep gets a
 // fresh answer from the reconnect rather than from this.
 internal const val CLOCK_SYNC_PERIOD_MS = 30_000L
+
+// The active device's proof of life, and the same period the web reports on.
+// The server ends a session whose active device has not reported for fifteen
+// seconds and broadcasts the cleared state, which every device reads as the
+// session ending — so a client that never reports plays for fifteen seconds and
+// is then silenced by its own server (measured on an SM-A137F, 2026-08-17: the
+// gap between the last frame carrying the track and the frame carrying nothing
+// was 15,070ms).
+internal const val POSITION_REPORT_PERIOD_MS = 5_000L

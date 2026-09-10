@@ -27,6 +27,13 @@ public data class AutoAdvanceOptions(
     val crossfade: Boolean = false,
     /** Crossfade duration in seconds. Default `0` — a hard cut. */
     val crossfadeDuration: Double = 0.0,
+    /**
+     * On `itemEndingSoon`, warm the coming track through [NMMusicPlayer.preloadNow]
+     * when [crossfade] is off. Crossfading already primes the engine's own
+     * secondary slot — see [onItemEndingSoon] — so this only fires the
+     * separate warm when there is no crossfade doing it already.
+     */
+    val preloadNextOnEnding: Boolean = false,
 )
 
 /**
@@ -75,6 +82,10 @@ public open class AutoAdvancePlugin(
         on(CoreEvents.ItemEndingSoon) {
             if (opts.enabled) launch { onItemEndingSoon() }
         }
+
+        // Invalidates the cache below on any item change, not just this
+        // plugin's own advance().
+        on(CoreEvents.Item) { pendingNext = null }
     }
 
     /**
@@ -97,7 +108,7 @@ public open class AutoAdvancePlugin(
      */
     @Suppress("TooGenericExceptionCaught", "SwallowedException")
     public suspend fun preloadNext() {
-        val next: PlaylistItem = resolveNext() ?: return
+        val next: PlaylistItem = resolveNextCached() ?: return
 
         try {
             player.preloadNow(next)
@@ -135,18 +146,27 @@ public open class AutoAdvancePlugin(
     private val crossfadeHandlers: MutableList<suspend (PlaylistItem?, Double) -> Unit> = mutableListOf()
 
     public suspend fun onItemEndingSoon() {
-        if (!opts.crossfade) return
+        if (!opts.crossfade) {
+            // The crossfade branch below already primes the coming track by
+            // loading it into the engine's own secondary slot — a second warm
+            // here would be redundant work on the same track. Without a
+            // crossfade there is no such priming, so this is the only warm
+            // the coming track gets before advance() plays it.
+            if (opts.preloadNextOnEnding) preloadNext()
+            return
+        }
 
         // Only a music player can crossfade — the method is not on the core
         // composition — so a plugin registered on a video player skips it
         // rather than failing at a cast.
         val music: NMMusicPlayer = player as? NMMusicPlayer ?: return
-        val next: PlaylistItem = resolveNext() ?: return
+        val next: PlaylistItem = resolveNextCached() ?: return
 
         // The crossfade IS the head start: it loads the coming track into the
         // engine's secondary slot and primes it before the fade begins. The
         // reference's separate preloadNextOnEnding exists because a browser has
-        // no such slot and warms the HTTP cache instead.
+        // no such slot and warms the HTTP cache instead; here it only fires
+        // when crossfade is off, above.
         music.crossfadeTo(next, opts.crossfadeDuration)
     }
 
@@ -163,6 +183,19 @@ public open class AutoAdvancePlugin(
         return queue.getOrNull(target)
     }
 
+    // [resolveNext]'s answer for the current transition, cached rather than
+    // re-derived: SmartShuffleGenerator draws random and mutates its own
+    // history on every call, so asking twice can draw two different tracks.
+    // Cleared by the CoreEvents.Item listener in [use].
+    private var pendingNext: PlaylistItem? = null
+
+    private fun resolveNextCached(): PlaylistItem? {
+        pendingNext?.let { return it }
+        val resolved: PlaylistItem = resolveNext() ?: return null
+        pendingNext = resolved
+        return resolved
+    }
+
     /**
      * Move on now, whether or not the track ended.
      *
@@ -170,23 +203,19 @@ public open class AutoAdvancePlugin(
      * both want the generator's answer rather than the player's raw next().
      */
     public suspend fun advance() {
-        val generator: PlaylistGenerator = opts.generator ?: run {
+        if (opts.generator == null) {
             player.next()
             return
         }
-
-        val queue = player.queue()
-        val target: Int? = generator.next(queue, player.index())
 
         // Null is end of queue, which is a normal outcome. Falling back to the
         // player's own next() here would make a generator that said "stop"
         // advance anyway, and a radio that ended would loop instead.
         //
-        // By id rather than by index, because that is what the player takes and
-        // because an index resolved against a queue that changed between the
-        // generator answering and this line running would play the wrong track.
-        val id: String? = queue.getOrNull(target ?: return)?.id
-        if (id != null) player.item(id)
+        // Through the same cache as preload/crossfade, so this plays the
+        // track that was actually warmed.
+        val next: PlaylistItem = resolveNextCached() ?: return
+        player.item(next.id)
     }
 
     /** What the generator says is next, without moving. */

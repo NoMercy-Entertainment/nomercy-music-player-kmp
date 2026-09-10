@@ -10,7 +10,9 @@ package tv.nomercy.player.music.connect
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.events.BeforeEvent
@@ -65,15 +67,26 @@ public open class MusicConnectPlugin(
 
     private var clockSync: Job? = null
 
+    private var positionReports: Job? = null
+
     private val ticker = ConnectMirrorTicker(scope)
 
     private var loadContinuation: List<Subscription> = emptyList()
+
+    // Separate from loadContinuation on purpose — see armLoadContinuation's
+    // own comment on why the two can no longer share one dispose-together list.
+    private var readySubscription: Subscription? = null
 
     private var playingShield: OptimisticShield? = null
 
     // Until when a freshly promoted device ignores a pause. Zero means it is not
     // settling, which is the state it spends nearly all its life in.
     private var settlingUntilMs: Long = 0
+
+    // Mirror of settlingUntilMs for the opposite direction: armed by a local
+    // Pause/Stop, ignores an incoming stale isPlaying=true. Can't share a
+    // field with settlingUntilMs — that one must let a fresh promotion play.
+    private var pauseIntentUntilMs: Long = 0
 
     // The track a local crossfade has already swapped the audio to, while the
     // server is still broadcasting the one before it. Null whenever no crossfade
@@ -86,9 +99,33 @@ public open class MusicConnectPlugin(
     // is a question about when the server sent it, not about which track it is.
     private var advanceShield: OptimisticShield? = null
 
+    // Until when this device's own start is protected from a session end.
+    //
+    // Deliberately not settlingUntilMs, which a SERVER-driven promotion also
+    // arms: a device the server promoted was promoted with a track, so a frame
+    // with no item after it is a real session end and has to stop. This window
+    // is armed only by a start that began here, where the server has not been
+    // told what is playing yet and its own answer carries no item.
+    private var localStartUntilMs: Long = 0
+
     // What a passive device draws. Empty on the active one, which renders from
     // its own player because it is the thing actually playing.
     public val mirror: StateFlow<ConnectMirror> get() = ticker.mirror
+
+    // Not this device's own remembered level (ownVolumeIn/applyOwnVolume,
+    // deliberately a different knob) and not the engine's gain. This is what
+    // the server last said the ACTIVE device is at, kept for every role so a
+    // device that is currently passive still knows what it would be nudging.
+    //
+    // Without it, a phone computing a volume-down step from its own stale idea
+    // of the television's level sent that stale number back up before stepping
+    // down from it — the television got LOUDER on a press meant to lower it.
+    // Stoney: "my phone is holding the original volume causing the volume down
+    // action on my phone to reset to the higher value before then lowering one
+    // step every press."
+    private val _remoteVolume = MutableStateFlow(DEFAULT_VOLUME_PERCENT)
+
+    public val remoteVolume: StateFlow<Int> get() = _remoteVolume.asStateFlow()
 
     public open val role: DeviceRole get() = resolveRole(activeDeviceId, channel.deviceId)
 
@@ -179,6 +216,7 @@ public open class MusicConnectPlugin(
         // with a different answer than it went in with.
         scope.launch { syncClock() }
         clockSync = interval(CLOCK_SYNC_PERIOD_MS) { scope.launch { syncClock() } }
+        positionReports = interval(POSITION_REPORT_PERIOD_MS) { reportPositionNow() }
     }
 
     override fun dispose() {
@@ -186,6 +224,8 @@ public open class MusicConnectPlugin(
         subscription = null
         clockSync?.cancel()
         clockSync = null
+        positionReports?.cancel()
+        positionReports = null
         cancelLoadContinuation()
         ticker.dispose()
     }
@@ -195,21 +235,39 @@ public open class MusicConnectPlugin(
         val nextSeq: Long = nextAppliedSeqOrNull(frame.seq, lastAppliedSeq) ?: return
         lastAppliedSeq = nextSeq
 
+        // Every frame that gets this far, whatever it says about the session —
+        // regardless of this device's own role, and regardless of whether it
+        // carries an item at all. The value is read by whichever device is
+        // about to step a volume it does not own, and it has to be current the
+        // instant that press happens, not only while a track is loaded.
+        _remoteVolume.value = frame.volumePercentage
+
         // No item is the session ending, and it ends everywhere at once. The
         // device that was playing stops and every other one stops mirroring,
         // which is why this happens before the role is reconciled — after it,
         // the device that just stopped being active would take the passive
         // branch and start following a session that no longer exists.
-        val item: PlaylistItem = frame.item ?: run {
-            activeDeviceId = null
-            cancelLoadContinuation()
-            ticker.clear()
-            scope.launch { player.stop(remote) }
+        val item: PlaylistItem? = frame.item
+        if (item == null) {
+            endSession(frame)
             return
         }
 
+        // A frame carrying an item is the server caught up, whatever its clock
+        // says — the window has done its job and holding it open longer would
+        // only delay a real session end.
+        localStartUntilMs = 0
+
         val wasActive: Boolean = role == DeviceRole.ACTIVE
         activeDeviceId = frame.deviceId
+
+        // This device's own level, applied before the staleness gate below.
+        // Living in applyUniversalSettings meant a frame dropped as stale — one
+        // naming a track this device had already moved past — took the volume
+        // change with it, so a level sent to a device that was mid-advance was
+        // silently discarded (measured on the living-room TV: the phone
+        // addressed SetDeviceVolumeCommand correctly and nothing moved).
+        ownVolumeIn(frame, channel.deviceId)?.let { own -> scope.launch { applyOwnVolume(own) } }
 
         // One coroutine for the whole frame, in order. Two would race: the queue
         // is written by the settings and read by the load, and a load that
@@ -225,7 +283,17 @@ public open class MusicConnectPlugin(
             // dropped whole rather than partly applied. Letting it through to
             // the settings would rewrite the queue around the song that just
             // ended, and the next frame would rewrite it back.
-            val overtaken: Boolean = heldItemId != item.id && item.id != crossfadeTargetId
+            // Only a device that actually HELD a different track can have been
+            // overtaken by one. A device holding nothing — every mirroring
+            // device, by design, and every device the server is about to
+            // promote — has no track to be overtaken from, and comparing null
+            // against the frame's id made EVERY frame look overtaken. Whenever
+            // the shield window covered it the whole frame was dropped: no
+            // queue, no promotion, no mirror. That is a handoff that produces
+            // silence and a track drawn as live, and a passive device whose
+            // current item never updates.
+            val overtaken: Boolean =
+                heldItemId != null && heldItemId != item.id && item.id != crossfadeTargetId
             val stale: Boolean = overtaken && advanceShield.precedes(frame.serverTimeMs, nowMs())
 
             if (!stale) {
@@ -250,6 +318,14 @@ public open class MusicConnectPlugin(
     protected open suspend fun applyPassiveFrame(frame: MusicPlayerState, item: PlaylistItem) {
         val held: Boolean = playingShield.holds(frame.serverTimeMs, nowMs())
         if (!held) playingShield = null
+
+        // The cursor moves, the engine is asked for nothing — the same verb the
+        // crossfade path uses. Without it a passive device kept the track it
+        // held when it went passive: its notification, lock screen and every
+        // reader of player.item() named the wrong song for the rest of the
+        // session.
+        val index: Int = player.queue().indexOfFirst { it.id == item.id }
+        if (index >= 0) player.seekToIndex(index + 1)
 
         ticker.show(
             ConnectMirror(
@@ -310,7 +386,11 @@ public open class MusicConnectPlugin(
             // is inside this call — a continuation armed afterwards would wait
             // for a signal that had already gone past.
             armLoadContinuation(frame, target)
-            player.item(item.id)
+            // Not the library's own autoplay default: whether this plays is
+            // matchPlaybackTo's call once MediaReady fires, not the load's — a
+            // paused session handed over would otherwise start audibly, if
+            // only for the instant before that correction lands.
+            player.item(item.id, autoplay = false)
             return
         }
 
@@ -320,31 +400,106 @@ public open class MusicConnectPlugin(
 
     // What happens once the engine has the track.
     //
-    // Both arms end the continuation, including the failure one: a load that
-    // errored is never going to report ready, and leaving the subscription armed
-    // means the NEXT track's readiness runs this frame's stale seek.
+    // The ready arm ends only itself, not the failure arms beside it. MediaReady
+    // says the engine holds a source, never that the bytes behind it arrived —
+    // load() on the real backend (ExoPlayerVideoBackend.load) returns as soon as
+    // prepare() is called and reports a bad response later, off its own loading
+    // thread, once the fetch it started actually completes. Measured live, real
+    // phone, 2026-09-08: a track's MediaReady fired at once and its real 404
+    // surfaced roughly a minute later — so a version of this that let "ready"
+    // retire the failure listeners was deaf to the one failure shape production
+    // hits, and recovery from a genuine stream error never ran at all, first
+    // failure or fifth. The failure arms stay live for the rest of this load's
+    // life and are only replaced by the next armLoadContinuation/
+    // recoverFromLoadFailure call, or torn down deliberately by
+    // cancelLoadContinuation.
     private fun armLoadContinuation(frame: MusicPlayerState, seekSeconds: Double) {
         cancelLoadContinuation()
 
-        val ready: Subscription = on(CoreEvents.MediaReady) {
-            cancelLoadContinuation()
+        readySubscription = on(CoreEvents.MediaReady) {
+            readySubscription?.dispose()
+            readySubscription = null
             scope.launch {
                 player.time(seekSeconds, remote)
                 matchPlaybackTo(frame)
             }
         }
-        // Both failure surfaces. A stream that would not open reports one, a
-        // playlist that would not resolve reports the other, and either of them
-        // means the readiness this is waiting for is never coming.
-        val streamFailed: Subscription = on(CoreEvents.StreamError) { cancelLoadContinuation() }
-        val failed: Subscription = on(CoreEvents.Error) { cancelLoadContinuation() }
+        armFailureRecovery()
+    }
 
-        loadContinuation = listOf(ready, streamFailed, failed)
+    // Both failure surfaces. A stream that would not open reports one, a
+    // playlist that would not resolve reports the other, and either of them
+    // means the readiness this load was waiting for is never coming — and this
+    // device already told the server, or the server already believes, that it
+    // is playing something it now holds no source for.
+    //
+    // Called both from armLoadContinuation, before its own load, and from
+    // recoverFromLoadFailure, before the next() call that load reaches for —
+    // armed before the load in both places, not after: against a fast engine
+    // the load's own failure can land inside that same call, and a listener
+    // attached afterwards would wait for a signal that already went past.
+    private fun armFailureRecovery() {
+        val streamFailed: Subscription = on(CoreEvents.StreamError) { recoverFromLoadFailure() }
+        val failed: Subscription = on(CoreEvents.Error) { recoverFromLoadFailure() }
+
+        loadContinuation = listOf(streamFailed, failed)
     }
 
     private fun cancelLoadContinuation() {
+        readySubscription?.dispose()
+        readySubscription = null
         loadContinuation.forEach { it.dispose() }
         loadContinuation = emptyList()
+    }
+
+    // What a load failure resolves to. Left alone, the claim this device made
+    // to the server never corrects itself: the server's own frame keeps
+    // broadcasting isPlaying=true against a position that stopped moving the
+    // moment the engine gave up, and every passive device mirrors that
+    // forever — measured live, real phone, 2026-09-07 (a 404 thirty seconds
+    // into a handoff froze the bar at ~33s for the rest of the session, and
+    // "next song" was the only thing that ever moved it again).
+    //
+    // Recovering has to reach the server, not just the local engine, so it
+    // goes through the same public transport calls a real button press
+    // uses — next() first, matching what a real next press already does
+    // against this same queue — rather than a bare local reset. Those calls
+    // are the ones whose own guard() carries the outbound command; tagging
+    // them `remote` the way every other call in this file is tagged would
+    // silence exactly the send this correction depends on, since the server
+    // does not already know this device failed.
+    //
+    // Only once NEXT itself has nowhere to go (CoreEvents.QueueExhausted,
+    // the same signal a chrome would read) does this fall back to stopping
+    // outright — the honest answer once nothing is left to try.
+    //
+    // Re-arms its own failure listeners before calling next(), rather than
+    // trusting the server's next frame to do it through applyActiveFrame.
+    // next() moves the queue cursor and loads the new track synchronously
+    // (TransportController.next -> advanceTo -> ctx.load), before the
+    // server's frame confirming that move ever arrives — so by the time it
+    // does, applyActiveFrame's heldItemId (read from player.item() at the top
+    // of that frame) already equals the frame's own item, isTrackChange reads
+    // false, and armLoadContinuation is never called for the track this
+    // recovery just moved to. A second, unrelated failure on that track would
+    // then have nothing listening for it. Measured live, real phone,
+    // 2026-09-08: recovery skipped the first failed track correctly and then
+    // froze forever on the second one, in the same session, immediately after.
+    private fun recoverFromLoadFailure() {
+        cancelLoadContinuation()
+        armFailureRecovery()
+
+        scope.launch {
+            var exhausted = false
+            val watch: Subscription = on(CoreEvents.QueueExhausted) { exhausted = true }
+            player.next(ownInitiative)
+            watch.dispose()
+
+            if (exhausted) {
+                cancelLoadContinuation()
+                player.stop(ownInitiative)
+            }
+        }
     }
 
     // Only when it differs. Playing a player that is already playing is an event
@@ -358,7 +513,10 @@ public open class MusicConnectPlugin(
         // promotion it crossed with.
         val pauseIsWanted: Boolean = !frame.isPlaying && nowMs() >= settlingUntilMs
 
-        if (frame.isPlaying && !playing) player.play(remote)
+        // A resume this device is willing to hear — see pauseIntentUntilMs.
+        val playIsWanted: Boolean = frame.isPlaying && nowMs() >= pauseIntentUntilMs
+
+        if (playIsWanted && !playing) player.play(remote)
         else if (pauseIsWanted && playing) player.pause(remote)
     }
 
@@ -369,11 +527,31 @@ public open class MusicConnectPlugin(
     // looking at the wrong list, and it becomes the wrong list to play from the
     // moment they take over.
     protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
-        ownVolumeIn(frame, channel.deviceId)?.let { own -> player.volume(own, remote) }
-
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
-        player.queue(upcoming)
+        // Only when it actually changed. This runs on EVERY frame, and a frame
+        // arrives several times a second: rewriting the queue tears down and
+        // rebuilds what the engine is playing from, which for a small album is
+        // survivable and for a genre — the server sends a hundred-entry window —
+        // means the current source is reset faster than it can start. That is
+        // playback that never begins, with no duration, which a chrome draws as
+        // live.
+        val held: List<String> = player.queue().map { it.id }
+        val offered: List<String> = upcoming.map { it.id }
+
+        // The server sends a WINDOW, not the queue: CloneForBroadcast caps the
+        // playlist at a hundred upcoming tracks. Overwriting with it threw away
+        // the rest of a long list on the device that started it — a five hundred
+        // track genre became a hundred and one, and the tracks after that could
+        // not be chosen any more. A window this device already contains tells it
+        // nothing it does not know, so it is dropped rather than applied.
+        val alreadyContained: Boolean = offered.isNotEmpty() &&
+            held.size > offered.size &&
+            held.containsAll(offered)
+
+        if (held != offered && !alreadyContained) {
+            player.queue(upcoming)
+        }
         player.repeatState(frame.repeatState, remote)
         player.shuffleState(
             if (frame.shuffleState) ShuffleState.ON else ShuffleState.OFF,
@@ -384,7 +562,32 @@ public open class MusicConnectPlugin(
     // Marked as the server's doing, which is what stops every one of these
     // becoming an outbound command. The guards read the source and the applier
     // is the only thing that sets it.
+    /**
+     * The level the server says THIS device should be at.
+     *
+     * Separate from every other volume call in this library because it is a
+     * different thing: a slider moves the player's own gain, while this is a
+     * remote telling an appliance how loud to be. On a television those are not
+     * the same knob — turning the engine's gain down leaves the set exactly as
+     * loud as it was, so the phone's volume key appeared to do nothing (Stoney:
+     * "it changes the exoplayer volume instead of the hardware volume on tv").
+     *
+     * The default keeps the old behaviour, because gain is the only volume a
+     * library can portably touch — a browser cannot set OS volume at all. A host
+     * that CAN move the device overrides this and does.
+     */
+    protected open suspend fun applyOwnVolume(percent: Int) {
+        player.volume(percent, remote)
+    }
+
     private val remote = ActionOptions(source = ActionSource.REMOTE)
+
+    // Tags a transport call this plugin makes on its own initiative — recovering
+    // from a load failure the server was never told about — rather than an echo
+    // of a server frame. Deliberately not `remote`: that source is what silences
+    // guard()'s own outbound send, and reaching the server is the whole point of
+    // this one.
+    private val ownInitiative = ActionOptions(source = ActionSource.PLUGIN)
 
     // Its own function rather than a labelled return inside the subscription,
     // which reads as a jump out of a lambda and is one more thing to hold while
@@ -402,6 +605,17 @@ public open class MusicConnectPlugin(
         // though nothing else was actually claiming the device).
         if (role == DeviceRole.PASSIVE) event.preventDefault()
         val seconds: Double = event.data.time
+
+        // Same settlement window applyActiveFrame arms for justBecameActive —
+        // a seek just told the server where this device now is, and the
+        // server's own broadcast of that hasn't landed yet. A frame already
+        // in flight (describing wherever this device was BEFORE the seek)
+        // can still arrive in the gap and, unprotected, its isPlaying read
+        // matchPlaybackTo() as a real pause request — a genuinely playing
+        // local seek left paused by its own stale echo. Confirmed live, real
+        // device, 2026-08-12: FAST_FORWARD advanced the position correctly
+        // and the transport still ended up PAUSED.
+        settlingUntilMs = nowMs() + SETTLEMENT_MS
         scope.launch { channel.playbackCommand(ConnectCommand.SEEK, seconds) }
     }
 
@@ -421,14 +635,76 @@ public open class MusicConnectPlugin(
             claimActiveForLocalPlaybackStart()
         }
 
-        if (isActiveDevice && command in ADVANCING_COMMANDS) advanceShield = armed()
+        armWindowsFor(command)
 
         // See guardSeek's comment: only a confirmed PASSIVE role blocks.
         if (role == DeviceRole.PASSIVE) {
             showIntentBeforeTheServerAnswers(command)
             event.preventDefault()
+
+            // A passive device forwarding a command it did not act on locally
+            // is a deliberate feature — the widget's own transport controls
+            // are meant to reach whichever device is actually playing (see
+            // media-notification.md), and a genuine tap's source is USER,
+            // PLUGIN, or unset (ActionOptions defaults source to null) — this
+            // must stay allow-by-default, not an allowlist, or an unset
+            // source on a real tap silently stops forwarding it. What has to
+            // be denied is the small, closed set of sources that mean "this
+            // device's own engine reacted to something local," which a
+            // passive mirror has no business relaying as a remote command:
+            // PLATFORM/AUDIO_FOCUS/BACKEND_SETTLE. Confirmed live, real
+            // device, 2026-09-09: starting local video on a phone passively
+            // mirroring another device's music stopped that OTHER device's
+            // playback account-wide, with nothing the viewer did on either
+            // device asking for that.
+            if (event.data.source in OWN_ENGINE_SOURCES) {
+                return
+            }
         }
         scope.launch { channel.playbackCommand(command) }
+    }
+
+    // Stop here and stop mirroring, because the session is over.
+    //
+    // Unless this device just started playing and the server is only now
+    // acknowledging it. Measured on an SM-A137F: the frame that killed playback
+    // arrived thirty milliseconds AFTER the press, named this very device, and
+    // carried no item — the server had processed the device claim and not yet
+    // the track. Answering that with a stop tore down the audio the viewer had
+    // just started, decoder RUNNING to RELEASED in eight milliseconds with no
+    // error anywhere. A null item means the session is over everywhere EXCEPT
+    // in the gap this device opened itself.
+    //
+    // An unstamped frame is held for the same reason: a server too old to stamp
+    // cannot be placed either side of the press, and silently killing playback
+    // is the worse of the two ways to be wrong.
+    private fun endSession(frame: MusicPlayerState) {
+        if (frame.deviceId == channel.deviceId && nowMs() < localStartUntilMs) return
+
+        activeDeviceId = null
+        cancelLoadContinuation()
+        ticker.clear()
+        scope.launch { player.stop(remote) }
+    }
+
+    // The two settle windows a local command opens.
+    //
+    // pauseIntentUntilMs guards against a stale isPlaying=true frame resuming
+    // what a Pause or Stop just stopped. The advance shield covers the other
+    // direction, with the same window a promotion gets: the frame the server
+    // built before it heard the advance says the session is not playing, and
+    // obeying it pauses audio that just started — auto-advance reached the next
+    // track and stopped there, with the session still claiming to play. A pause
+    // is only wanted once the server has caught up.
+    private fun armWindowsFor(command: String) {
+        if (command == ConnectCommand.PAUSE || command == ConnectCommand.STOP) {
+            pauseIntentUntilMs = nowMs() + SETTLEMENT_MS
+        }
+
+        if (isActiveDevice && command in ADVANCING_COMMANDS) {
+            advanceShield = armed()
+            settlingUntilMs = nowMs() + SETTLEMENT_MS
+        }
     }
 
     // Optimistic, ahead of the round trip — the same reasoning as the deleted
@@ -437,9 +713,51 @@ public open class MusicConnectPlugin(
     // server's ChangeDevice broadcast is delayed. A later frame naming another
     // device still demotes normally through applyServerFrame; this only sets
     // the optimistic starting point, never bypasses that.
+    //
+    // Also arms settlingUntilMs, same as applyActiveFrame does for a
+    // server-driven promotion — without it the confirming frame's own
+    // justBecameActive check reads false, since this flip already happened.
     private fun claimActiveForLocalPlaybackStart() {
+        settlingUntilMs = nowMs() + SETTLEMENT_MS
+        // A round trip's worth, the same budget the optimistic shield uses, and
+        // for the same reason: it has to survive a bad connection.
+        localStartUntilMs = nowMs() + OPTIMISTIC_SHIELD_MS
         activeDeviceId = channel.deviceId
         scope.launch { channel.changeDevice(channel.deviceId) }
+    }
+
+    /**
+     * A genuine user-initiated start of a list on THIS device: claim the
+     * session, then tell the server what is playing.
+     *
+     * Without the second half the server's session has no item, and an itemless
+     * session is broadcast as an ended one — the device that started the music
+     * stopped itself on the very next frame (play, seek, or the ~5s cadence),
+     * and a handoff moved an empty session to a device that then had nothing to
+     * play. Measured on two phones, 2026-08-17.
+     *
+     * Only a real tap calls this. A passive device mirroring the active one's
+     * auto-advance must never claim, which is why this is not driven off the
+     * item-changed event.
+     */
+    public fun startPlayback(type: String, listId: String, trackId: String) {
+        // The server answers the claim before it has processed the start, and
+        // that answer still names the PREVIOUS track. Applied, it loads and
+        // plays the song the viewer just moved away from. This is the same
+        // shield a local track change already uses, armed for the same reason.
+        advanceShield = armed()
+        claimActiveForLocalPlaybackStart()
+        scope.launch { channel.startPlayback(type, listId, trackId) }
+    }
+
+    // Only the device the server considers active, and only while it is really
+    // playing: a paused device is not stale, and a passive one reporting would
+    // be telling the server about a position it got FROM the server.
+    internal fun reportPositionNow() {
+        if (!isActiveDevice) return
+        if (player.playState() != PlayState.PLAYING) return
+        val itemId: String = player.item()?.id ?: return
+        scope.launch { channel.reportPosition(player.time(), itemId) }
     }
 
     private fun armed() = OptimisticShield(sentAtServerMs = serverNowMs(), sentAtLocalMs = nowMs())
@@ -462,3 +780,19 @@ public open class MusicConnectPlugin(
 
 // The two that move this device off the track the server last named.
 private val ADVANCING_COMMANDS = setOf(ConnectCommand.NEXT, ConnectCommand.PREVIOUS)
+
+// The small, closed set of sources that mean "this device's own engine reacted
+// to something local". A passive mirror must not relay one of these onward as a
+// remote command. Everything else forwards, including an unset source: a
+// genuine tap is USER, PLUGIN, or nothing at all, and an allowlist would
+// silently stop forwarding real taps.
+private val OWN_ENGINE_SOURCES = setOf(
+    ActionSource.PLATFORM,
+    ActionSource.AUDIO_FOCUS,
+    ActionSource.BACKEND_SETTLE,
+)
+
+// Only a starting point before the first frame ever lands — matches
+// MusicPlayerState.volumePercentage's own default, so a device that has not
+// heard from the server yet assumes full rather than silent.
+private const val DEFAULT_VOLUME_PERCENT = 100

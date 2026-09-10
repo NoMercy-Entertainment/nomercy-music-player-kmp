@@ -62,15 +62,19 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
             .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
             .build()
 
-        val newTrack = AudioTrack.Builder()
-            .setAudioAttributes(audioAttributes)
-            .setAudioFormat(audioFormat)
-            .setBufferSizeInBytes(bufSize)
-            .setTransferMode(AudioTrack.MODE_STREAM)
-            .build()
+        // build() can throw UnsupportedOperationException on odd OEM HALs —
+        // folded into the not-initialized path below.
+        val newTrack = runCatching {
+            AudioTrack.Builder()
+                .setAudioAttributes(audioAttributes)
+                .setAudioFormat(audioFormat)
+                .setBufferSizeInBytes(bufSize)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build()
+        }.getOrNull()
 
-        if (newTrack.state != AudioTrack.STATE_INITIALIZED) {
-            newTrack.release()
+        if (newTrack == null || newTrack.state != AudioTrack.STATE_INITIALIZED) {
+            newTrack?.release()
             running = false
             return
         }
@@ -107,14 +111,17 @@ public class AndroidKeepAliveTone(private val context: Context) : KeepAliveTone 
     // One chunk written, or null when the track is gone or the write itself
     // failed — either end is the same "stop the loop" outcome to the caller,
     // collapsed here so the loop body carries a single jump statement.
+    // write() runs on a raw Thread here, not a coroutine, and throws on some
+    // OEM HALs — guarded for the same reason build() is.
     private fun writeChunk(bufPos: Int): Int? {
         val t = track ?: return null
         val toWrite = minOf(WRITE_CHUNK, toneBuffer.size - bufPos)
-        val wrote = t.write(toneBuffer, bufPos, toWrite)
+        val wrote = runCatching { t.write(toneBuffer, bufPos, toWrite) }.getOrDefault(-1)
         if (wrote < 0) return null
         val next = bufPos + wrote
         return if (next >= toneBuffer.size) 0 else next
     }
+
 
     // What output route the tone is actually reaching — expected HDMI/ARC or
     // a Bluetooth A2DP device on a television; `TYPE_BUILTIN_SPEAKER` means

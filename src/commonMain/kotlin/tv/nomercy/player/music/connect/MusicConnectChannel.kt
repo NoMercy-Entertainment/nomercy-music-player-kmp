@@ -38,10 +38,23 @@ public interface MusicConnectChannel {
     // Hand playback to another device.
     public suspend fun changeDevice(targetDeviceId: String)
 
-    // Where this device has actually got to, in milliseconds. Only the active
+    // Tell the server what this device just started playing, so its session has
+    // a track at all. Every other command reconciles against that session: with
+    // no item in it the server broadcasts an empty state, which every client
+    // reads as "session over" — the device playing stops itself on its own next
+    // frame and a handoff hands over nothing. Type is the hub's singular
+    // vocabulary (track/playlist/album/artist/genre), not the REST route.
+    public suspend fun startPlayback(type: String, listId: String, trackId: String)
+
+    // Where this device has actually got to, in seconds, tagged with the item it
+    // is a position in — a report that arrives after a track change would
+    // otherwise move the new track to the old one's position. Only the active
     // device reports; a passive one reporting would be telling the server about
     // a position it inferred from the server.
-    public suspend fun reportPosition(positionMs: Long)
+    //
+    // It is also the session's proof of life, which is why it is on a cadence
+    // rather than sent when something happens.
+    public suspend fun reportPosition(positionSeconds: Double, itemId: String)
 
     // The server's clock, for measuring the offset from this device's. Null on a
     // transport that cannot answer, which is a reason to fall back to local time

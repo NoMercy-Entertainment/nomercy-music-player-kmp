@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.ports.CanonicalBackendEvent
 import tv.nomercy.player.music.ConnectBackend
 import tv.nomercy.player.music.NMMusicPlayer
@@ -142,6 +143,107 @@ class MusicConnectActiveTest {
     }
 
     @Test
+    fun aFailedLoadWithNothingQueuedStopsRatherThanStayingSilentlyPlaying() = runTest {
+        // Traced live, real phone, 2026-09-07: a track 404'd on handoff and the
+        // session was left claiming isPlaying=true forever, frozen at the
+        // position the failure happened at. Nothing corrected it because
+        // nothing told the server. This is the case with no other track to
+        // fall back to — the plugin has to say so, out loud, to the server.
+        val rig: Rig = rig()
+        rig.backend.holdTheNextLoad()
+
+        send(rig, playingHere(seq = 1, progressMs = 33_000))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals(1, rig.backend.stopCount, "a load that never opened left the engine claiming to play")
+        assertEquals(PlayState.STOPPED, rig.player.playState())
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.STOP),
+            "the server was never told this device gave up: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
+    fun aFailedLoadWithATrackQueuedSkipsToItInsteadOfFreezing() = runTest {
+        // The same failure, but the server's own window still names a track
+        // after the one that would not open — the case a real "next" press
+        // already handles correctly. Recovering should look exactly like that
+        // press: move to the next one and tell the server NEXT happened,
+        // never falling back to stopping when there was somewhere to go.
+        //
+        // The engine is left holding its load (never finished) so the failed
+        // continuation is still armed when STREAM_ERROR fires; the assertion
+        // reads the queue cursor rather than a completed load; the fake
+        // engine's own outstanding first load has no cancellation and would
+        // still land on a finish this test never calls.
+        val rig: Rig = rig()
+        rig.backend.holdTheNextLoad()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("b", rig.player.item()?.id, "recovery never advanced past the track that would not open")
+        assertEquals(0, rig.backend.stopCount, "there was a track to fall back to and it stopped anyway")
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.NEXT),
+            "the server was never told this device skipped: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
+    fun aStreamErrorArrivingAfterMediaReadyStillRecovers() = runTest {
+        // MediaReady says the engine holds a source, not that the bytes behind
+        // it will ever arrive. The real backend's load() (ExoPlayerVideoBackend)
+        // returns as soon as prepare() is called and reports a bad response
+        // later, off its own loading thread — measured live, real phone,
+        // 2026-09-08: MediaReady fired at once and the real 404 surfaced
+        // roughly a minute afterward. This fake's default load() reports ready
+        // synchronously (no holdTheNextLoad needed), so the STREAM_ERROR below
+        // models exactly that late, out-of-band failure. A continuation that
+        // let "ready" retire the failure listeners would be deaf to it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("b", rig.player.item()?.id, "a failure that arrived after MediaReady was never heard")
+        assertTrue(
+            rig.channel.sent.contains(ConnectCommand.NEXT),
+            "the server was never told this device skipped: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
+    fun twoConsecutiveLoadFailuresBothRecoverInsteadOfFreezingOnTheSecond() = runTest {
+        // Traced live, real phone, 2026-09-08: recovery skipped the first
+        // failed track correctly and then froze forever on the second one, in
+        // the same session, immediately after. next() moves the queue cursor
+        // and loads the new track synchronously, before the server's own frame
+        // confirming that move arrives — so applyActiveFrame's isTrackChange
+        // reads false against it and never re-arms. Recovery has to arm its
+        // own retry rather than depend on that frame ever doing it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1, id = "a").copy(playlist = listOf(Track("b"), Track("c"))))
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+        assertEquals("b", rig.player.item()?.id, "the first failure never skipped forward")
+
+        rig.backend.fire(CanonicalBackendEvent.STREAM_ERROR)
+        testScheduler.runCurrent()
+
+        assertEquals("c", rig.player.item()?.id, "the second failure in a row was never heard")
+        assertEquals(
+            2,
+            rig.channel.sent.count { it == ConnectCommand.NEXT },
+            "the server was told about only one of the two skips: ${rig.channel.sent}",
+        )
+    }
+
+    @Test
     fun aSmallDriftIsLeftAlone() = runTest {
         // Correcting every frame would make each one a seek, and a seek on a
         // music engine is an audible gap. The tolerance exists to keep the
@@ -230,5 +332,18 @@ class MusicConnectActiveTest {
         send(rig, playingHere(seq = 2, progressMs = 12_000))
 
         assertEquals(plays, rig.backend.playCount)
+    }
+
+    @Test
+    fun theActiveDeviceAlsoLearnsItsOwnBroadcastVolumeAsTheRemoteFigure() = runTest {
+        // remoteVolume is "what the active device is at", tracked for every
+        // role rather than only while passive — this device happens to BE the
+        // active one here, and the server's own echo of that fact is still the
+        // right source, not a special case that skips it.
+        val rig: Rig = rig()
+
+        send(rig, playingHere(seq = 1).copy(volumePercentage = 37))
+
+        assertEquals(37, rig.plugin.remoteVolume.value)
     }
 }

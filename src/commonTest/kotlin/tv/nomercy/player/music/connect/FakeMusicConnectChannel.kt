@@ -37,7 +37,7 @@ class FakeMusicConnectChannel(
 
     val sent: MutableList<String> = mutableListOf()
 
-    val reported: MutableList<Long> = mutableListOf()
+    val reported: MutableList<Pair<Double, String>> = mutableListOf()
 
     // No replay: a device that joins late should not be handed a frame from
     // before it was listening, because a real hub does not do that either.
@@ -53,8 +53,12 @@ class FakeMusicConnectChannel(
         sent += "changeDevice:$targetDeviceId"
     }
 
-    override suspend fun reportPosition(positionMs: Long) {
-        reported += positionMs
+    override suspend fun startPlayback(type: String, listId: String, trackId: String) {
+        sent += "startPlayback:$type:$listId:$trackId"
+    }
+
+    override suspend fun reportPosition(positionSeconds: Double, itemId: String) {
+        reported += positionSeconds to itemId
     }
 
     override suspend fun serverTimeMs(): Long? {

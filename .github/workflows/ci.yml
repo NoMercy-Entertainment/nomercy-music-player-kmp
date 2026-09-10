@@ -46,6 +46,28 @@ jobs:
       # configure, and the message names a licence rather than a missing SDK.
       - uses: android-actions/setup-android@v3
 
+      # Skiko, which is what Compose Multiplatform renders through on the JVM,
+      # dlopens libGL when its class initialises. A GitHub-hosted ubuntu image
+      # carries that library and this runner does not, so :ui-compose:jvmTest
+      # fails with "libskiko-linux-x64.so: libGL.so.1: cannot open shared
+      # object file" before a single assertion runs. Core hit exactly this on
+      # 2026-09-10; this module has the same Compose target.
+      #
+      # Fonts for the same reason: Skia rasterises GLYPHS, and a bare runner
+      # has none.
+      #
+      # Installed only when missing, because this is a PERSISTENT machine
+      # rather than a fresh VM.
+      - name: Install the libraries Skiko opens at runtime
+        run: |
+          set -e
+          if ! ldconfig -p | grep -q "libGL.so.1"; then
+            sudo apt-get update
+            sudo apt-get install -y libgl1 libfontconfig1 fonts-liberation fonts-dejavu-core
+            sudo fc-cache -f
+          fi
+          ldconfig -p | grep -c "libGL.so.1"
+
       # The Gradle user home, kept between runs. On a persistent machine this
       # matters less than it did on a fresh VM, and it still keeps two repos'
       # builds from fighting over one unmanaged cache directory.

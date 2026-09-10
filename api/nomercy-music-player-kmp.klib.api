@@ -46,8 +46,9 @@ abstract interface tv.nomercy.player.music.connect/MusicConnectChannel { // tv.n
 
     abstract suspend fun changeDevice(kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.changeDevice|changeDevice(kotlin.String){}[0]
     abstract suspend fun playbackCommand(kotlin/String, kotlin/Double? = ...) // tv.nomercy.player.music.connect/MusicConnectChannel.playbackCommand|playbackCommand(kotlin.String;kotlin.Double?){}[0]
-    abstract suspend fun reportPosition(kotlin/Long) // tv.nomercy.player.music.connect/MusicConnectChannel.reportPosition|reportPosition(kotlin.Long){}[0]
+    abstract suspend fun reportPosition(kotlin/Double, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.reportPosition|reportPosition(kotlin.Double;kotlin.String){}[0]
     abstract suspend fun serverTimeMs(): kotlin/Long? // tv.nomercy.player.music.connect/MusicConnectChannel.serverTimeMs|serverTimeMs(){}[0]
+    abstract suspend fun startPlayback(kotlin/String, kotlin/String, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectChannel.startPlayback|startPlayback(kotlin.String;kotlin.String;kotlin.String){}[0]
 }
 
 abstract interface tv.nomercy.player.music.input/MusicCommands { // tv.nomercy.player.music.input/MusicCommands|null[0]
@@ -368,7 +369,7 @@ final class tv.nomercy.player.music.lyrics/LyricsOptions { // tv.nomercy.player.
 }
 
 final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.player.music.queue/AutoAdvanceOptions|null[0]
-    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
+    constructor <init>(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ..., kotlin/Boolean = ...) // tv.nomercy.player.music.queue/AutoAdvanceOptions.<init>|<init>(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double;kotlin.Boolean){}[0]
 
     final val crossfade // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade|{}crossfade[0]
         final fun <get-crossfade>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.crossfade.<get-crossfade>|<get-crossfade>(){}[0]
@@ -378,12 +379,15 @@ final class tv.nomercy.player.music.queue/AutoAdvanceOptions { // tv.nomercy.pla
         final fun <get-enabled>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.enabled.<get-enabled>|<get-enabled>(){}[0]
     final val generator // tv.nomercy.player.music.queue/AutoAdvanceOptions.generator|{}generator[0]
         final fun <get-generator>(): tv.nomercy.player.music.queue/PlaylistGenerator? // tv.nomercy.player.music.queue/AutoAdvanceOptions.generator.<get-generator>|<get-generator>(){}[0]
+    final val preloadNextOnEnding // tv.nomercy.player.music.queue/AutoAdvanceOptions.preloadNextOnEnding|{}preloadNextOnEnding[0]
+        final fun <get-preloadNextOnEnding>(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.preloadNextOnEnding.<get-preloadNextOnEnding>|<get-preloadNextOnEnding>(){}[0]
 
     final fun component1(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component1|component1(){}[0]
     final fun component2(): tv.nomercy.player.music.queue/PlaylistGenerator? // tv.nomercy.player.music.queue/AutoAdvanceOptions.component2|component2(){}[0]
     final fun component3(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component3|component3(){}[0]
     final fun component4(): kotlin/Double // tv.nomercy.player.music.queue/AutoAdvanceOptions.component4|component4(){}[0]
-    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double){}[0]
+    final fun component5(): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.component5|component5(){}[0]
+    final fun copy(kotlin/Boolean = ..., tv.nomercy.player.music.queue/PlaylistGenerator? = ..., kotlin/Boolean = ..., kotlin/Double = ..., kotlin/Boolean = ...): tv.nomercy.player.music.queue/AutoAdvanceOptions // tv.nomercy.player.music.queue/AutoAdvanceOptions.copy|copy(kotlin.Boolean;tv.nomercy.player.music.queue.PlaylistGenerator?;kotlin.Boolean;kotlin.Double;kotlin.Boolean){}[0]
     final fun equals(kotlin/Any?): kotlin/Boolean // tv.nomercy.player.music.queue/AutoAdvanceOptions.equals|equals(kotlin.Any?){}[0]
     final fun hashCode(): kotlin/Int // tv.nomercy.player.music.queue/AutoAdvanceOptions.hashCode|hashCode(){}[0]
     final fun toString(): kotlin/String // tv.nomercy.player.music.queue/AutoAdvanceOptions.toString|toString(){}[0]
@@ -588,6 +592,8 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
 
     final val mirror // tv.nomercy.player.music.connect/MusicConnectPlugin.mirror|{}mirror[0]
         final fun <get-mirror>(): kotlinx.coroutines.flow/StateFlow<tv.nomercy.player.music.connect/ConnectMirror> // tv.nomercy.player.music.connect/MusicConnectPlugin.mirror.<get-mirror>|<get-mirror>(){}[0]
+    final val remoteVolume // tv.nomercy.player.music.connect/MusicConnectPlugin.remoteVolume|{}remoteVolume[0]
+        final fun <get-remoteVolume>(): kotlinx.coroutines.flow/StateFlow<kotlin/Int> // tv.nomercy.player.music.connect/MusicConnectPlugin.remoteVolume.<get-remoteVolume>|<get-remoteVolume>(){}[0]
     open val isActiveDevice // tv.nomercy.player.music.connect/MusicConnectPlugin.isActiveDevice|{}isActiveDevice[0]
         open fun <get-isActiveDevice>(): kotlin/Boolean // tv.nomercy.player.music.connect/MusicConnectPlugin.isActiveDevice.<get-isActiveDevice>|<get-isActiveDevice>(){}[0]
     open val manifest // tv.nomercy.player.music.connect/MusicConnectPlugin.manifest|{}manifest[0]
@@ -600,6 +606,7 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
     final var lastAppliedSeq // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq|{}lastAppliedSeq[0]
         final fun <get-lastAppliedSeq>(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.lastAppliedSeq.<get-lastAppliedSeq>|<get-lastAppliedSeq>(){}[0]
 
+    final fun startPlayback(kotlin/String, kotlin/String, kotlin/String) // tv.nomercy.player.music.connect/MusicConnectPlugin.startPlayback|startPlayback(kotlin.String;kotlin.String;kotlin.String){}[0]
     final suspend fun syncClock() // tv.nomercy.player.music.connect/MusicConnectPlugin.syncClock|syncClock(){}[0]
     open fun applyServerFrame(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyServerFrame|applyServerFrame(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
     open fun dispose() // tv.nomercy.player.music.connect/MusicConnectPlugin.dispose|dispose(){}[0]
@@ -607,6 +614,7 @@ open class tv.nomercy.player.music.connect/MusicConnectPlugin : tv.nomercy.playe
     open fun serverNowMs(): kotlin/Long // tv.nomercy.player.music.connect/MusicConnectPlugin.serverNowMs|serverNowMs(){}[0]
     open fun use() // tv.nomercy.player.music.connect/MusicConnectPlugin.use|use(){}[0]
     open suspend fun applyActiveFrame(tv.nomercy.player.music.connect/MusicPlayerState, tv.nomercy.player.core.media/PlaylistItem, kotlin/Boolean, kotlin/String?) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyActiveFrame|applyActiveFrame(tv.nomercy.player.music.connect.MusicPlayerState;tv.nomercy.player.core.media.PlaylistItem;kotlin.Boolean;kotlin.String?){}[0]
+    open suspend fun applyOwnVolume(kotlin/Int) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyOwnVolume|applyOwnVolume(kotlin.Int){}[0]
     open suspend fun applyPassiveFrame(tv.nomercy.player.music.connect/MusicPlayerState, tv.nomercy.player.core.media/PlaylistItem) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyPassiveFrame|applyPassiveFrame(tv.nomercy.player.music.connect.MusicPlayerState;tv.nomercy.player.core.media.PlaylistItem){}[0]
     open suspend fun applyUniversalSettings(tv.nomercy.player.music.connect/MusicPlayerState) // tv.nomercy.player.music.connect/MusicConnectPlugin.applyUniversalSettings|applyUniversalSettings(tv.nomercy.player.music.connect.MusicPlayerState){}[0]
 

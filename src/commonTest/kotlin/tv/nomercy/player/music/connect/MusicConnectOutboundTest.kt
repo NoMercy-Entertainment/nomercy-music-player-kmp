@@ -120,6 +120,54 @@ class MusicConnectOutboundTest {
     }
 
     @Test
+    fun aSystemTransportButtonReachesTheServerEvenWhilePassive() = runTest {
+        // PlayerTransportCommands (the notification, lock screen, car, or
+        // Bluetooth remote) tags its calls PLUGIN, not REMOTE — REMOTE is
+        // reserved for this plugin's own echo of a server frame, one test
+        // above. A passive device's system-transport button press has to
+        // reach the server the same way a genuine on-screen tap does, or
+        // pressing pause while mirroring another device's session does
+        // nothing to the real session at all (confirmed live, real phone,
+        // 2026-09-09 — see PlayerTransportCommands.kt's own comment).
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.pause(ActionOptions(source = ActionSource.PLUGIN))
+
+        assertEquals(listOf("pause"), rig.channel.sent, "a system-transport button was swallowed as an echo")
+    }
+
+    @Test
+    fun aLocalEngineReactionDoesNotReachTheServerWhilePassive() = runTest {
+        // Unlike PLUGIN (a real system-transport button, tested above), these
+        // three sources mean this device's own engine reacted to something
+        // that happened only on this device — another local app taking audio
+        // focus, a transient backend settle blip, the library pausing itself.
+        // A passive mirror has no real audio of its own to lose, so relaying
+        // one of these as a command stopped another device's genuine, live
+        // playback because of a local video starting on a phone that was only
+        // ever watching. Confirmed live, real device, 2026-09-09.
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.pause(ActionOptions(source = ActionSource.AUDIO_FOCUS))
+        rig.player.pause(ActionOptions(source = ActionSource.PLATFORM))
+        rig.player.pause(ActionOptions(source = ActionSource.BACKEND_SETTLE))
+
+        assertEquals(emptyList(), rig.channel.sent, "a local-only engine reaction reached the server while passive")
+    }
+
+    @Test
+    fun aSeekFromSystemTransportReachesTheServerEvenWhilePassive() = runTest {
+        // guardSeek is its own function with its own isEcho check — separate
+        // from guard()'s, proven above only for pause. A fix to one is not
+        // proof of the other; this is the seek half.
+        val rig: Rig = rig(activeDeviceId = "dev-b")
+
+        rig.player.time(42.0, ActionOptions(source = ActionSource.PLUGIN))
+
+        assertEquals(listOf("seek:42.0"), rig.channel.sent, "a system-transport seek was swallowed as an echo")
+    }
+
+    @Test
     fun anEchoedActionStillHappensLocally() = runTest {
         // The other half of the same rule. Not echoing it back must not mean
         // ignoring it — the server said pause, so this device pauses.
@@ -133,15 +181,16 @@ class MusicConnectOutboundTest {
     }
 
     @Test
-    fun withNoActiveDeviceAnywhereAGenuineLocalPlayClaimsThisOne() = runTest {
-        // Nothing is playing anywhere. A genuine local PLAY — not an echo, not
-        // already claimed by another device — claims this one optimistically,
-        // ahead of the round trip (see MusicConnectPlugin.claimActiveForLocalPlaybackStart).
+    fun withNoActiveDeviceAnywhereAGenuineLocalPlayClaimsThisDeviceAndProceeds() = runTest {
+        // Nothing is playing anywhere yet. A device that refused to start
+        // until told would never be the one anyone could hear —
+        // claimActiveForLocalPlaybackStart() claims this device immediately,
+        // ahead of the round trip, the same as an already-active device does.
         val rig: Rig = rig(activeDeviceId = null)
 
         rig.player.play()
 
-        assertTrue(rig.backend.playCount > 0, "a genuine local play did not start playback")
+        assertTrue(rig.backend.playCount > 0, "a device claiming active off its own play did not play")
         assertEquals(listOf("changeDevice:dev-a", "play"), rig.channel.sent)
     }
 

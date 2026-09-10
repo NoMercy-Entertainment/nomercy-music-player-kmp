@@ -51,11 +51,16 @@ rootProject.name = "nomercy-music-player-kmp"
 // declaration the video surface uses. -PusePublishedPlayerCore forces the
 // resolution a consumer gets.
 //
-// Opt-OUT rather than opt-in, which is the reverse of what the plan wrote. The
-// composite already keys on the sibling being there, and CI clones one repo, so
-// CI is on the published path with no flag at all. Making the local path opt-in
-// instead would mean every ordinary build silently resolved a published core
-// that may be older than the checkout sitting next to it.
+// Opt-OUT rather than opt-in, which is the reverse of what the plan wrote.
+// Making the local path opt-in would mean every ordinary build silently
+// resolved a published core that may be older than the checkout sitting next
+// to it.
+//
+// The composite keys on the sibling being there, and ci.yml checks core out to
+// exactly this path — so CI builds against core's DEFAULT BRANCH, not against a
+// published artifact. That is worth knowing when a build here fails on a symbol
+// that exists in core: it means core is unmerged, not unpublished. Pass
+// -PusePublishedPlayerCore to resolve the released one instead.
 val coreCheckout: java.io.File = file("../nomercy-player-core-kmp")
 val preferPublishedCore: Boolean = providers.gradleProperty("usePublishedPlayerCore").isPresent
 if (!preferPublishedCore && coreCheckout.resolve("settings.gradle.kts").exists()) {
