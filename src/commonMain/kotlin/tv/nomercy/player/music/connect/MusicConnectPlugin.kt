@@ -247,31 +247,9 @@ public open class MusicConnectPlugin(
         // which is why this happens before the role is reconciled — after it,
         // the device that just stopped being active would take the passive
         // branch and start following a session that no longer exists.
-        val item: PlaylistItem = frame.item ?: run {
-            // Unless the server produced it before it heard this device start.
-            // Then it is not the session ending, it is the state from before the
-            // session began, and adopting it stops the track the viewer just
-            // pressed play on — measured on an SM-A137F as the decoder going
-            // RUNNING and RELEASED within eight milliseconds, no audio, no
-            // error. An unstamped frame is held too: a server too old to stamp
-            // cannot be placed either side of the press, and silently killing
-            // playback is the worse of the two ways to be wrong.
-            // Unless this device just started playing and the server is only
-            // now acknowledging it.
-            //
-            // Measured on an SM-A137F: the frame that killed playback arrived
-            // thirty milliseconds AFTER the press, named this very device, and
-            // carried no item — the server had processed the device claim and
-            // not yet the track. Answering that with a stop tore down the audio
-            // the viewer had just started, decoder RUNNING to RELEASED in eight
-            // milliseconds with no error anywhere. A null item means the session
-            // is over everywhere EXCEPT in the gap this device opened itself.
-            if (frame.deviceId == channel.deviceId && nowMs() < localStartUntilMs) return
-
-            activeDeviceId = null
-            cancelLoadContinuation()
-            ticker.clear()
-            scope.launch { player.stop(remote) }
+        val item: PlaylistItem? = frame.item
+        if (item == null) {
+            endSession(frame)
             return
         }
 
@@ -657,21 +635,7 @@ public open class MusicConnectPlugin(
             claimActiveForLocalPlaybackStart()
         }
 
-        // See pauseIntentUntilMs: guards against a stale isPlaying=true frame
-        // resuming what this Pause/Stop just stopped.
-        if (command == ConnectCommand.PAUSE || command == ConnectCommand.STOP) {
-            pauseIntentUntilMs = nowMs() + SETTLEMENT_MS
-        }
-
-        if (isActiveDevice && command in ADVANCING_COMMANDS) {
-            advanceShield = armed()
-            // And the same window a promotion gets. The frame the server built
-            // before it heard this advance says the session is not playing, and
-            // obeying it pauses audio that just started: auto-advance reached the
-            // next track and stopped there, with the session still claiming to
-            // play. A pause is only wanted once the server has caught up.
-            settlingUntilMs = nowMs() + SETTLEMENT_MS
-        }
+        armWindowsFor(command)
 
         // See guardSeek's comment: only a confirmed PASSIVE role blocks.
         if (role == DeviceRole.PASSIVE) {
@@ -693,14 +657,54 @@ public open class MusicConnectPlugin(
             // mirroring another device's music stopped that OTHER device's
             // playback account-wide, with nothing the viewer did on either
             // device asking for that.
-            if (event.data.source == ActionSource.PLATFORM ||
-                event.data.source == ActionSource.AUDIO_FOCUS ||
-                event.data.source == ActionSource.BACKEND_SETTLE
-            ) {
+            if (event.data.source in OWN_ENGINE_SOURCES) {
                 return
             }
         }
         scope.launch { channel.playbackCommand(command) }
+    }
+
+    // Stop here and stop mirroring, because the session is over.
+    //
+    // Unless this device just started playing and the server is only now
+    // acknowledging it. Measured on an SM-A137F: the frame that killed playback
+    // arrived thirty milliseconds AFTER the press, named this very device, and
+    // carried no item — the server had processed the device claim and not yet
+    // the track. Answering that with a stop tore down the audio the viewer had
+    // just started, decoder RUNNING to RELEASED in eight milliseconds with no
+    // error anywhere. A null item means the session is over everywhere EXCEPT
+    // in the gap this device opened itself.
+    //
+    // An unstamped frame is held for the same reason: a server too old to stamp
+    // cannot be placed either side of the press, and silently killing playback
+    // is the worse of the two ways to be wrong.
+    private fun endSession(frame: MusicPlayerState) {
+        if (frame.deviceId == channel.deviceId && nowMs() < localStartUntilMs) return
+
+        activeDeviceId = null
+        cancelLoadContinuation()
+        ticker.clear()
+        scope.launch { player.stop(remote) }
+    }
+
+    // The two settle windows a local command opens.
+    //
+    // pauseIntentUntilMs guards against a stale isPlaying=true frame resuming
+    // what a Pause or Stop just stopped. The advance shield covers the other
+    // direction, with the same window a promotion gets: the frame the server
+    // built before it heard the advance says the session is not playing, and
+    // obeying it pauses audio that just started — auto-advance reached the next
+    // track and stopped there, with the session still claiming to play. A pause
+    // is only wanted once the server has caught up.
+    private fun armWindowsFor(command: String) {
+        if (command == ConnectCommand.PAUSE || command == ConnectCommand.STOP) {
+            pauseIntentUntilMs = nowMs() + SETTLEMENT_MS
+        }
+
+        if (isActiveDevice && command in ADVANCING_COMMANDS) {
+            advanceShield = armed()
+            settlingUntilMs = nowMs() + SETTLEMENT_MS
+        }
     }
 
     // Optimistic, ahead of the round trip — the same reasoning as the deleted
@@ -776,6 +780,17 @@ public open class MusicConnectPlugin(
 
 // The two that move this device off the track the server last named.
 private val ADVANCING_COMMANDS = setOf(ConnectCommand.NEXT, ConnectCommand.PREVIOUS)
+
+// The small, closed set of sources that mean "this device's own engine reacted
+// to something local". A passive mirror must not relay one of these onward as a
+// remote command. Everything else forwards, including an unset source: a
+// genuine tap is USER, PLUGIN, or nothing at all, and an allowlist would
+// silently stop forwarding real taps.
+private val OWN_ENGINE_SOURCES = setOf(
+    ActionSource.PLATFORM,
+    ActionSource.AUDIO_FOCUS,
+    ActionSource.BACKEND_SETTLE,
+)
 
 // Only a starting point before the first frame ever lands — matches
 // MusicPlayerState.volumePercentage's own default, so a device that has not
