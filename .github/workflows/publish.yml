@@ -7,6 +7,22 @@ on:
 permissions:
   contents: read
 
+# The payload download needs a token, in EVERY job that builds.
+#
+# Core assembles its native payloads from release assets, and one of them --
+# libass -- lives in a private repository, so `gh release download` is an
+# authenticated call. Only the xcframework job below ever set this, so the
+# publish job itself failed on a v0.1.0 tag with a bare 401 "Requires
+# authentication" against libass-0.17.5-1-windows-x64.tar.gz, before it reached
+# a single thing the release was about.
+#
+# The org PAT rather than the job's own token: GITHUB_TOKEN is scoped to THIS
+# repository and cannot read another private one, which is exactly the call
+# being made. Falls back so a fork without the secret still builds the payloads
+# it can reach.
+env:
+  GH_TOKEN: ${{ secrets.PAT || github.token }}
+
 jobs:
   # macOS only, and not by preference. A multiplatform publication has to carry
   # every declared target, and the Apple frameworks can only be linked here.
