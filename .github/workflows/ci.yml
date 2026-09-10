@@ -3,6 +3,16 @@ name: ci
 on:
   push:
     branches: [master]
+    # A release-workflow edit must not queue an Apple job.
+    #
+    # `nomercy-mac-mini` is the only runner carrying the xcode label, every
+    # apple job and every publish wants it, and those jobs run 33-41 minutes.
+    # Pushing a one-line fix to publish.yml in two repos once put three of
+    # them ahead of the release that fix was for. Nothing in these files
+    # changes what ci.yml builds.
+    paths-ignore:
+      - '.github/workflows/publish.yml'
+      - '.github/workflows/portal.yml'
   pull_request:
   workflow_dispatch:
 
