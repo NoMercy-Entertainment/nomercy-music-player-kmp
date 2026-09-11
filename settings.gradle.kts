@@ -13,10 +13,41 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    // PREFER, not FAIL. The Kotlin/Wasm plugin adds nodejs.org and Binaryen
+    // as project repositories to download its own toolchain, which
+    // FAIL_ON_PROJECT_REPOS rejects outright. Preferring these still means no
+    // project repository can supply a dependency this file also declares.
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()
+
+        // Node, downloaded by the Kotlin/Wasm plugin to run wasmJsBrowserTest
+        // (Karma needs a Node toolchain). Same class of project-repo addition
+        // as Binaryen below.
+        ivy("https://nodejs.org/dist") {
+            name = "Node Distributions"
+            patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("org.nodejs", "node") }
+        }
+
+        // Yarn, downloaded by the same plugin and for the same reason.
+        ivy("https://github.com/yarnpkg/yarn/releases/download") {
+            name = "Yarn Distributions"
+            patternLayout { artifact("v[revision]/[artifact](-v[revision]).[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("com.yarnpkg", "yarn") }
+        }
+
+        // Binaryen, downloaded by the Kotlin/Wasm plugin to run wasm-opt on a
+        // wasmJs production build. See the repositoriesMode comment above.
+        ivy("https://github.com/WebAssembly/binaryen/releases/download") {
+            name = "Binaryen Distributions"
+            patternLayout { artifact("version_[revision]/binaryen-version_[revision]-[classifier].[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("com.github.webassembly", "binaryen") }
+        }
 
         // Only under the flag, and only so the flag is usable at all. The point
         // of -PusePublishedPlayerCore is to build the way a consumer does, and

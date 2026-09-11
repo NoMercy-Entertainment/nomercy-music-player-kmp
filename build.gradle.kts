@@ -49,6 +49,18 @@ kotlin {
         }
     }
 
+    // The browser, which is where the cast receiver plays music.
+    //
+    // Absent until now, and the cost was a whole second music engine: the app
+    // kept its own Web Audio player alive for `cast-web` alone, so a television
+    // receiving a queue ran different playback code from the phone that sent it.
+    // Two engines is two definitions of crossfade, repeat and what "playing"
+    // means. The audio backend itself is core's `Html5AudioBackend`.
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+
     val musicXcf: XCFrameworkConfig = XCFramework("NoMercyMusicPlayer")
     listOf(
         iosArm64(),
