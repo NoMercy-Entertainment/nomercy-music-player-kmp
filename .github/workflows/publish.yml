@@ -44,6 +44,55 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # A browser for the Kotlin/Wasm tests `build` runs through karma.
+      #
+      # Preferring one already installed, because the action's own download is
+      # cached under the runner's tool directory and a half-written entry there
+      # is reported as a cache HIT with no executable inside it. That is exactly
+      # what happened: the third v0.1.0 attempt populated the cache, and the
+      # fourth failed on "Unable to locate executable file ... /arm64/chrome"
+      # before it reached a single build task.
+      - name: Look for a browser already on this Mac
+        id: local-chrome
+        run: |
+          set -e
+          for candidate in \
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+            "/Applications/Chromium.app/Contents/MacOS/Chromium"; do
+            if [ -x "$candidate" ]; then
+              echo "path=$candidate" >> "$GITHUB_OUTPUT"
+              echo "found $candidate"
+              exit 0
+            fi
+          done
+          echo "path=" >> "$GITHUB_OUTPUT"
+          echo "no browser in /Applications"
+
+      # A cache entry with no browser in it is worse than none: the action trusts
+      # it and skips the download. Removed here so the install below can succeed.
+      - name: Drop a half-written browser cache
+        if: steps.local-chrome.outputs.path == ''
+        run: |
+          root="${RUNNER_TOOL_CACHE:-$HOME/actions-runner/_work/_tool}/setup-chrome"
+          [ -d "$root" ] || exit 0
+          find "$root" -mindepth 2 -maxdepth 3 -type d | while read -r dir; do
+            if [ ! -x "$dir/chrome" ] && [ ! -d "$dir/Chromium.app" ] && [ ! -d "$dir/Google Chrome.app" ]; then
+              echo "removing incomplete $dir"
+              rm -rf "$dir"
+            fi
+          done
+
+      - uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+        if: steps.local-chrome.outputs.path == ''
+
+      - name: Point karma at that browser
+        run: |
+          bin="${{ steps.local-chrome.outputs.path }}"
+          [ -n "$bin" ] || bin="${{ steps.setup-chrome.outputs.chrome-path }}"
+          echo "CHROME_BIN=$bin" >> "$GITHUB_ENV"
+          echo "karma will use: $bin"
+
       # The tag is the source of truth for what gets published. A tag that does
       # not match VERSION_NAME would publish a version nobody asked for, under a
       # name nobody can find.

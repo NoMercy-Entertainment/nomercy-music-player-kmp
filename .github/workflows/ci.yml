@@ -78,6 +78,20 @@ jobs:
           fi
           ldconfig -p | grep -c "libGL.so.1"
 
+      # Chrome, because this module targets wasmJs { browser() } now and
+      # Kotlin/Wasm runs those tests in a real browser through karma. This
+      # runner is not a GitHub-hosted ubuntu image and ships none, so `build`
+      # reached :wasmJsBrowserTest and reported "test sources present ... did
+      # not discover any tests to execute" — which reads like a broken suite
+      # and is a missing browser. Core and video already carry this step; music
+      # did not need it until it gained the target.
+      - uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+
+      # Karma looks the browser up by this variable rather than by PATH.
+      - name: Point karma at that Chrome
+        run: echo "CHROME_BIN=${{ steps.setup-chrome.outputs.chrome-path }}" >> "$GITHUB_ENV"
+
       # The Gradle user home, kept between runs. On a persistent machine this
       # matters less than it did on a fresh VM, and it still keeps two repos'
       # builds from fighting over one unmanaged cache directory.
