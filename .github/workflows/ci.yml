@@ -55,6 +55,8 @@ jobs:
       # self-hosted runner does not. Without it every Android target fails to
       # configure, and the message names a licence rather than a missing SDK.
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
 
       # Skiko, which is what Compose Multiplatform renders through on the JVM,
       # dlopens libGL when its class initialises. A GitHub-hosted ubuntu image
