@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -120,6 +121,14 @@ public class KeepAliveGate(
         playbackJob?.cancel()
         idleJob?.cancel()
         tone.stop()
+
+        // The three jobs above are this scope's own children, so cancelling
+        // it would already take them down — named here anyway because a
+        // fourth launch added later (attachPlayback, a future gate input)
+        // would otherwise need to remember to add itself to this list too.
+        // This class built [scope] in its own constructor and nothing else
+        // ever gets a reference to it, so nothing else can be holding it open.
+        scope.cancel()
     }
 
     public companion object {

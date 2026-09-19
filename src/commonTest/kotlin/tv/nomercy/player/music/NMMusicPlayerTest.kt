@@ -228,6 +228,25 @@ class NMMusicPlayerTest {
     }
 
     @Test
+    fun aFactoryRegisteredPlayerIsForgottenWhenDisposed() = runTest {
+        // register() is internal to the factory this class does not have yet
+        // (see its own comment), so this reaches it directly to stand in for
+        // that factory. Every player it builds used to have no call site that
+        // ever removed it from [live] on dispose, which is the actual leak:
+        // a process-wide map that only ever grew.
+        val (subject, _) = player()
+        NMMusicPlayer.register(subject)
+        assertTrue(NMMusicPlayer.instances().contains(subject), "register() did not add the player")
+
+        subject.dispose()
+
+        assertTrue(
+            !NMMusicPlayer.instances().contains(subject),
+            "dispose() left a registered player in the shared registry",
+        )
+    }
+
+    @Test
     fun theNextTrackIsLoadedAndPrimedBeforeTheFadeStarts() = runTest {
         // The order is the whole job. Loading after the fade begins is a
         // transition that starts with silence, and nothing reports it — the

@@ -10,6 +10,7 @@ package tv.nomercy.player.music
 
 import kotlinx.coroutines.CoroutineScope
 import tv.nomercy.player.core.controllers.ComposedPlayer
+import tv.nomercy.player.core.events.CoreEvents
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.ports.AudioBackend
 import tv.nomercy.player.core.player.PlayerConfig
@@ -51,6 +52,17 @@ public open class NMMusicPlayer(
 
     // An audio backend is both, so a caller with one says so once.
     public constructor(audio: AudioBackend, id: String = "nmmusic") : this(audio, audio, id = id)
+
+    init {
+        // Unconditional, unlike the factory's own [register] — a player this
+        // class never registered simply is not in [live], and forgetting an
+        // id that was never added is a no-op. What forget() closes is the
+        // other half: a factory-built player that WAS registered used to have
+        // no call site that ever removed it, so it, and everything reachable
+        // from it, stayed retained in [live] for the process's whole life.
+        // Mirrors NMVideoPlayer's own CoreEvents.Dispose -> unregister wiring.
+        on(CoreEvents.Dispose) { forget(playerId) }
+    }
 
     private var crossfadeSeconds: Double = 0.0
 
@@ -220,8 +232,10 @@ public open class NMMusicPlayer(
             live[player.playerId] = player
         }
 
-        // For a host tearing a player down, and for tests, which would otherwise
-        // leak an instance into every later one through a process-wide map.
+        // Called automatically on CoreEvents.Dispose (see init above), and
+        // exposed for a host or a test that wants to remove an id without
+        // waiting on dispose to run. Idempotent: removing an id that was
+        // never registered is a no-op.
         public fun forget(id: String) {
             live.remove(id)
         }
