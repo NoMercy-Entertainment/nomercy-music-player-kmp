@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: packages-native/nomercy-music-player-kmp
+          path: packages/player-kmp/nomercy-music-player-kmp
 
       # Core is not on Maven Central yet, so the composite build is the only way
       # to resolve it. The relative path mirrors the monorepo, which is what
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: NoMercy-Entertainment/nomercy-player-core-kmp
-          path: packages-native/nomercy-player-core-kmp
+          path: packages/player-kmp/nomercy-player-core-kmp
 
       - uses: actions/setup-java@v4
         with:
@@ -104,11 +104,11 @@ jobs:
       # says which question was answered no rather than burying it in a build
       # that takes ten minutes to reach the same conclusion.
       - name: Conformance gate
-        working-directory: packages-native/nomercy-music-player-kmp
+        working-directory: packages/player-kmp/nomercy-music-player-kmp
         run: ./gradlew parityConformance
 
       - name: Build
-        working-directory: packages-native/nomercy-music-player-kmp
+        working-directory: packages/player-kmp/nomercy-music-player-kmp
         run: ./gradlew build --stacktrace
 
       # The reports, always, because a failing test's cause does not survive the
@@ -125,8 +125,8 @@ jobs:
           # used: the repo is checked out into a subdirectory here, and an
           # unrooted path uploads an empty artifact while reporting success.
           path: |
-            packages-native/nomercy-music-player-kmp/build/reports/
-            packages-native/nomercy-music-player-kmp/build/test-results/
-            packages-native/nomercy-music-player-kmp/ui-compose/build/reports/
-            packages-native/nomercy-music-player-kmp/ui-compose/build/test-results/
+            packages/player-kmp/nomercy-music-player-kmp/build/reports/
+            packages/player-kmp/nomercy-music-player-kmp/build/test-results/
+            packages/player-kmp/nomercy-music-player-kmp/ui-compose/build/reports/
+            packages/player-kmp/nomercy-music-player-kmp/ui-compose/build/test-results/
           retention-days: 7
