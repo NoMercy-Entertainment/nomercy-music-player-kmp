@@ -84,7 +84,12 @@ jobs:
             fi
           done
 
-      - uses: browser-actions/setup-chrome@v2
+      # v1 on purpose, not the v2 the Linux ci.yml uses. v2 hands this Mac
+      # "Google Chrome for Testing" and karma then reports "ChromeHeadless has
+      # not captured in 60000 ms" three times and gives up (v0.2.7 publish run
+      # 36680268904, 2026-09-30). v1 installs Chromium, which captured for the
+      # v0.2.6 publish here and for video's v0.2.7 publish the same morning.
+      - uses: browser-actions/setup-chrome@v1
         id: setup-chrome
         if: steps.local-chrome.outputs.path == ''
 
