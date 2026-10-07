@@ -32,7 +32,10 @@ env:
 
 jobs:
   build:
-    runs-on: [self-hosted, Linux, X64, beast-unit]
+    # GitHub-hosted for now: the self-hosted runners failed on setup-android, a
+    # Windows libmpv download and the tvOS simulator (#48). Back to self-hosted
+    # once those are fixed.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
@@ -87,7 +90,7 @@ jobs:
       # not discover any tests to execute" — which reads like a broken suite
       # and is a missing browser. Core and video already carry this step; music
       # did not need it until it gained the target.
-      - uses: browser-actions/setup-chrome@v2
+      - uses: browser-actions/setup-chrome@v1
         id: setup-chrome
 
       # Karma looks the browser up by this variable rather than by PATH.
