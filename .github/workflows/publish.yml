@@ -28,7 +28,10 @@ jobs:
   # every declared target, and the Apple frameworks can only be linked here.
   # Publishing from Linux would silently ship an artifact with no Apple variants.
   publish:
-    runs-on: [self-hosted, macOS, ARM64, xcode]
+    # Hosted, like CI's apple job: the Mac mini has no tvOS simulator, and
+    # core's v0.2.8 tag failed on :tvosSimulatorArm64Test there
+    # (NoMercy-Entertainment/nomercy-github-runner#48).
+    runs-on: macos-15
     env:
       DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
       GRADLE_OPTS: -Dorg.gradle.daemon=false
