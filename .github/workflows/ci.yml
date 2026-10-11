@@ -35,6 +35,7 @@ jobs:
     # GitHub-hosted for now: the self-hosted runners failed on setup-android, a
     # Windows libmpv download and the tvOS simulator (#48). Back to self-hosted
     # once those are fixed.
+    timeout-minutes: 7200
     runs-on: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && fromJSON('["self-hosted","Linux","X64","beast-unit"]') || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v7
