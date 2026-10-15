@@ -1,0 +1,9 @@
+// Add a local Maven target without changing the Maven Central publication.
+gradle.beforeProject { project ->
+    project.pluginManager.withPlugin('maven-publish') {
+        project.publishing.repositories.maven {
+            name = 'ReleaseAssets'
+            url = project.rootProject.file('build/release-maven').toURI()
+        }
+    }
+}
