@@ -67,11 +67,11 @@ if len(assets) + len(upload) > 1000:
 Path('build/release-upload-files.txt').write_text('\n'.join(upload) + ('\n' if upload else ''))
 print(f'{len(staged)} staged; {len(upload)} new release assets')
 PY
-mapfile -t staged < build/release-upload-files.txt
+# A read loop, not mapfile: the macOS runner's bash is 3.2.
 upload=()
-for file in "${staged[@]}"; do
-  upload+=("$file")
-done
+while IFS= read -r file; do
+  [ -n "$file" ] && upload+=("$file")
+done < build/release-upload-files.txt
 if (( ${#upload[@]} > 0 )); then
   gh release upload "$tag" "${upload[@]}"
 fi
