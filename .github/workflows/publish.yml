@@ -5,7 +5,7 @@ on:
     tags: ['v*']
 
 permissions:
-  contents: read
+  contents: write
 
 # The payload download needs a token, in EVERY job that builds.
 #
@@ -118,7 +118,21 @@ jobs:
       # Gates first. A release that skips them is a release nothing checked.
       - run: ./gradlew build
 
+      # Stage every signed publication locally and attach its files to this
+      # library's release. First, so repo.nomercy.tv gets the version even
+      # when Central refuses it.
+      - name: Attach Maven files to the GitHub release
+        run: bash tools/release-maven.sh
+        env:
+          GH_TOKEN: ${{ secrets.PAT || github.token }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+      # Central caps free releases per month. The repo variable MAVEN_CENTRAL=off
+      # skips it while repo.nomercy.tv still gets every version.
       - name: Publish to Maven Central
+        if: vars.MAVEN_CENTRAL != 'off'
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
