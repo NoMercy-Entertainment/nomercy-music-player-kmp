@@ -20,6 +20,8 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
+        // Our own repository serves every core version, Central only some.
+        maven("https://repo.nomercy.tv/maven") { content { includeGroup("tv.nomercy") } }
         mavenCentral()
 
         // Node, downloaded by the Kotlin/Wasm plugin to run wasmJsBrowserTest
