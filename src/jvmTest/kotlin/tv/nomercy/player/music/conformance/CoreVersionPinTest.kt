@@ -8,6 +8,7 @@
 
 package tv.nomercy.player.music.conformance
 
+import java.io.File
 import tv.nomercy.player.core.KIT_VERSION
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,6 +27,18 @@ import kotlin.test.assertEquals
 // that had already been fixed. A stale pin does not break a build; it makes the
 // build measure the wrong thing.
 class CoreVersionPinTest {
+
+    @Test
+    fun ciChecksOutTheCoreVersionPinnedByThisLibrary() {
+        val version = Regex("nomercyPlayerCore = \"([^\"]+)\"")
+            .find(File("gradle/libs.versions.toml").readText())
+            ?.groupValues?.get(1) ?: error("core version is not pinned")
+        val workflow = File(".github/workflows/ci.yml").readText()
+        val coreCheckout = workflow.substringAfter("repository: NoMercy-Entertainment/nomercy-player-core-kmp")
+            .substringBefore("- uses:")
+
+        assertEquals("v$version", Regex("(?m)^\\s+ref: (\\S+)").find(coreCheckout)?.groupValues?.get(1))
+    }
 
     @Test
     fun theResolvedCoreIsTheVersionThisLibraryShipsAs() {

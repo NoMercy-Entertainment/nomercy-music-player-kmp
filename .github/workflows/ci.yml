@@ -58,6 +58,7 @@ jobs:
         with:
           repository: NoMercy-Entertainment/nomercy-player-core-kmp
           path: packages/player-kmp/nomercy-player-core-kmp
+          ref: v0.2.18
 
       - uses: actions/setup-java@v6
         with:
