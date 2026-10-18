@@ -32,6 +32,31 @@ import kotlin.test.assertTrue
 class NMMusicPlayerTest {
 
     @Test
+    fun aSecondCrossfadeIsRefusedWhileTheBeforeGateIsPending() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        val backend = TwoTrackBackend()
+        val subject = NMMusicPlayer(backend, backend)
+        subject.setup()
+        subject.ready().await()
+        subject.configureCrossfade(3.0)
+        subject.queue(listOf(Track("a"), Track("b"), Track("c")))
+        subject.play()
+        subject.on(MusicEvents.BeforeCrossfade) { it.delay { gate.await() } }
+
+        val first = async { subject.crossfadeTo(Track("b")) }
+        runCurrent()
+        val second = async { subject.crossfadeTo(Track("c")) }
+        runCurrent()
+        val refusedBeforeGateOpened = second.isCompleted
+        gate.complete(Unit)
+
+        assertTrue(refusedBeforeGateOpened, "second crossfade waited at the same before gate")
+        assertFalse(second.await())
+        assertTrue(first.await())
+        assertEquals(1, backend.calls.count { it.startsWith("crossfade:") })
+    }
+
+    @Test
     fun aSecondCrossfadeWhileOneIsRunningIsRefused() = runTest {
         // Two overlapping crossfades drive the same gain and the loser wins: one
         // ends by setting the outgoing track to silence while the other is still
