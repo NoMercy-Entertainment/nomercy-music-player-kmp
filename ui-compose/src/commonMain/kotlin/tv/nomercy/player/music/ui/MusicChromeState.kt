@@ -78,8 +78,13 @@ public fun rememberMusicChromeState(
 ): MusicChromeState {
     val snapshot: PlayerState by player.stateFlow.collectAsState()
 
-    return musicChromeStateOf(snapshot, trackOf(snapshot.item), player.queue().mapNotNull(trackOf))
+    return musicChromeStateOf(snapshot, trackOf(snapshot.item), musicQueueTracksOf(player.queue(), trackOf))
 }
+
+internal fun musicQueueTracksOf(
+    items: List<PlaylistItem>,
+    trackOf: (PlaylistItem?) -> MusicTrack?,
+): List<MusicTrack> = items.map { item -> trackOf(item) ?: MusicTrack(title = item.id) }
 
 // Split from the composable so it can be driven from a fixture.
 public fun musicChromeStateOf(

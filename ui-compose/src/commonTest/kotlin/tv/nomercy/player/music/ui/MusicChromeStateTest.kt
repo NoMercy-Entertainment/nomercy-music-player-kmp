@@ -8,9 +8,11 @@
 
 package tv.nomercy.player.music.ui
 
+import kotlinx.coroutines.test.runTest
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.player.PlayerState
+import tv.nomercy.player.music.NMMusicPlayer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -22,6 +24,24 @@ import kotlin.test.assertTrue
 // against a length nobody knows is a bar that is either always full or always
 // empty, and neither looks like an error.
 class MusicChromeStateTest {
+
+    @Test
+    fun selectingTheFirstQueueRowUsesThePlayersOneBasedPosition() = runTest {
+        val player = NMMusicPlayer()
+        player.queue(listOf(BlankItem, NamedItem))
+
+        musicCommandsOf(player, this).playQueueIndex(0)
+
+        assertEquals(BlankItem.id, player.item()?.id)
+    }
+
+    @Test
+    fun blankTitlesStillOccupyTheirQueuePositions() {
+        val rows = musicQueueTracksOf(listOf(BlankItem, NamedItem), ::musicTrackOf)
+
+        assertEquals(2, rows.size)
+        assertEquals(NAMED_TITLE, rows[1].title)
+    }
 
     @Test
     fun aTrackWithNoLengthYetHasNoProgress() {
