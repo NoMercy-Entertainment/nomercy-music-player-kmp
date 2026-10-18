@@ -96,6 +96,6 @@ private class PlayerMusicCommands(
     }
 
     override fun playQueueIndex(index: Int) {
-        player.seekToIndex(index)
+        player.seekToIndex(index + 1)
     }
 }
