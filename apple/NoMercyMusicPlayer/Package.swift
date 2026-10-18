@@ -1,8 +1,9 @@
 // swift-tools-version:5.9
-import Foundation
 import PackageDescription
 
-// Two Apple tiers, the same shape the video package has.
+// Two Apple tiers, the same shape the video package has. This manifest resolves
+// against a locally assembled XCFramework until the release workflow publishes
+// an Apple binary and stamps a real checksum.
 //
 // NoMercyMusicPlayer is the headless engine; NoMercyMusicPlayerUI is the drop-in
 // SwiftUI player over it. The UI product carries a different name from the
@@ -13,18 +14,10 @@ import PackageDescription
 // gets the core symbols with it and there is deliberately no second binaryTarget
 // for core: two copies of the same symbols in one process is a linker error
 // nobody can read.
-let releasing = ProcessInfo.processInfo.environment["NOMERCY_SPM_RELEASE"] == "1"
-
-let engine: Target = releasing
-    ? .binaryTarget(
-        name: "NoMercyMusicPlayer",
-        url: "https://github.com/NoMercy-Entertainment/nomercy-music-player-kmp/releases/download/v2.0.0-rc.1/NoMercyMusicPlayer.xcframework.zip",
-        checksum: "REPLACED_BY_RELEASE_JOB"
-    )
-    : .binaryTarget(
-        name: "NoMercyMusicPlayer",
-        path: "../../build/XCFrameworks/release/NoMercyMusicPlayer.xcframework"
-    )
+let engine: Target = .binaryTarget(
+    name: "NoMercyMusicPlayer",
+    path: "../../build/XCFrameworks/release/NoMercyMusicPlayer.xcframework"
+)
 
 let package = Package(
     name: "NoMercyMusicPlayer",
