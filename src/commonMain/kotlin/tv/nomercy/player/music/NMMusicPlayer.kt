@@ -107,34 +107,36 @@ public open class NMMusicPlayer(
         if (transitioning) return refuse(ALREADY_TRANSITIONING)
 
         rejectWhatCannotBeCrossfaded(next)
-
-        val outcome = dispatchBefore(
-            MusicEvents.BeforeCrossfade,
-            Crossfade(from = item(), to = next, duration = seconds ?: crossfadeSeconds),
-        )
-        val resolved: Crossfade = outcome.data
-        val engine: TransitionBackend? = transitions
-
-        // Every way this can decline, decided in one place. A listener refusing,
-        // a listener shortening it to nothing, and an engine that cannot hold two
-        // tracks at once are all the same answer to the caller: false, with a
-        // reason. Emitting a start and a completion with nothing between them is
-        // what this did before the transition seam existed, and it looked exactly
-        // like a working crossfade.
-        val refusal: String? = when {
-            outcome.prevented -> outcome.reason
-            resolved.duration <= 0.0 -> "zero-duration"
-            engine == null -> "no-transition-backend"
-            else -> null
-        }
-        if (engine == null || refusal != null) return refuse(refusal)
-
-        emit(MusicEvents.CrossfadeStart, resolved)
         transitioning = true
         try {
+            val outcome = dispatchBefore(
+                MusicEvents.BeforeCrossfade,
+                Crossfade(from = item(), to = next, duration = seconds ?: crossfadeSeconds),
+            )
+            val resolved: Crossfade = outcome.data
+            val engine: TransitionBackend? = transitions
+
+            // Every way this can decline, decided in one place. A listener refusing,
+            // a listener shortening it to nothing, and an engine that cannot hold two
+            // tracks at once are all the same answer to the caller: false, with a
+            // reason. Emitting a start and a completion with nothing between them is
+            // what this did before the transition seam existed, and it looked exactly
+            // like a working crossfade.
+            val refusal: String? = when {
+                outcome.prevented -> outcome.reason
+                resolved.duration <= 0.0 -> "zero-duration"
+                engine == null -> "no-transition-backend"
+                else -> null
+            }
+            if (engine == null || refusal != null) return refuse(refusal)
+
+            emit(MusicEvents.CrossfadeStart, resolved)
             engine.loadSecondary(resolved.to.url)
             engine.primeSecondary()
             engine.crossfade((resolved.duration * MILLIS_PER_SECOND).toLong(), CrossfadeCurve.EQUAL_POWER)
+
+            emit(MusicEvents.CrossfadeComplete, CrossfadeComplete(resolved.to))
+            return true
         } finally {
             // In a finally because an engine that throws mid-fade would
             // otherwise leave this player believing it is still transitioning,
@@ -142,9 +144,6 @@ public open class NMMusicPlayer(
             // session.
             transitioning = false
         }
-
-        emit(MusicEvents.CrossfadeComplete, CrossfadeComplete(resolved.to))
-        return true
     }
 
     /**
