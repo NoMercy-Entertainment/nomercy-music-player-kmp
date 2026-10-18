@@ -8,7 +8,9 @@
 
 package tv.nomercy.player.music.lyrics
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import tv.nomercy.player.core.cues.Cue
 import tv.nomercy.player.core.cues.LrcPayload
@@ -46,6 +48,29 @@ private const val TRACK_SECONDS = 10.0
 private const val LYRICS = "[00:00.00]first\n[00:02.00]second"
 
 class LyricsPluginTest {
+
+    @Test
+    fun aLateFetchCannotReplaceTheCurrentTracksLyrics() = runTest {
+        val first = CompletableDeferred<String?>()
+        val second = CompletableDeferred<String?>()
+        val subject = plugin(object : LyricsSource {
+            override suspend fun fetch(url: String): String? =
+                if (url.endsWith("a.lrc")) first.await() else second.await()
+        })
+
+        testPlugin(subject, FakePlayer(scope = this)) { player, _ ->
+            player.emit(CoreEvents.Item, itemChange("a"))
+            runCurrent()
+            player.emit(CoreEvents.Item, itemChange("b"))
+            runCurrent()
+            second.complete("[00:00.00]track b")
+            runCurrent()
+            first.complete("[00:00.00]track a")
+            advanceUntilIdle()
+
+            assertEquals(listOf("track b"), subject.all().map { it.payload.text })
+        }
+    }
 
     private fun itemChange(id: String) =
         ItemChange(item = MediaItem(id = id, url = "https://example.test/$id.mp3"), index = 0)

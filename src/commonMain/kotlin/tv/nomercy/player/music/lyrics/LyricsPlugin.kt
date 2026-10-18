@@ -96,6 +96,7 @@ public open class LyricsPlugin(
     override val options: LyricsOptions get() = opts
 
     private val tracker = CueTracker<TextPayload>()
+    private var itemGeneration: Long = 0
 
     /** Every line of the current track, in order. Empty when there are none. */
     // `all` and `current`, because those are the reference's names for these.
@@ -109,6 +110,7 @@ public open class LyricsPlugin(
 
     override fun use() {
         on(CoreEvents.Item) { change: ItemChange ->
+            val generation = ++itemGeneration
             // Cleared first, always. A track whose lyrics fail to arrive must
             // not leave the previous track's words on the screen, which is a
             // worse failure than showing none: it is confidently wrong.
@@ -117,7 +119,7 @@ public open class LyricsPlugin(
 
             val item: PlaylistItem? = change.item
             if (opts.autoFetch && item != null) {
-                opts.getLyricsUrl(item)?.let { url -> launch { fetchInto(url) } }
+                opts.getLyricsUrl(item)?.let { url -> launch { fetchInto(url, generation) } }
             }
         }
 
@@ -144,7 +146,7 @@ public open class LyricsPlugin(
      * lyrics some other way — a cache, a bundled file, a user-supplied one.
      */
     public suspend fun fetchLyrics(url: String) {
-        fetchInto(url)
+        fetchInto(url, itemGeneration)
     }
 
     /**
@@ -157,6 +159,7 @@ public open class LyricsPlugin(
      * it again.
      */
     public fun clear() {
+        itemGeneration++
         tracker.load(emptyList())
         emit(LyricsEvents.Cleared, Unit)
     }
@@ -172,8 +175,10 @@ public open class LyricsPlugin(
         emit(LyricsEvents.Loaded, cues.size)
     }
 
-    private suspend fun fetchInto(url: String) {
-        val raw: String = source.fetch(url) ?: run {
+    private suspend fun fetchInto(url: String, generation: Long) {
+        val fetched: String? = source.fetch(url)
+        if (generation != itemGeneration) return
+        val raw: String = fetched ?: run {
             // The event says what happened to a lyrics view; the code says it
             // in the ecosystem's words, which is what a consumer's single error
             // surface and a dashboard both match on. Reported as well as
