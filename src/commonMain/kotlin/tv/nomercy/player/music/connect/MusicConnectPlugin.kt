@@ -24,6 +24,7 @@ import tv.nomercy.player.core.player.ActionOptions
 import tv.nomercy.player.core.player.ActionSource
 import tv.nomercy.player.core.player.PlayState
 import tv.nomercy.player.core.player.ShuffleState
+import tv.nomercy.player.core.player.VolumeState
 import tv.nomercy.player.core.plugin.Plugin
 import tv.nomercy.player.core.plugin.PluginManifest
 import tv.nomercy.player.music.MusicEvents
@@ -527,6 +528,8 @@ public open class MusicConnectPlugin(
     // looking at the wrong list, and it becomes the wrong list to play from the
     // moment they take over.
     protected open suspend fun applyUniversalSettings(frame: MusicPlayerState) {
+        // Only the playing device; a passive engine is paused and keeps its own mute.
+        if (role == DeviceRole.ACTIVE) applyMuteState(frame.mutedState)
         val upcoming: List<PlaylistItem> = listOfNotNull(frame.item) + frame.playlist
 
         // Only when it actually changed. This runs on EVERY frame, and a frame
@@ -581,6 +584,13 @@ public open class MusicConnectPlugin(
     }
 
     private val remote = ActionOptions(source = ActionSource.REMOTE)
+
+    // Runs after the own-level apply: a volume above zero un-mutes the engine.
+    private suspend fun applyMuteState(muted: Boolean) {
+        val isMuted: Boolean = player.volumeState() == VolumeState.MUTED
+        if (muted && !isMuted) player.mute(remote)
+        else if (!muted && isMuted) player.unmute(remote)
+    }
 
     // Tags a transport call this plugin makes on its own initiative — recovering
     // from a load failure the server was never told about — rather than an echo
