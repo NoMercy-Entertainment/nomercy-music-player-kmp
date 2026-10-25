@@ -217,7 +217,7 @@ class LyricsPluginTest {
     @Test
     fun aHostsCustomParserIsVisibleToThePlugin() = runTest {
         val karaoke = object : CueParser<LrcPayload> {
-            override val id: String = "fillz:karaoke"
+            override val id: String = "karaoke"
             override fun canParse(url: String, contentType: String?): Boolean = url.endsWith(".karaoke")
             override fun parse(raw: String, baseUrl: String?): List<Cue<LrcPayload>> =
                 listOf(Cue(start = 0.0, end = 1.0, payload = LrcPayload(text = raw)))
