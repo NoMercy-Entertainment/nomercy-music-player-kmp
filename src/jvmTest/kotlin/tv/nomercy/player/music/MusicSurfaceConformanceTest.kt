@@ -155,6 +155,8 @@ class MusicSurfaceConformanceTest {
             // expose a real secondary rather than a cache to warm, so the
             // capability had to be reachable another way. See core's own list.
             "preloadNow",
+            // Core's frame-on-screen seam: the web reads it from requestVideoFrameCallback.
+            "presentedTime", "onFrameAnnounced",
             "context", "transport", "volume", "time", "state", "lifecycle", "bridge", "activity",
             "cueParsers", "streamFactories", "metrics", "bandwidth", "plugins", "queue",
             "stateFlow", "rootLogger", "rootStorage", "emit", "on", "onAll", "once", "off",
