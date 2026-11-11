@@ -7,21 +7,9 @@ on:
 permissions:
   contents: write
 
-# The payload download needs a token, in EVERY job that builds.
-#
-# Core assembles its native payloads from release assets, and one of them --
-# libass -- lives in a private repository, so `gh release download` is an
-# authenticated call. Only the xcframework job below ever set this, so the
-# publish job itself failed on a v0.1.0 tag with a bare 401 "Requires
-# authentication" against libass-0.17.5-1-windows-x64.tar.gz, before it reached
-# a single thing the release was about.
-#
-# The org PAT rather than the job's own token: GITHUB_TOKEN is scoped to THIS
-# repository and cannot read another private one, which is exactly the call
-# being made. Falls back so a fork without the secret still builds the payloads
-# it can reach.
-env:
-  GH_TOKEN: ${{ secrets.PAT || github.token }}
+# GH_TOKEN is set per step, only where gh runs (directly or from Gradle's payload
+# download). The org PAT is needed because libass lives in another private repo;
+# it falls back to the job token so a fork still builds what it can reach.
 
 jobs:
   # macOS only, and not by preference. A multiplatform publication has to carry
@@ -43,11 +31,11 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v4
+      - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
         with:
           packages: 'platform-tools'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4
 
       # A browser for the Kotlin/Wasm tests `build` runs through karma.
       #
@@ -117,6 +105,8 @@ jobs:
 
       # Gates first. A release that skips them is a release nothing checked.
       - run: ./gradlew build
+        env:
+          GH_TOKEN: ${{ secrets.PAT || github.token }}
 
       # Stage every signed publication locally and attach its files to this
       # library's release. First, so repo.nomercy.tv gets the version even
@@ -156,6 +146,7 @@ jobs:
         if: vars.MAVEN_CENTRAL != 'off'
         run: ./gradlew publishToMavenCentral --no-configuration-cache
         env:
+          GH_TOKEN: ${{ secrets.PAT || github.token }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
