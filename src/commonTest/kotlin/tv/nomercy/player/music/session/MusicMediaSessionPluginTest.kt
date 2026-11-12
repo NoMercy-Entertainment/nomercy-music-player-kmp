@@ -8,6 +8,10 @@
 
 package tv.nomercy.player.music.session
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import tv.nomercy.player.core.controllers.ComposedPlayer
 import tv.nomercy.player.core.events.CoreEvents
@@ -15,12 +19,17 @@ import tv.nomercy.player.core.events.ItemChange
 import tv.nomercy.player.core.media.PlaylistItem
 import tv.nomercy.player.core.player.PlayerConfig
 import tv.nomercy.player.core.plugin.TransportCommands
+import tv.nomercy.player.core.plugin.PlayerTransportCommands
 import tv.nomercy.player.core.ports.NowPlaying
 import tv.nomercy.player.core.ports.SystemTransport
 import tv.nomercy.player.core.ports.TransportActions
 import tv.nomercy.player.core.ports.TransportPlaybackState
 import tv.nomercy.player.music.NMMusicPlayer
 import tv.nomercy.player.music.SilentBackend
+import tv.nomercy.player.music.TwoTrackBackend
+import tv.nomercy.player.music.connect.FakeMusicConnectChannel
+import tv.nomercy.player.music.connect.MusicConnectPlugin
+import tv.nomercy.player.music.connect.MusicPlayerState
 import tv.nomercy.player.music.item.MusicPlaylistItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -58,12 +67,87 @@ private class SilentCommands : TransportCommands {
     override fun seekTo(positionMs: Long) = Unit
 }
 
+// A platform can deliver its last pause/stop callbacks while tearing down a
+// session. A real button uses the same handlers before release.
+private class ReleaseCallbacksTransport : SystemTransport by CapturingTransport() {
+    private var handlers: TransportActions? = null
+    var stale: Boolean = false
+
+    override val isReleased: Boolean get() = stale
+
+    override fun setActionHandlers(actions: TransportActions) {
+        handlers = actions
+    }
+
+    fun pressStop() {
+        handlers?.onStop?.invoke()
+    }
+
+    override fun release() {
+        handlers?.onPause?.invoke()
+        handlers?.onStop?.invoke()
+    }
+}
+
 // The four things a music notification draws.
 //
 // Without the mapping this proves, a track reaches the lock screen as a file
 // name in a grey box: NowPlaying carries an artist, an album and a cover, and
 // nothing in this library was filling any of them.
 class MusicMediaSessionPluginTest {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun TestScope.eager(): CoroutineScope = CoroutineScope(UnconfinedTestDispatcher(testScheduler))
+
+    private suspend fun TestScope.passiveSession():
+        Triple<MusicMediaSessionPlugin, ReleaseCallbacksTransport, FakeMusicConnectChannel> {
+        val backend = TwoTrackBackend()
+        val channel = FakeMusicConnectChannel(deviceId = "dev-a")
+        val player = NMMusicPlayer(backend, backend)
+        val scope = eager()
+        val transport = ReleaseCallbacksTransport()
+        val session = MusicMediaSessionPlugin(PlayerTransportCommands(player, scope)) { transport }
+
+        player.setup()
+        player.addPlugin(MusicConnectPlugin(player, channel, scope))
+        player.addPlugin(session)
+        testScheduler.runCurrent()
+        channel.broadcast(MusicPlayerState(deviceId = "dev-b", seq = 1, item = Track()))
+        testScheduler.runCurrent()
+        channel.sent.clear()
+        return Triple(session, transport, channel)
+    }
+
+    @Test
+    fun releasingAPassiveMediaSessionDoesNotCommandTheActiveDevice() = runTest {
+        val (session, _, channel) = passiveSession()
+
+        session.dispose()
+        testScheduler.runCurrent()
+
+        assertEquals(emptyList(), channel.sent, "session teardown forwarded pause or stop to the active device")
+    }
+
+    @Test
+    fun notificationStopStillReachesTheServerWhilePassive() = runTest {
+        val (_, transport, channel) = passiveSession()
+
+        transport.pressStop()
+        testScheduler.runCurrent()
+
+        assertEquals(listOf("stop"), channel.sent)
+    }
+
+    @Test
+    fun aReplacedMediaSessionDoesNotForwardItsOldStopHandler() = runTest {
+        val (_, transport, channel) = passiveSession()
+
+        transport.stale = true
+        transport.pressStop()
+        testScheduler.runCurrent()
+
+        assertEquals(emptyList(), channel.sent)
+    }
+
 
     private suspend fun announce(item: PlaylistItem): NowPlaying? {
         val transport = CapturingTransport()

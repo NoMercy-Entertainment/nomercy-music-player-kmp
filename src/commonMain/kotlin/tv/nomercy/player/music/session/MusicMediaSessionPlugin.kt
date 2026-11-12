@@ -13,6 +13,7 @@ import tv.nomercy.player.core.plugin.MediaSessionPlugin
 import tv.nomercy.player.core.plugin.TransportCommands
 import tv.nomercy.player.core.ports.NowPlaying
 import tv.nomercy.player.core.ports.SystemTransport
+import tv.nomercy.player.core.ports.TransportActions
 import tv.nomercy.player.core.ports.defaultSystemTransport
 import tv.nomercy.player.music.item.MusicPlaylistItem
 
@@ -28,7 +29,7 @@ import tv.nomercy.player.music.item.MusicPlaylistItem
 public open class MusicMediaSessionPlugin(
     commands: TransportCommands,
     openTransport: () -> SystemTransport = ::defaultSystemTransport,
-) : MediaSessionPlugin(commands, openTransport) {
+) : MediaSessionPlugin(commands, { ReleaseSafeTransport(openTransport()) }) {
 
     override fun nowPlayingFor(item: PlaylistItem): NowPlaying {
         val track: MusicPlaylistItem = item as? MusicPlaylistItem ?: return super.nowPlayingFor(item)
@@ -39,5 +40,26 @@ public open class MusicMediaSessionPlugin(
             album = track.album,
             artworkUrl = track.image ?: track.cover,
         )
+    }
+}
+
+// A released session can still fire its last pause/stop, with the same PLUGIN
+// source as a real button, so Connect would forward it to the active device.
+// The old session's pause and stop stay inert from release on.
+private class ReleaseSafeTransport(private val delegate: SystemTransport) : SystemTransport by delegate {
+    private var releasing: Boolean = false
+
+    override val isReleased: Boolean get() = releasing || delegate.isReleased
+
+    override fun setActionHandlers(actions: TransportActions) {
+        delegate.setActionHandlers(actions.copy(
+            onPause = actions.onPause?.let { pause -> { if (!isReleased) pause() } },
+            onStop = actions.onStop?.let { stop -> { if (!isReleased) stop() } },
+        ))
+    }
+
+    override fun release() {
+        releasing = true
+        delegate.release()
     }
 }
